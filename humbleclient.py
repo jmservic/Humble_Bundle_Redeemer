@@ -4,6 +4,7 @@ import pickle
 from os.path import exists
 
 HUMBLE_MAIN = "https://www.humblebundle.com/"
+HUMBLE_KEYS = "https://www.humblebundle.com/home/keys"
 
 class GameKeyClient(ABC):
 
@@ -32,8 +33,13 @@ class HumbleClient(GameKeyClient):
         self.__loggedIn = False
         self.__LoadCookies()
 
-    def Login(self, login, password):
-        pass
+    def Login(self, login=None, password=None):
+        response = self.__session.get(HUMBLE_KEYS)
+        print(f"Status code = {response.status_code}")
+        print(f"Response text = {response.text()}")
+        print(f"Response json = {response.json()}")
+        print(f"Final URL of the Response = {response.url}")
+        
 
     def GetGamesInfo(self):
         pass
