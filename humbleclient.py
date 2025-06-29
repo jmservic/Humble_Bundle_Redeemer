@@ -64,9 +64,9 @@ class HumbleClient(GameKeyClient):
             self.__session.cookies = cj
     
     def __del__(self):
-        if self.__session:
+        if self.__session :
             try:
-                if self.__login:
+                if self.__login and len(self.__session.cookies) > 0:
                     cookies_file = f"./cookies/hb_{self.__login.lower()}_cookies.txt"
                     with open(cookies_file, "w+b") as f:
                         pickle.dump(self.__session.cookies, f)
