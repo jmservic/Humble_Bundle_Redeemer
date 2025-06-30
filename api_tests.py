@@ -16,12 +16,15 @@ hb_cookies = hb.GetSessionCookies()
 for cookie in hb_cookies:
     print(cookie)
 
-#hb.VisitHomePage()
+hb.VisitHomePage()
 hb_cookies = hb.GetSessionCookies()
 print(f"Cookies after request to humble bundle main page:")
-for cookie in hb_cookies:
-    print(cookie)
+#for (cookie_name, cookie_value) in dict(hb_cookies).items():
+#    print(cookie_name, cookie_value)
 print("")
+print(hb_cookies.get("_simpleauth_sess"))
+#for cookie in hb_cookies:
+#    print(cookie.domain)
 hb.Login()
 #with Session() as s:
 #    print(f"Cookies before request to humble bundle main page:\n {s.cookies}")

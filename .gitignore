@@ -3,3 +3,6 @@ __pycache__/
 cookies/
 .env
 requestTest.py
+request_test.py
+httpclient_test.py
+SuccessfulPostHeaders.txt
