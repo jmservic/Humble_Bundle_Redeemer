@@ -2,21 +2,27 @@ from requests import Request, Session
 from http.cookiejar import MozillaCookieJar
 from humbleclient import HUMBLE_MAIN, HumbleClient 
 import os
+from dotenv import load_dotenv
 #We're going to use the pickle module to save and load the cookies.
+load_dotenv()
+hb_account = os.getenv("HB_ACCOUNT")
+hb_password = os.getenv("HB_PASSWORD")
 
 if not os.path.exists("./cookies"):
     os.mkdir("./cookies")
-hb = HumbleClient(login="InqindiGaming@gmail.com")
+hb = HumbleClient(login=hb_account,password=hb_password)
 print(f"Cookies before request to humble bundle main page:")
 hb_cookies = hb.GetSessionCookies()
 for cookie in hb_cookies:
     print(cookie)
 
-hb.VisitHomePage()
+#hb.VisitHomePage()
 hb_cookies = hb.GetSessionCookies()
 print(f"Cookies after request to humble bundle main page:")
 for cookie in hb_cookies:
     print(cookie)
+print("")
+hb.Login()
 #with Session() as s:
 #    print(f"Cookies before request to humble bundle main page:\n {s.cookies}")
 #    print(f"Cookie jar object:")

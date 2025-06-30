@@ -2,10 +2,13 @@ from abc import ABC, abstractmethod
 from requests import Session
 import pickle
 from os.path import exists
+from time import sleep
 
 HUMBLE_MAIN = "https://www.humblebundle.com/"
 HUMBLE_KEYS = "https://www.humblebundle.com/home/keys"
-
+HUMBLE_LOGIN = "https://www.humblebundle.com/login"
+HUMBLE_LOGIN_REQUEST = "https://www.humblebundle.com/processlogin"
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0"
 class GameKeyClient(ABC):
 
     @abstractmethod
@@ -33,13 +36,35 @@ class HumbleClient(GameKeyClient):
         self.__loggedIn = False
         self.__LoadCookies()
 
-    def Login(self, login=None, password=None):
-        response = self.__session.get(HUMBLE_KEYS)
-        print(f"Status code = {response.status_code}")
-        print(f"Response text = {response.text()}")
-        print(f"Response json = {response.json()}")
-        print(f"Final URL of the Response = {response.url}")
-        
+    def Login(self, params=None):
+        if self.__loggedIn:
+            return (True, None)
+
+        #response = self.__session.get(HUMBLE_KEYS, headers={"User-Agent": USER_AGENT})
+        #print(f"Status code = {response.status_code}")
+        #print(f"Final URL of the Response = {response.url}")
+        #print(f"Request headers {response.request.headers}")
+        #if not HUMBLE_LOGIN in response.url:
+        #    self.__loggedIn = True
+        #    return (True, None)
+
+        headers = {"Csrf-Prevention-Token": self.__session.cookies["csrf_cookie"]
+                   , "User-Agent": USER_AGENT
+                   , "Accept-Encoding": "gzip, deflate, br"}
+        if not params:
+            params = {}
+        params["goto"] = "/home/keys"
+        params["password"] = self.__password
+        params["username"] = self.__login
+        params["qs"] = "reason=secureArea"
+        #print(headers)
+        #sleep(5)
+        response = self.__session.post(HUMBLE_LOGIN_REQUEST, data=params, headers=headers) 
+        print(f"Status code of post request {response.status_code}")
+        print(f"Request headers {response.request.headers}")
+        print(f"Request body {response.request.body}")
+        #print(f"Text of post request {response.text}")
+        print(f"The reponse itself {response}")
 
     def GetGamesInfo(self):
         pass
@@ -52,7 +77,7 @@ class HumbleClient(GameKeyClient):
 
     def VisitHomePage(self):
         if self.__session:
-            self.__session.get(HUMBLE_MAIN)
+            print(f"Final URL of visit home page = {self.__session.get(HUMBLE_MAIN, headers={'User-Agent': USER_AGENT}).url}")
 
     def GetSessionCookies(self):
         if self.__session:
