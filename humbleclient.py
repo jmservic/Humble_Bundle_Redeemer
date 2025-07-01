@@ -6,12 +6,25 @@ from os.path import exists
 from time import sleep
 import http.client, urllib.parse
 import http.cookies
+from enum import Enum
+import json
 
+HUMBLE_DOMAIN = "www.humblebundle.com"
 HUMBLE_MAIN = "https://www.humblebundle.com/"
 HUMBLE_KEYS = "https://www.humblebundle.com/home/keys"
 HUMBLE_LOGIN = "https://www.humblebundle.com/login"
 HUMBLE_LOGIN_API = "http://localhost:1234/processlogin"#"https://www.humblebundle.com/processlogin"
+HUMBLE_PROCESS_LOGIN = "/processlogin"
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0"
+class LoginResult(Enum):
+    SUCCESS = 0
+    GUARD = 1
+    BAD_USERNAME = 2
+    BAD_PASSWORD = 3
+    TWO_FACTOR = 4
+    BLOCKED = 5
+    TOO_MANY_REQUESTS = 6
+
 class GameKeyClient(ABC):
 
     @abstractmethod
@@ -52,7 +65,7 @@ class HumbleClient(GameKeyClient):
             self.__loggedIn = True
             return (True, None)
         #Using http.client because Cloudflare continues to block the requests-module for processlogin requests
-        conn = http.client.HTTPSConnection("www.humblebundle.com")
+        conn = http.client.HTTPSConnection(HUMBLE_DOMAIN)
 
         headers = {"Csrf-Prevention-Token": self.__session.cookies["csrf_cookie"]
                    , "User-Agent": USER_AGENT
@@ -77,19 +90,18 @@ class HumbleClient(GameKeyClient):
         payload["password"] = self.__password
         payload["username"] = self.__login
         payload["qs"] = "reason=secureArea"
-        payload["guard"] = "CCPG5S5"
         payloadStr = urllib.parse.urlencode(payload)
-        print(headers)
-        print(payloadStr)
+        #print(headers)
+        #print(payloadStr)
         #sleep(2)
-        conn.request("POST", "/processlogin", payloadStr, headers)
+        conn.request("POST", HUMBLE_PROCESS_LOGIN, payloadStr, headers)
         res = conn.getresponse()
         data = res.read()
-        print(data.decode("utf-8"))
-        print(res.getheaders())
-        print(res.status)
-        print(res.reason)
-        print(type(res))
+        #print(data.decode("utf-8"))
+        #print(res.getheaders())
+        #print(res.status)
+        #print(res.reason)
+        #print(type(res))
         #with open("SuccessfulPostHeaders.txt", "w") as f:
         #    f.write(res.getheader("Set-Cookie"))
         responseHeaders = res.getheaders()
@@ -113,15 +125,10 @@ class HumbleClient(GameKeyClient):
         print()
         #new_cj = cookiejar_from_dict(set_cookie_dict)
         #self.__session.cookies = cookiejar_from_dict(dict(self.__session.cookies), new_cj, False)
-        valid_request_cookie_keys = ["vesion", "port", "domain", "path", "secure", "expires", "discard", "comment", "comment_url", "rfc2109"]
+
         for cookieGroup in set_cookies:
             for (cookie, morsel) in cookieGroup.items():
-                print(cookie, morsel.value)
-                kw_args = {}
-                for (key, kv) in morsel.items():
-                    if key.lower() in valid_request_cookie_keys:
-                        print(key, kv)
-                        kw_args[key] = kv
+                #print(cookie, morsel.value)
                 self.__session.cookies.set_cookie(morsel_to_cookie(morsel))
         print("After updating Cookies from http.client Post Request:")
         print(self.__CookieString())
@@ -131,6 +138,7 @@ class HumbleClient(GameKeyClient):
         #print(f"Request body {response.request.body}")
         #print(f"Text of post request {response.text}")
         #print(f"The reponse itself {response}")
+        return self.__ValidateLoginRequest(res.status, res.reason, data.decode("utf-8"))
 
     def GetGamesInfo(self):
         pass
@@ -141,6 +149,11 @@ class HumbleClient(GameKeyClient):
     def RedeemKey(self, keytype, gamekey, keyindex=0):
         pass
 
+    def Set_Login(self, login):
+        self.__login = login
+
+    def Set_Password(self, password):
+        self.__password = password
     def VisitHomePage(self):
         if self.__session:
             print(f"Final URL of visit home page = {self.__session.get(HUMBLE_MAIN, headers={'User-Agent': USER_AGENT}).url}")
@@ -162,6 +175,33 @@ class HumbleClient(GameKeyClient):
             cj = pickle.load(f)
             cj.clear_expired_cookies()
             self.__session.cookies = cj
+
+    def __ValidateLoginRequest(self, status, reason, data):
+        #print(status)
+        #print(reason)
+        #print(data)
+        match status:
+            case 200:
+                return LoginResult.SUCCESS
+            case 401:
+                json_data = json.loads(data)
+                #print(json_data["errors"]["username"])
+                if "humble_guard_required" in json_data.keys() and json_data["humble_guard_required"]:
+                    return LoginResult.GUARD
+                if "errors" in json_data.keys() and "username" in json_data["errors"].keys():
+                    errors = json_data["errors"]["username"]
+                    for error in errors:
+                        if "can't find an account" in error:
+                            return LoginResult.BAD_USERNAME
+                        if "don't match" in error:
+                            return LoginResult.BAD_PASSWORD
+            case 403:
+                return LoginResult.BLOCKED
+            case 429:
+                return LoginResult.TOO_MANY_REQUESTS
+        raise ValueError(f"Unknown combination of status, reason, and data response from HumbleBundle Login Request:\nstatus={status}\nreason={reason}\ndata={data}")
+                
+            
     
     def __del__(self):
         if self.__session :
@@ -174,5 +214,5 @@ class HumbleClient(GameKeyClient):
                 print(f"Exception of type {type(ex)}: {ex}")
             finally:
                 self.__session.close()
-
+    
 

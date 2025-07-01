@@ -1,6 +1,6 @@
 from requests import Request, Session
 from http.cookiejar import MozillaCookieJar
-from humbleclient import HUMBLE_MAIN, HumbleClient 
+from humbleclient import HUMBLE_MAIN, HumbleClient, LoginResult
 import os
 from dotenv import load_dotenv
 #We're going to use the pickle module to save and load the cookies.
@@ -11,21 +11,45 @@ hb_password = os.getenv("HB_PASSWORD")
 if not os.path.exists("./cookies"):
     os.mkdir("./cookies")
 hb = HumbleClient(login=hb_account,password=hb_password)
-print(f"Cookies before request to humble bundle main page:")
-hb_cookies = hb.GetSessionCookies()
-for cookie in hb_cookies:
-    print(cookie)
+#print(f"Cookies before request to humble bundle main page:")
+#hb_cookies = hb.GetSessionCookies()
+#for cookie in hb_cookies:
+#    print(cookie)
 
-hb.VisitHomePage()
-hb_cookies = hb.GetSessionCookies()
-print(f"Cookies after request to humble bundle main page:")
+#hb.VisitHomePage()
+#hb_cookies = hb.GetSessionCookies()
+#print(f"Cookies after request to humble bundle main page:")
 #for (cookie_name, cookie_value) in dict(hb_cookies).items():
 #    print(cookie_name, cookie_value)
-print("")
-print(hb_cookies.get("_simpleauth_sess"))
+#print("")
+#print(hb_cookies.get("_simpleauth_sess"))
 #for cookie in hb_cookies:
 #    print(cookie.domain)
-hb.Login()
+login_result = hb.Login()
+counter = 0
+print(str(login_result))
+while login_result != LoginResult.SUCCESS and counter < 5:
+    match login_result:
+        case LoginResult.GUARD:
+            guard = input("Please enter the humble bundle guard code from your email: ")
+            payload = {"guard": guard}
+            hb.Login(payload)
+        case LoginResult.BAD_USERNAME:
+            hb_account = input("Cannot find an account with that name, please enter a new account name: ")
+            hb.Set_Login(hb_account)
+            hb.Login()
+        case LoginResult.BAD_PASSWORD:
+            hb_password = input("Password does not match, please enter a new password: ")
+            hb.Set_Password(hb_password)
+            hb.Login()
+        case LoginResult.BLOCKED:
+            print("Yeah... Cloudflare doesn't like us. Shutting down!")
+            exit(1)
+        case LoginResult.TOO_MANY_REQUESTS:
+            print("Too many requests...")
+            exit(1)
+    counter += 1
+
 #with Session() as s:
 #    print(f"Cookies before request to humble bundle main page:\n {s.cookies}")
 #    print(f"Cookie jar object:")
