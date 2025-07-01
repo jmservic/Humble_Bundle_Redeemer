@@ -33,15 +33,15 @@ while login_result != LoginResult.SUCCESS and counter < 5:
         case LoginResult.GUARD:
             guard = input("Please enter the humble bundle guard code from your email: ")
             payload = {"guard": guard}
-            hb.Login(payload)
+            login_result = hb.Login(payload)
         case LoginResult.BAD_USERNAME:
             hb_account = input("Cannot find an account with that name, please enter a new account name: ")
             hb.Set_Login(hb_account)
-            hb.Login()
+            login_result = hb.Login()
         case LoginResult.BAD_PASSWORD:
             hb_password = input("Password does not match, please enter a new password: ")
             hb.Set_Password(hb_password)
-            hb.Login()
+            login_result = hb.Login()
         case LoginResult.BLOCKED:
             print("Yeah... Cloudflare doesn't like us. Shutting down!")
             exit(1)
