@@ -5,7 +5,8 @@ import pickle
 from os.path import exists
 from time import sleep
 import http.client, urllib.parse
-import http.cookies
+#import http.cookies
+from http_utils import SetCookieHeaderToMorsels 
 from enum import Enum
 import json
 
@@ -16,6 +17,7 @@ HUMBLE_LOGIN = "https://www.humblebundle.com/login"
 HUMBLE_LOGIN_API = "http://localhost:1234/processlogin"#"https://www.humblebundle.com/processlogin"
 HUMBLE_PROCESS_LOGIN = "/processlogin"
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0"
+
 class LoginResult(Enum):
     SUCCESS = 0
     GUARD = 1
@@ -105,16 +107,18 @@ class HumbleClient(GameKeyClient):
         #with open("SuccessfulPostHeaders.txt", "w") as f:
         #    f.write(res.getheader("Set-Cookie"))
         responseHeaders = res.getheaders()
-        set_cookie_dict = {}
-        set_cookies = []
-        for (name, value) in responseHeaders:
-            if(name == "Set-Cookie"):
+        print(responseHeaders)
+        #set_cookie_dict = {}
+        #set_cookies = []
+        morsels = SetCookieHeaderToMorsels(responseHeaders)
+        #for (name, value) in responseHeaders:
+        #    if(name == "Set-Cookie"):
         #        print(name, value)
-                cookie = http.cookies.SimpleCookie()
-                cookie.load(rawdata=value)
-                set_cookies.append(cookie)
-                cookieSplit = value.split("=", maxsplit=1)
-                set_cookie_dict[cookieSplit[0]] = cookieSplit[1].split(";", maxsplit=1)[0]
+        #        cookie = http.cookies.SimpleCookie()
+        #        cookie.load(rawdata=value)
+        #        set_cookies.append(cookie)
+                #cookieSplit = value.split("=", maxsplit=1)
+                #set_cookie_dict[cookieSplit[0]] = cookieSplit[1].split(";", maxsplit=1)[0]
        #print(set_cookie_dict)
        #print("The SimpleCookie:")
        #print(set_cookies[0]["_simpleauth_sess"].value)
@@ -125,11 +129,14 @@ class HumbleClient(GameKeyClient):
         print()
         #new_cj = cookiejar_from_dict(set_cookie_dict)
         #self.__session.cookies = cookiejar_from_dict(dict(self.__session.cookies), new_cj, False)
-
-        for cookieGroup in set_cookies:
-            for (cookie, morsel) in cookieGroup.items():
+        for morsel in morsels.values():
+            print(morsel.value)
+            self.__session.cookies.set_cookie(morsel_to_cookie(morsel))
+        print()
+        #for cookieGroup in set_cookies:
+           # for (cookie, morsel) in cookieGroup.items():
                 #print(cookie, morsel.value)
-                self.__session.cookies.set_cookie(morsel_to_cookie(morsel))
+            #    self.__session.cookies.set_cookie(morsel_to_cookie(morsel))
         print("After updating Cookies from http.client Post Request:")
         print(self.__CookieString())
         #response = self.__session.post(HUMBLE_LOGIN_API, data=payload, headers=headers) 
