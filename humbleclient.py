@@ -59,13 +59,12 @@ class HumbleClient(GameKeyClient):
             return (True, None)
         
         response = self.__session.get(HUMBLE_KEYS, headers={"User-Agent": USER_AGENT})
-        #print(f"Status code = {response.status_code}")
-        #print(f"Final URL of the Response = {response.url}")
-        #print(f"Request headers {response.request.headers}")
+
         if not HUMBLE_LOGIN in response.url:
             print("Already Logged In")
             self.__loggedIn = True
             return (True, None)
+
         #Using http.client because Cloudflare continues to block the requests-module for processlogin requests
         conn = http.client.HTTPSConnection(HUMBLE_DOMAIN)
 
@@ -73,78 +72,26 @@ class HumbleClient(GameKeyClient):
                    , "User-Agent": USER_AGENT
                    , "Cookie": self.__CookieString()
                    , "Content-type": "application/x-www-form-urlencoded"
-                   #, "accept": "application/json, text/javascript, */*; q=0.01"
-                   #, "accent-language": "en-US,en;q=0.9"
-                   #, "origin": "https://www.humblebundle.com"
-                   #, "priority": "u=1, i"
-                   #, "referer": "https://www.humblebundle.com/login?goto=/home/keys"
-                   #, "sec-ch-ua": '"Not)A;Brand";v="8", "Chromium";v="138", "Microsoft Edge";v="138"'
-                   #, "sec-ch-ua-mobile": "?0"
-                   #, "sec-ch-ua-platform": '"Windows"'
-                   #, "sec-fetch-dest": "empty"
-                   #, "sec-fetch-mode": "cors"
-                   #, "sec-fetch-site": "same-origin"
-                   #, "x-requested_with": "XMLHttpRequest"
                    }
+
         if not payload:
             payload = {}
+
         payload["goto"] = "/home/keys"
         payload["password"] = self.__password
         payload["username"] = self.__login
         payload["qs"] = "reason=secureArea"
         payloadStr = urllib.parse.urlencode(payload)
-        #print(headers)
-        #print(payloadStr)
-        #sleep(2)
+
         conn.request("POST", HUMBLE_PROCESS_LOGIN, payloadStr, headers)
         res = conn.getresponse()
         data = res.read()
-        #print(data.decode("utf-8"))
-        #print(res.getheaders())
-        #print(res.status)
-        #print(res.reason)
-        #print(type(res))
-        #with open("SuccessfulPostHeaders.txt", "w") as f:
-        #    f.write(res.getheader("Set-Cookie"))
         responseHeaders = res.getheaders()
-        print(responseHeaders)
-        #set_cookie_dict = {}
-        #set_cookies = []
+
         morsels = SetCookieHeaderToMorsels(responseHeaders)
-        #for (name, value) in responseHeaders:
-        #    if(name == "Set-Cookie"):
-        #        print(name, value)
-        #        cookie = http.cookies.SimpleCookie()
-        #        cookie.load(rawdata=value)
-        #        set_cookies.append(cookie)
-                #cookieSplit = value.split("=", maxsplit=1)
-                #set_cookie_dict[cookieSplit[0]] = cookieSplit[1].split(";", maxsplit=1)[0]
-       #print(set_cookie_dict)
-       #print("The SimpleCookie:")
-       #print(set_cookies[0]["_simpleauth_sess"].value)
-       #print(dict(self.__session.cookies))
-        #print(self.__session.cookies.get("_simpleauth_sess"))
-        print("Before updating Cookies from http.client Post Request:")
-        print(self.__CookieString())
-        print()
-        #new_cj = cookiejar_from_dict(set_cookie_dict)
-        #self.__session.cookies = cookiejar_from_dict(dict(self.__session.cookies), new_cj, False)
         for morsel in morsels.values():
-            print(morsel.value)
             self.__session.cookies.set_cookie(morsel_to_cookie(morsel))
-        print()
-        #for cookieGroup in set_cookies:
-           # for (cookie, morsel) in cookieGroup.items():
-                #print(cookie, morsel.value)
-            #    self.__session.cookies.set_cookie(morsel_to_cookie(morsel))
-        print("After updating Cookies from http.client Post Request:")
-        print(self.__CookieString())
-        #response = self.__session.post(HUMBLE_LOGIN_API, data=payload, headers=headers) 
-        #print(f"Status code of post request {response.status_code}")
-        #print(f"Request headers {response.request.headers}")
-        #print(f"Request body {response.request.body}")
-        #print(f"Text of post request {response.text}")
-        #print(f"The reponse itself {response}")
+
         return self.__ValidateLoginRequest(res.status, res.reason, data.decode("utf-8"))
 
     def GetGamesInfo(self):

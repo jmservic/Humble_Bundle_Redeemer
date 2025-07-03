@@ -11,6 +11,7 @@ hb_password = os.getenv("HB_PASSWORD")
 if not os.path.exists("./cookies"):
     os.mkdir("./cookies")
 hb = HumbleClient(login=hb_account,password=hb_password)
+
 #print(f"Cookies before request to humble bundle main page:")
 #hb_cookies = hb.GetSessionCookies()
 #for cookie in hb_cookies:
@@ -25,9 +26,10 @@ hb = HumbleClient(login=hb_account,password=hb_password)
 #print(hb_cookies.get("_simpleauth_sess"))
 #for cookie in hb_cookies:
 #    print(cookie.domain)
+
 login_result = hb.Login()
 counter = 0
-print(str(login_result))
+
 while login_result != LoginResult.SUCCESS and counter < 5:
     match login_result:
         case LoginResult.GUARD:
