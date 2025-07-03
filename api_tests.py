@@ -52,6 +52,7 @@ while login_result != LoginResult.SUCCESS and counter < 5:
             exit(1)
     counter += 1
 
+hb.GetGameLibrary()
 #with Session() as s:
 #    print(f"Cookies before request to humble bundle main page:\n {s.cookies}")
 #    print(f"Cookie jar object:")

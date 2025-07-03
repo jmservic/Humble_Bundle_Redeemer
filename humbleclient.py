@@ -9,6 +9,7 @@ import http.client, urllib.parse
 from http_utils import SetCookieHeaderToMorsels 
 from enum import Enum
 import json
+from bs4 import BeautifulSoup
 
 HUMBLE_DOMAIN = "www.humblebundle.com"
 HUMBLE_MAIN = "https://www.humblebundle.com/"
@@ -95,7 +96,11 @@ class HumbleClient(GameKeyClient):
         return self.__ValidateLoginRequest(res.status, res.reason, data.decode("utf-8"))
 
     def GetGamesInfo(self):
-        pass
+        response = self.__session.get(HUMBLE_KEYS, headers={"User-Agent": USER_AGENT})
+        soup = BeautifulSoup(response.text, "html.parser")
+        user_json = soup.find(id="user-home-json-data").text 
+        user_json_dict = json.loads(user_json)
+        print(user_json_dict["gamekeys"])
 
     def ChooseContent(self, gamekey, identifiers):
         pass
@@ -108,6 +113,7 @@ class HumbleClient(GameKeyClient):
 
     def Set_Password(self, password):
         self.__password = password
+
     def VisitHomePage(self):
         if self.__session:
             print(f"Final URL of visit home page = {self.__session.get(HUMBLE_MAIN, headers={'User-Agent': USER_AGENT}).url}")
