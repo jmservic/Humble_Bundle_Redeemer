@@ -17,6 +17,8 @@ HUMBLE_KEYS = "https://www.humblebundle.com/home/keys"
 HUMBLE_LOGIN = "https://www.humblebundle.com/login"
 HUMBLE_LOGIN_API = "http://localhost:1234/processlogin"#"https://www.humblebundle.com/processlogin"
 HUMBLE_PROCESS_LOGIN = "/processlogin"
+HUMBLE_ORDER_API = "https://www.humblebundle.com/api/v1/orders"
+HUMBLE_CHOICE = "https://www.humblebundle.com/membership/"
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0"
 
 class LoginResult(Enum):
@@ -35,7 +37,7 @@ class GameKeyClient(ABC):
         pass
 
     @abstractmethod
-    def GetGamesInfo(self):
+    def GetOrdersDetail(self):
         pass
 
     @abstractmethod
@@ -95,12 +97,50 @@ class HumbleClient(GameKeyClient):
 
         return self.__ValidateLoginRequest(res.status, res.reason, data.decode("utf-8"))
 
-    def GetGamesInfo(self):
+    def GetOrdersDetail(self):
+        gamekeys = self.__GetGameKeys()
+        order_details = self.__QueryOrders(gamekeys)
+        print(order_details)
+
+    def __GetGameKeys(self):
+        #Need to add in error handling
         response = self.__session.get(HUMBLE_KEYS, headers={"User-Agent": USER_AGENT})
+        if not response.ok:
+            return []
         soup = BeautifulSoup(response.text, "html.parser")
         user_json = soup.find(id="user-home-json-data").text 
         user_json_dict = json.loads(user_json)
-        print(user_json_dict["gamekeys"])
+        return user_json_dict["gamekeys"]
+
+    def __QueryOrders(self, gamekeys):
+        order_details = {}
+        start = 0
+        end = 0
+        while start < len(gamekeys):
+            end = start + 40 if start + 40 < len(gamekeys) else len(gamekeys)
+            params = [("gamekeys", gamekey) for gamekey in gamekeys[start:end]]
+            params.insert(0, ("all_tpkds", "true"))
+            print(f"Requesting for {end - start} keys.")
+            response = self.__session.get(HUMBLE_ORDER_API, params=params, headers={"User-Agent": USER_AGENT})
+            if response.ok:
+                print("Request was successful.")
+                order_details.update(response.json())
+            else:
+                print("Request failed.")
+            start = end
+        
+        return order_details
+        
+    def GetChoiceDetails(self, choice_url):
+        response = self.__session.get(HUMBLE_CHOICE + choice_url, headers={"User-Agent": USER_AGENT})
+        if not response.ok:
+            return {}
+        soup = BeautifulSoup(response.text, "html.parser")
+        monthly_json = soup.find(id="webpack-monthly-product-data").text
+        monthly_json_dict = json.loads(monthly_json)
+        game_data_dict = monthly_json_dict["contentChoiceOptions"]["contentChoiceData"]["game_data"]
+        return game_data_dict
+        
 
     def ChooseContent(self, gamekey, identifiers):
         pass
