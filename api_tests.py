@@ -52,7 +52,8 @@ while login_result != LoginResult.SUCCESS and counter < 5:
             exit(1)
     counter += 1
 
-#hb.GetOrdersDetail()
+hb.GetOrdersDetail()
+exit(0)
 game_data_dict = hb.GetChoiceDetails("april-2025")
 for key in game_data_dict.keys():
     print(key)
@@ -67,6 +68,8 @@ for key in game_data_dict["novalands"]["tpkds"][0].keys():
     print(key)
 
 print( game_data_dict["novalands"]["tpkds"])
+print()
+print(hb.GetChoiceDetails("may-2022")["commandconquerremasteredcollection"]["tpkds"])
 #with Session() as s:
 #    print(f"Cookies before request to humble bundle main page:\n {s.cookies}")
 #    print(f"Cookie jar object:")

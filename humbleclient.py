@@ -98,9 +98,36 @@ class HumbleClient(GameKeyClient):
         return self.__ValidateLoginRequest(res.status, res.reason, data.decode("utf-8"))
 
     def GetOrdersDetail(self):
-        gamekeys = self.__GetGameKeys()
+        gamekeys = self.__GetGameKeys()#['nmZqeAmGSpFWTWs4']#['A7CESV6Pp4ZWFarX']
+        #["qyK3DHE65xGZTzMa", "8tHd5em7weh8u7wc", "Z8KftUKAEf8zG7zY", "8uBEqKBAtNcbtnYu", "XSrTR7atKHTUVkTf"]  
         order_details = self.__QueryOrders(gamekeys)
-        print(order_details)
+        for (gamekey, order_info) in order_details.items():
+            #print(f"{gamekey} is {order_info['product']['machine_name']}.")
+            #print(f"It's category is {order_info['product']['category']}")
+            #if "subscription" in order_info["product"]["category"]:
+            #   print(f"Has choice URL? {'choice_url' in order_info['product']}")
+            if "choice_url" in order_info["product"]:
+                #print(order_info)
+                choice_details = self.GetChoiceDetails(order_info["product"]["choice_url"])
+                #all_products_details = {}
+                #for (name, game_info) in choice_details.items():
+                    #print(game_info)
+                #    print(name)
+                    #I'm going to move this into a domain class
+                    #if "tpkds" not in game_info:
+                    #    print(game_info)
+                    #    continue
+                    #product_details = {}
+                    #product_details["machine_name"] = game_info["tpkds"][0]["machine_name"]
+                    #product_details["human_name"] = game_info["tpkds"][0]["human_name"]
+                    #product_details["key_type"] = game_info["tpkds"][0]["key_type"]
+                    #if "steam_app_id" in game_info["tpkds"][0]:
+                    #    product_details["steam_app_id"] = game_info["tpkds"][0]["steam_app_id"]
+                    #all_products_details[game_info["display_item_machine_name"]] = product_details
+                #print(all_products_details)
+                order_info["product"]["all_choices"] = choice_details#all_products_details
+        #print(order_details)
+        return order_details
 
     def __GetGameKeys(self):
         #Need to add in error handling
@@ -138,8 +165,16 @@ class HumbleClient(GameKeyClient):
         soup = BeautifulSoup(response.text, "html.parser")
         monthly_json = soup.find(id="webpack-monthly-product-data").text
         monthly_json_dict = json.loads(monthly_json)
-        game_data_dict = monthly_json_dict["contentChoiceOptions"]["contentChoiceData"]["game_data"]
-        return game_data_dict
+        #This is also being moved into a domain class lol
+        #choice_data = monthly_json_dict["contentChoiceOptions"]["contentChoiceData"]
+        #print(choice_data)
+        #if "game_data" in choice_data:
+        #    game_data_dict = choice_data["game_data"]
+        #else:
+        #    game_data_dict = choice_data["initial"]["content_choices"]
+        # 
+        #game_data_dict = monthly_json_dict["contentChoiceOptions"]["contentChoiceData"]["game_data"]
+        return monthly_json_dict
         
 
     def ChooseContent(self, gamekey, identifiers):
