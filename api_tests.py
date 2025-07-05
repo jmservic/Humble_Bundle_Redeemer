@@ -52,10 +52,12 @@ while login_result != LoginResult.SUCCESS and counter < 5:
             exit(1)
     counter += 1
 
-hb.GetOrdersDetail()
+#hb.GetOrdersDetail()
+#print(hb.ChooseContent("rw3m6TUnb3eqmHzM", ["nobodywantstodie", "dungeonsofhinterberg"]))
+print(hb.RedeemKey("dungeonsofhinterberg_choice_steam", "rw3m6TUnb3eqmHzM"))
 exit(0)
-game_data_dict = hb.GetChoiceDetails("april-2025")
-for key in game_data_dict.keys():
+game_data_dict = hb.GetChoiceDetails("june-2025")
+for key in game_data_dict["contentChoiceOptions"]["contentChoiceData"]["game_data"]:
     print(key)
 print()
 
@@ -66,7 +68,6 @@ print()
 
 for key in game_data_dict["novalands"]["tpkds"][0].keys():
     print(key)
-
 print( game_data_dict["novalands"]["tpkds"])
 print()
 print(hb.GetChoiceDetails("may-2022")["commandconquerremasteredcollection"]["tpkds"])
