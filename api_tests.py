@@ -53,8 +53,13 @@ while login_result != LoginResult.SUCCESS and counter < 5:
     counter += 1
 
 #hb.GetOrdersDetail()
-print(hb.ChooseContent("rw3m6TUnb3eqmHzM", ["nobodywantstodie", "dungeonsofhinterberg"]))
-print(hb.RedeemKey("dungeonsofhinterberg_choice_steam", "rw3m6TUnb3eqmHzM"))
+#print(hb.ChooseContent("rw3m6TUnb3eqmHzM", "tchia"))#["nobodywantstodie", "dungeonsofhinterberg"]))
+#print(hb.RedeemKey("dungeonsofhinterberg_choice_steam", "rw3m6TUnb3eqmHzM"))
+#print(hb.RedeemKey("fashionpolicesquad_choice_steam", "Z8KftUKAEf8zG7zY"))
+#print(hb.RedeemKey("tchia_row_choice_steam", "rw3m6TUnb3eqmHzM"))
+
+#Out of choices
+#print(hb.ChooseContent("qdxHRf4bHywuMfd2", "sigmatheory_globalcoldwar"))
 exit(0)
 game_data_dict = hb.GetChoiceDetails("june-2025")
 for key in game_data_dict["contentChoiceOptions"]["contentChoiceData"]["game_data"]:

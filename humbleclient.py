@@ -15,8 +15,7 @@ HUMBLE_DOMAIN = "www.humblebundle.com"
 HUMBLE_MAIN = "https://www.humblebundle.com/"
 HUMBLE_KEYS = "https://www.humblebundle.com/home/keys"
 HUMBLE_LOGIN = "https://www.humblebundle.com/login"
-HUMBLE_LOGIN_API = "http://localhost:1234/processlogin"#"https://www.humblebundle.com/processlogin"
-HUMBLE_PROCESS_LOGIN = "/processlogin"
+HUMBLE_PROCESS_LOGIN_API = "/processlogin"
 HUMBLE_ORDER_API = "https://www.humblebundle.com/api/v1/orders"
 HUMBLE_CHOOSE_API = "/humbler/choosecontent"
 HUMBLE_REDEEMKEY_API = "/humbler/redeemkey"
@@ -80,7 +79,7 @@ class HumbleClient(GameKeyClient):
 
         #Using http.client because Cloudflare continues to block the requests-module for processlogin requests
         conn = http.client.HTTPSConnection(HUMBLE_DOMAIN) 
-        res = self.__HumblePostRequest(conn, HUMBLE_PROCESS_LOGIN, payload)
+        res = self.__HumblePostRequest(conn, HUMBLE_PROCESS_LOGIN_API, payload)
         data = res.read()
         data_decoded = data.decode("utf-8")
         self.__SetCookies(res.getheaders())
@@ -184,6 +183,15 @@ class HumbleClient(GameKeyClient):
         data = res.read()
         data_decoded = data.decode("utf-8")
         self.__SetCookies(res.getheaders())
+
+        if res.status < 300:
+            json_dict = json.loads(data_decode)
+            json_dict["status"] = res.status
+        else:
+            json_dict = {"success": False,
+                         "status": res.status,
+                         "error_msg": data_decode
+                         }
         conn.close()
 
         return json.loads(data_decoded)
@@ -199,11 +207,18 @@ class HumbleClient(GameKeyClient):
         data = res.read()
         data_decode = data.decode("utf-8")
         self.__SetCookies(res.getheaders())
-        conn.close() 
         
-        print(res.status)
-        print(data.decode("utf-8"))
-        return json.loads(data_decode)
+        if res.status < 300:
+            json_dict = json.loads(data_decode)
+            json_dict["status"] = res.status
+        else:
+            json_dict = {"success": False,
+                         "status": res.status,
+                         "error_msg": data_decode
+                         }
+        conn.close() 
+
+        return json_dict
 
     def Set_Login(self, login):
         self.__login = login
@@ -255,15 +270,11 @@ class HumbleClient(GameKeyClient):
             self.__session.cookies = cj
 
     def __ValidateLoginRequest(self, status, reason, data):
-        #print(status)
-        #print(reason)
-        #print(data)
         match status:
             case 200:
                 return LoginResult.SUCCESS
             case 401:
                 json_data = json.loads(data)
-                #print(json_data["errors"]["username"])
                 if "humble_guard_required" in json_data.keys() and json_data["humble_guard_required"]:
                     return LoginResult.GUARD
                 if "errors" in json_data.keys() and "username" in json_data["errors"].keys():
