@@ -53,7 +53,7 @@ while login_result != LoginResult.SUCCESS and counter < 5:
     counter += 1
 
 #hb.GetOrdersDetail()
-#print(hb.ChooseContent("rw3m6TUnb3eqmHzM", ["nobodywantstodie", "dungeonsofhinterberg"]))
+print(hb.ChooseContent("rw3m6TUnb3eqmHzM", ["nobodywantstodie", "dungeonsofhinterberg"]))
 print(hb.RedeemKey("dungeonsofhinterberg_choice_steam", "rw3m6TUnb3eqmHzM"))
 exit(0)
 game_data_dict = hb.GetChoiceDetails("june-2025")

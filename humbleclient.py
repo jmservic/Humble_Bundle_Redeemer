@@ -70,15 +70,6 @@ class HumbleClient(GameKeyClient):
             self.__loggedIn = True
             return (True, None)
 
-        #Using http.client because Cloudflare continues to block the requests-module for processlogin requests
-        conn = http.client.HTTPSConnection(HUMBLE_DOMAIN)
-
-        headers = {"Csrf-Prevention-Token": self.__session.cookies["csrf_cookie"]
-                   , "User-Agent": USER_AGENT
-                   , "Cookie": self.__CookieString()
-                   , "Content-type": "application/x-www-form-urlencoded"
-                   }
-
         if not payload:
             payload = {}
 
@@ -86,19 +77,16 @@ class HumbleClient(GameKeyClient):
         payload["password"] = self.__password
         payload["username"] = self.__login
         payload["qs"] = "reason=secureArea"
-        payloadStr = urllib.parse.urlencode(payload)
 
-        conn.request("POST", HUMBLE_PROCESS_LOGIN, payloadStr, headers)
-        res = conn.getresponse()
+        #Using http.client because Cloudflare continues to block the requests-module for processlogin requests
+        conn = http.client.HTTPSConnection(HUMBLE_DOMAIN) 
+        res = self.__HumblePostRequest(conn, HUMBLE_PROCESS_LOGIN, payload)
         data = res.read()
-        responseHeaders = res.getheaders()
-
-        morsels = SetCookieHeaderToMorsels(responseHeaders)
-        for morsel in morsels.values():
-            self.__session.cookies.set_cookie(morsel_to_cookie(morsel))
-        
+        data_decoded = data.decode("utf-8")
+        self.__SetCookies(res.getheaders())
         conn.close()
-        return self.__ValidateLoginRequest(res.status, res.reason, data.decode("utf-8"))
+
+        return self.__ValidateLoginRequest(res.status, res.reason, data_decoded)
 
     def GetOrdersDetail(self):
         gamekeys = self.__GetGameKeys()#['nmZqeAmGSpFWTWs4']#['A7CESV6Pp4ZWFarX']
@@ -191,32 +179,14 @@ class HumbleClient(GameKeyClient):
         else:
             payload.append(("chosen_identifiers[]", identifiers))
         
-        conn = http.client.HTTPSConnection(HUMBLE_DOMAIN)
-        
-        headers = {"Csrf-Prevention-Token": self.__session.cookies["csrf_cookie"]
-                   , "User-Agent": USER_AGENT
-                   , "Cookie": self.__CookieString()
-                   , "Content-type": "application/x-www-form-urlencoded"
-                   }
-        payloadStr = urllib.parse.urlencode(payload)
-        #print(payload)
-        #print(payloadStr)
-        
-        conn.request("POST", HUMBLE_CHOOSE_API, payloadStr, headers)
-        res = conn.getresponse()
+        conn = http.client.HTTPSConnection(HUMBLE_DOMAIN) 
+        res = self.__HumblePostRequest(conn, HUMBLE_CHOOSE_API, payload)
         data = res.read()
-        responseHeaders = res.getheaders()
-
-        morsels = SetCookieHeaderToMorsels(responseHeaders)
-        for morsel in morsels.values():
-            self.__session.cookies.set_cookie(morsel_to_cookie(morsel)) 
-        #response = self.__session.post(HUMBLE_CHOOSE_API, data=payload, headers={"User-Agent": USER_AGENT}) 
-        #print(res.status)
-        
-        #print(data.decode("utf-8"))
+        data_decoded = data.decode("utf-8")
+        self.__SetCookies(res.getheaders())
         conn.close()
-        return json.loads(data.decode("utf-8"))
 
+        return json.loads(data_decoded)
 
     def RedeemKey(self, keytype, gamekey, keyindex=0):
         payload = [("keytype", keytype),
@@ -224,26 +194,16 @@ class HumbleClient(GameKeyClient):
                    ("keyindex", keyindex)
                    ]
 
-        conn = http.client.HTTPSConnection(HUMBLE_DOMAIN)
-
-        headers = {"Csrf-Prevention-Token": self.__session.cookies["csrf_cookie"]
-                   , "User-Agent": USER_AGENT
-                   , "Cookie": self.__CookieString()
-                   , "Content-type": "application/x-www-form-urlencoded"
-                   }
-        payloadStr = urllib.parse.urlencode(payload) 
-        conn.request("POST", HUMBLE_REDEEMKEY_API, payloadStr, headers)
-        res = conn.getresponse()
+        conn = http.client.HTTPSConnection(HUMBLE_DOMAIN) 
+        res = self.__HumblePostRequest(conn, HUMBLE_REDEEMKEY_API, payload)
         data = res.read()
-        responseHeaders = res.getheaders()
-
-        morsels = SetCookieHeaderToMorsels(responseHeaders)
-        for morsel in morsels.values():
-            self.__session.cookies.set_cookie(morsel_to_cookie(morsel))
-        conn.close()
-       # print(res.status)
-       # print(data.decode("utf-8"))
-        return json.loads(data.decode("utf-8"))
+        data_decode = data.decode("utf-8")
+        self.__SetCookies(res.getheaders())
+        conn.close() 
+        
+        print(res.status)
+        print(data.decode("utf-8"))
+        return json.loads(data_decode)
 
     def Set_Login(self, login):
         self.__login = login
@@ -259,6 +219,27 @@ class HumbleClient(GameKeyClient):
         if self.__session:
             return self.__session.cookies.copy()
     
+    def __HumblePostRequest(self, conn, endpoint, payload):
+
+        headers = {"Csrf-Prevention-Token": self.__session.cookies["csrf_cookie"]
+                   , "User-Agent": USER_AGENT
+                   , "Cookie": self.__CookieString()
+                   , "Content-type": "application/x-www-form-urlencoded"
+                   }
+
+        payloadStr = urllib.parse.urlencode(payload) 
+        
+        conn.request("POST", endpoint, payloadStr, headers)
+        res = conn.getresponse()
+
+        return res
+
+    def __SetCookies(self, responseHeaders):    
+        morsels = SetCookieHeaderToMorsels(responseHeaders)
+        for morsel in morsels.values():
+            self.__session.cookies.set_cookie(morsel_to_cookie(morsel))
+
+        
     def __CookieString(self):
         return "; ".join([f"{key}={value}" for (key, value) in self.__session.cookies.items()])
 
