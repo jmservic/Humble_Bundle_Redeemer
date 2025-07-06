@@ -3,9 +3,7 @@ from requests import Session
 from requests.cookies import cookiejar_from_dict, create_cookie, morsel_to_cookie
 import pickle
 from os.path import exists
-from time import sleep
 import http.client, urllib.parse
-#import http.cookies
 from http_utils import SetCookieHeaderToMorsels 
 from enum import Enum
 import json
