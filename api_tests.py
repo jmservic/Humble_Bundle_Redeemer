@@ -55,7 +55,7 @@ while login_result != LoginResult.SUCCESS and counter < 5:
 #hb.GetOrdersDetail()
 #print(hb.ChooseContent("rw3m6TUnb3eqmHzM", "tchia"))#["nobodywantstodie", "dungeonsofhinterberg"]))
 #print(hb.RedeemKey("dungeonsofhinterberg_choice_steam", "rw3m6TUnb3eqmHzM"))
-#print(hb.RedeemKey("fashionpolicesquad_choice_steam", "Z8KftUKAEf8zG7zY"))
+print(hb.RedeemKey("fashionpolicesquad_choice_steam", "Z8KftUKAEf8zG7zY"))
 #print(hb.RedeemKey("tchia_row_choice_steam", "rw3m6TUnb3eqmHzM"))
 
 #Out of choices

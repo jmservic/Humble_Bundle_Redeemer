@@ -32,7 +32,7 @@ class LoginResult(Enum):
 class GameKeyClient(ABC):
 
     @abstractmethod
-    def Login(self, login, password):
+    def Login(self, payload=None):
         pass
 
     @abstractmethod
