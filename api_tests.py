@@ -3,6 +3,7 @@ from http.cookiejar import MozillaCookieJar
 from humbleclient import HUMBLE_MAIN, HumbleClient, LoginResult
 import os
 from dotenv import load_dotenv
+import Steam_RSA_Public_Key_Request_pb2 
 #We're going to use the pickle module to save and load the cookies.
 load_dotenv()
 hb_account = os.getenv("HB_ACCOUNT")
@@ -60,6 +61,12 @@ print(hb.RedeemKey("fashionpolicesquad_choice_steam", "Z8KftUKAEf8zG7zY"))
 
 #Out of choices
 #print(hb.ChooseContent("qdxHRf4bHywuMfd2", "sigmatheory_globalcoldwar"))
+rsa_pk_request = Steam_RSA_Public_Key_Request_pb2.SteamRSAPublicKeyRequest()
+rsa_pk_request.account_name = "Jmarcus2004"
+print(type(rsa_pk_request.SerializeToString()))
+for char in rsa_pk_request.SerializeToString():
+    print(char)
+print(" ".join([str(b_val) for b_val in rsa_pk_request.SerializeToString()]))
 exit(0)
 game_data_dict = hb.GetChoiceDetails("june-2025")
 for key in game_data_dict["contentChoiceOptions"]["contentChoiceData"]["game_data"]:

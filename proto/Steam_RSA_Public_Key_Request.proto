@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package steam_proto;
+
+message SteamRSAPublicKeyRequest {
+	string account_name = 1;
+}
