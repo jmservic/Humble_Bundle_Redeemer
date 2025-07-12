@@ -4,6 +4,9 @@ from humbleclient import HUMBLE_MAIN, HumbleClient, LoginResult
 import os
 from dotenv import load_dotenv
 import Steam_RSA_Public_Key_Request_pb2 
+from steam_utils import *
+from steamclient import SteamClient
+import base64
 #We're going to use the pickle module to save and load the cookies.
 load_dotenv()
 hb_account = os.getenv("HB_ACCOUNT")
@@ -12,7 +15,7 @@ hb_password = os.getenv("HB_PASSWORD")
 if not os.path.exists("./cookies"):
     os.mkdir("./cookies")
 hb = HumbleClient(login=hb_account,password=hb_password)
-
+steam = SteamClient(login="Jmarcus2004")
 #print(f"Cookies before request to humble bundle main page:")
 #hb_cookies = hb.GetSessionCookies()
 #for cookie in hb_cookies:
@@ -63,10 +66,12 @@ print(hb.RedeemKey("fashionpolicesquad_choice_steam", "Z8KftUKAEf8zG7zY"))
 #print(hb.ChooseContent("qdxHRf4bHywuMfd2", "sigmatheory_globalcoldwar"))
 rsa_pk_request = Steam_RSA_Public_Key_Request_pb2.SteamRSAPublicKeyRequest()
 rsa_pk_request.account_name = "Jmarcus2004"
-print(type(rsa_pk_request.SerializeToString()))
-for char in rsa_pk_request.SerializeToString():
-    print(char)
-print(" ".join([str(b_val) for b_val in rsa_pk_request.SerializeToString()]))
+rsa_pk_serialized = rsa_pk_request.SerializeToString()
+print(rsa_pk_serialized)
+print(" ".join([str(b_val) for b_val in rsa_pk_serialized]))
+print(EncodeProtoBuff(rsa_pk_serialized))
+print(f"Steam RSA Public Key Request return: {steam.GetRSAPublicKey()}") 
+      #{base64.b64encode(steam.GetRSAPublicKey().encode('utf-8')).decode('utf-8')}")
 exit(0)
 game_data_dict = hb.GetChoiceDetails("june-2025")
 for key in game_data_dict["contentChoiceOptions"]["contentChoiceData"]["game_data"]:

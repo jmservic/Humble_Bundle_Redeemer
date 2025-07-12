@@ -8,8 +8,11 @@ from http_utils import SetCookieHeaderToMorsels
 from enum import Enum
 import json
 from bs4 import BeautifulSoup
+from steam_utils import EncodeProtoBuff
+import Steam_RSA_Public_Key_Request_pb2 
 
 STEAM_DOMAIN = "store.steampowered.com"
+STEAM_API_DOMAIN = "https://api.steampowered.com"
 STEAM_REGISTER_KEY = "https://store.teampowered.com/account/registerkey"
 STEAM_REGISTER_KEY_API = "/account/ajaxregisterkey"
 STEAM_PASS_RSA_PUBLIC_KEY_API = "/IAuthenticationService/GetPasswordRSAPublicKey/v1"
@@ -34,12 +37,13 @@ class LibraryClient(ABC):
 
 class SteamClient(LibraryClient):
 
-    def __init__(self, login=None, password=None user_agent=USER_AGENT):
+    def __init__(self, login=None, password=None, user_agent=USER_AGENT):
         self.__session = Session()
         self.__login = login
         self.__password = password
         self.__loggedIn = False
         self.__LoadCookies()
+        self.__user_agent = user_agent
 
     def Login(self, payload=None):
         pass
@@ -49,6 +53,40 @@ class SteamClient(LibraryClient):
 
     def RegisterKey(self, gamekey):
         pass
+
+    def GetRSAPublicKey(self):
+        print(self.__login)
+        rsa_pk_request = Steam_RSA_Public_Key_Request_pb2.SteamRSAPublicKeyRequest()
+        rsa_pk_request.account_name = self.__login
+        rsa_pk_serialized = rsa_pk_request.SerializeToString()
+
+        payload = { "origin":"https://store.steampowered.com",
+                   "input_protobuf_encoded": EncodeProtoBuff(rsa_pk_serialized)
+                }
+        res = self.__session.get(STEAM_API_DOMAIN + STEAM_PASS_RSA_PUBLIC_KEY_API,
+                           params=payload,
+                           headers={'User-Agent': self.__user_agent})
+        if not res.ok:
+            return ""
+        
+        rsa_pk_response = Steam_RSA_Public_Key_Request_pb2.SteamRSAPublicKeyResponse()
+        print(res.status_code)
+        res.encoding = "ascii"
+        print(bytes(res.text,"utf-8"))
+        print(res.text)
+        print(res.content)
+        print(len(res.text))
+        print([hex(ord(char_val)) for char_val in res.text])
+        print(len(bytes(res.text,"utf-8")))
+        #print([bin(char_val) for char_val in bytes(res.text, "utf-8")])
+        #print([char_val for char_val in bytes(res.text, "utf-8")])
+        #print(bin(-128))
+        #print([bin(ord(char_val)) for char_val in res.text])
+        response_text = res.text 
+        #response_text = response_text.replace(response_text[1], chr(512), 1)
+      #  print([ord(char_val) for char_val in response_text])
+        rsa_pk_response.ParseFromString(res.content)#bytes(response_text, "utf-8"))
+        return rsa_pk_response
 
     def Set_Login(self, login):
         self.__login = login

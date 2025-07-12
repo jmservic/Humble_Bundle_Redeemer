@@ -5,3 +5,9 @@ package steam_proto;
 message SteamRSAPublicKeyRequest {
 	string account_name = 1;
 }
+
+message SteamRSAPublicKeyResponse {
+	string publickey_exp = 1;
+	string publickey_mod = 2;
+	uint32 timestamp = 3;
+}
