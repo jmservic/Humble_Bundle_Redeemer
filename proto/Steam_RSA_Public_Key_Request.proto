@@ -11,3 +11,27 @@ message SteamRSAPublicKeyResponse {
 	string publickey_mod = 2;
 	uint64 timestamp = 3;
 }
+
+message SteamBeginAuthCredRequest {
+	string account_name = 1;
+	string encrypted_password = 2;
+	string encryption_timestamp = 3;
+	string remember_login = 4;
+	string persistence = 6;
+	string website_id = 7;
+}
+
+message SteamBeginAuthCredResponse {
+	uint64 client_id = 1;
+	uint32 request_id = 2;
+	float interval = 3;
+	SteamConfirmationResponse allowed_confirmations = 4;
+	steam_id = 5;
+	weak_token = 6;
+	agreement_session_url = 7;
+	extended_error_message = 8;
+}
+
+message SteamConfirmationResponse {
+
+}
