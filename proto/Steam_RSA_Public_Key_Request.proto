@@ -61,7 +61,7 @@ message SteamBeginAuthCredResponse {
 	uint64 client_id = 1;
 	bytes request_id = 2;
 	float interval = 3;
-	SteamConfirmationResponse allowed_confirmations = 4;
+	repeated SteamConfirmationResponse allowed_confirmations = 4;
 	uint64 steam_id = 5;
 	string weak_token = 6;
 	string agreement_session_url = 7;
