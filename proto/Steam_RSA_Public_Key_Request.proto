@@ -12,26 +12,63 @@ message SteamRSAPublicKeyResponse {
 	uint64 timestamp = 3;
 }
 
+enum platformType {
+	Windows = 1;
+	Web_maybe = 2;
+}
+
+enum persistenceType {
+	persist = 1;
+}
+
+enum appType {
+	unknown = 1;
+}
+
+enum confirmationType {
+	unknown = 1;
+	something = 2;
+	confirmed = 3;
+}
+
+message deviceDetails {
+	string device_friendly_name = 1; //User-Agent
+	platformType platform_type = 2; //it is 2 on firefox
+	int32 os_type = 3; //rest is undefined.
+	uint32 gaming_device_type = 4;
+	uint32 client_count = 5;
+	bytes machine_id = 6;
+	appType app_type = 7;
+
+}
+//website_id default should be "Unknown" device friendly name / platform type is undefined
 message SteamBeginAuthCredRequest {
-	string account_name = 1;
-	string encrypted_password = 2;
-	string encryption_timestamp = 3;
-	string remember_login = 4;
-	string persistence = 6;
-	string website_id = 7;
+	string device_friendly_name = 1;
+	string account_name = 2;
+	string encrypted_password = 3;
+	uint64 encryption_timestamp = 4;
+	bool remember_login = 5;
+	platformType platform_type = 6;
+	persistenceType persistence = 7;
+	string website_id = 8;
+	deviceDetails device_details = 9;
+	string guard_data = 10;
+	uint32 language = 11;
+	int32 qos_level = 12;
 }
 
 message SteamBeginAuthCredResponse {
 	uint64 client_id = 1;
-	uint32 request_id = 2;
+	bytes request_id = 2;
 	float interval = 3;
 	SteamConfirmationResponse allowed_confirmations = 4;
-	steam_id = 5;
-	weak_token = 6;
-	agreement_session_url = 7;
-	extended_error_message = 8;
+	uint64 steam_id = 5;
+	string weak_token = 6;
+	string agreement_session_url = 7;
+	string extended_error_message = 8;
 }
 
 message SteamConfirmationResponse {
-
+	confirmationType confirmation_type = 1;
+	string associated_message = 2;
 }
