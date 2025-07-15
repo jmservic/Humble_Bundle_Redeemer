@@ -13,15 +13,31 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\"Steam_RSA_Public_Key_Request.proto\x12\x0bsteam_proto\"0\n\x18SteamRSAPublicKeyRequest\x12\x14\n\x0c\x61\x63\x63ount_name\x18\x01 \x01(\t\"\\\n\x19SteamRSAPublicKeyResponse\x12\x15\n\rpublickey_exp\x18\x01 \x01(\t\x12\x15\n\rpublickey_mod\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x04\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\"Steam_RSA_Public_Key_Request.proto\x12\x0bsteam_proto\"0\n\x18SteamRSAPublicKeyRequest\x12\x14\n\x0c\x61\x63\x63ount_name\x18\x01 \x01(\t\"\\\n\x19SteamRSAPublicKeyResponse\x12\x15\n\rpublickey_exp\x18\x01 \x01(\t\x12\x15\n\rpublickey_mod\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x04\"\xde\x01\n\rdeviceDetails\x12\x1c\n\x14\x64\x65vice_friendly_name\x18\x01 \x01(\t\x12\x30\n\rplatform_type\x18\x02 \x01(\x0e\x32\x19.steam_proto.platformType\x12\x0f\n\x07os_type\x18\x03 \x01(\x05\x12\x1a\n\x12gaming_device_type\x18\x04 \x01(\r\x12\x14\n\x0c\x63lient_count\x18\x05 \x01(\r\x12\x12\n\nmachine_id\x18\x06 \x01(\x0c\x12&\n\x08\x61pp_type\x18\x07 \x01(\x0e\x32\x14.steam_proto.appType\"\x87\x03\n\x19SteamBeginAuthCredRequest\x12\x1c\n\x14\x64\x65vice_friendly_name\x18\x01 \x01(\t\x12\x14\n\x0c\x61\x63\x63ount_name\x18\x02 \x01(\t\x12\x1a\n\x12\x65ncrypted_password\x18\x03 \x01(\t\x12\x1c\n\x14\x65ncryption_timestamp\x18\x04 \x01(\x04\x12\x16\n\x0eremember_login\x18\x05 \x01(\x08\x12\x30\n\rplatform_type\x18\x06 \x01(\x0e\x32\x19.steam_proto.platformType\x12\x31\n\x0bpersistence\x18\x07 \x01(\x0e\x32\x1c.steam_proto.persistenceType\x12\x12\n\nwebsite_id\x18\x08 \x01(\t\x12\x32\n\x0e\x64\x65vice_details\x18\t \x01(\x0b\x32\x1a.steam_proto.deviceDetails\x12\x12\n\nguard_data\x18\n \x01(\t\x12\x10\n\x08language\x18\x0b \x01(\r\x12\x11\n\tqos_level\x18\x0c \x01(\x05\"\x81\x02\n\x1aSteamBeginAuthCredResponse\x12\x11\n\tclient_id\x18\x01 \x01(\x04\x12\x12\n\nrequest_id\x18\x02 \x01(\x0c\x12\x10\n\x08interval\x18\x03 \x01(\x02\x12\x45\n\x15\x61llowed_confirmations\x18\x04 \x03(\x0b\x32&.steam_proto.SteamConfirmationResponse\x12\x10\n\x08steam_id\x18\x05 \x01(\x04\x12\x12\n\nweak_token\x18\x06 \x01(\t\x12\x1d\n\x15\x61greement_session_url\x18\x07 \x01(\t\x12\x1e\n\x16\x65xtended_error_message\x18\x08 \x01(\t\"q\n\x19SteamConfirmationResponse\x12\x38\n\x11\x63onfirmation_type\x18\x01 \x01(\x0e\x32\x1d.steam_proto.confirmationType\x12\x1a\n\x12\x61ssociated_message\x18\x02 \x01(\t*@\n\x0cplatformType\x12\x14\n\x10unknown_platform\x10\x00\x12\x0b\n\x07Windows\x10\x01\x12\r\n\tWeb_maybe\x10\x02*/\n\x0fpersistenceType\x12\x0f\n\x0bnot_persist\x10\x00\x12\x0b\n\x07persist\x10\x01*)\n\x07\x61ppType\x12\x0b\n\x07unknown\x10\x00\x12\x11\n\runknown_app_2\x10\x01*h\n\x10\x63onfirmationType\x12\x15\n\x11unknown_confirm_1\x10\x00\x12\x0c\n\x08unknown2\x10\x01\x12\r\n\tsomething\x10\x02\x12\r\n\tconfirmed\x10\x03\x12\x11\n\rsomethingElse\x10\x04\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'Steam_RSA_Public_Key_Request_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
+  _PLATFORMTYPE._serialized_start=1189
+  _PLATFORMTYPE._serialized_end=1253
+  _PERSISTENCETYPE._serialized_start=1255
+  _PERSISTENCETYPE._serialized_end=1302
+  _APPTYPE._serialized_start=1304
+  _APPTYPE._serialized_end=1345
+  _CONFIRMATIONTYPE._serialized_start=1347
+  _CONFIRMATIONTYPE._serialized_end=1451
   _STEAMRSAPUBLICKEYREQUEST._serialized_start=51
   _STEAMRSAPUBLICKEYREQUEST._serialized_end=99
   _STEAMRSAPUBLICKEYRESPONSE._serialized_start=101
   _STEAMRSAPUBLICKEYRESPONSE._serialized_end=193
+  _DEVICEDETAILS._serialized_start=196
+  _DEVICEDETAILS._serialized_end=418
+  _STEAMBEGINAUTHCREDREQUEST._serialized_start=421
+  _STEAMBEGINAUTHCREDREQUEST._serialized_end=812
+  _STEAMBEGINAUTHCREDRESPONSE._serialized_start=815
+  _STEAMBEGINAUTHCREDRESPONSE._serialized_end=1072
+  _STEAMCONFIRMATIONRESPONSE._serialized_start=1074
+  _STEAMCONFIRMATIONRESPONSE._serialized_end=1187
 # @@protoc_insertion_point(module_scope)

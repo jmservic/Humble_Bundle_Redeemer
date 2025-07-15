@@ -11,11 +11,13 @@ import base64
 load_dotenv()
 hb_account = os.getenv("HB_ACCOUNT")
 hb_password = os.getenv("HB_PASSWORD")
+steam_account = os.getenv("STEAM_ACCOUNT")
+steam_password = os.getenv("STEAM_PASSWORD")
 
 if not os.path.exists("./cookies"):
     os.mkdir("./cookies")
 hb = HumbleClient(login=hb_account,password=hb_password)
-steam = SteamClient(login="Jmarcus2004")
+steam = SteamClient(login=steam_account,password=steam_password)
 #print(f"Cookies before request to humble bundle main page:")
 #hb_cookies = hb.GetSessionCookies()
 #for cookie in hb_cookies:
@@ -64,13 +66,14 @@ print(hb.RedeemKey("fashionpolicesquad_choice_steam", "Z8KftUKAEf8zG7zY"))
 
 #Out of choices
 #print(hb.ChooseContent("qdxHRf4bHywuMfd2", "sigmatheory_globalcoldwar"))
-rsa_pk_request = Steam_RSA_Public_Key_Request_pb2.SteamRSAPublicKeyRequest()
-rsa_pk_request.account_name = "Jmarcus2004"
-rsa_pk_serialized = rsa_pk_request.SerializeToString()
-print(rsa_pk_serialized)
-print(" ".join([str(b_val) for b_val in rsa_pk_serialized]))
-print(EncodeProtoBuff(rsa_pk_serialized))
-print(f"Steam RSA Public Key Request return: {steam.GetRSAPublicKey()}") 
+#rsa_pk_request = Steam_RSA_Public_Key_Request_pb2.SteamRSAPublicKeyRequest()
+#rsa_pk_request.account_name = "Jmarcus2004"
+#rsa_pk_serialized = rsa_pk_request.SerializeToString()
+#print(rsa_pk_serialized)
+#print(" ".join([str(b_val) for b_val in rsa_pk_serialized]))
+#print(EncodeProtoBuff(rsa_pk_serialized))
+#print(f"Steam RSA Public Key Request return: {steam.GetRSAPublicKey()}") 
+print(f"Steam Login Request return: {steam.Login()}") 
       #{base64.b64encode(steam.GetRSAPublicKey().encode('utf-8')).decode('utf-8')}")
 exit(0)
 game_data_dict = hb.GetChoiceDetails("june-2025")

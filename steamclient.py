@@ -8,7 +8,7 @@ from http_utils import SetCookieHeaderToMorsels
 from enum import Enum
 import json
 from bs4 import BeautifulSoup
-from steam_utils import EncodeProtoBuff
+from steam_utils import EncodeProtoBuff, EncryptPassword
 import Steam_RSA_Public_Key_Request_pb2 
 
 STEAM_DOMAIN = "store.steampowered.com"
@@ -46,7 +46,33 @@ class SteamClient(LibraryClient):
         self.__user_agent = user_agent
 
     def Login(self, payload=None):
-        pass
+        if self.__loggedIn:
+            print(f"Already logged into steam as {self.__login}")
+            return
+
+        rsa_pk_response = self.GetRSAPublicKey()
+        begin_auth_req = Steam_RSA_Public_Key_Request_pb2.SteamBeginAuthCredRequest()
+        begin_auth_req.account_name = self.__login
+        begin_auth_req.encrypted_password = EncryptPassword(self.__password, rsa_pk_response)
+        begin_auth_req.encryption_timestamp = rsa_pk_response.timestamp
+        begin_auth_req.remember_login = True
+        begin_auth_req.platform_type = 1
+        begin_auth_req.website_id = "Store"
+        begin_auth_req.device_details.device_friendly_name = self.__user_agent
+        begin_auth_req.device_details.platform_type = 2
+        begin_auth_req.language = 0
+
+        begin_auth_req_serialized = begin_auth_req.SerializeToString()
+        body = {"input_protobuf_encoded": EncodeProtoBuff(begin_auth_req_serialized)}
+
+        res = self.__session.post(STEAM_API_DOMAIN + STEAM_BEGIN_AUTH_API, data=body)
+
+        print(res.status_code)
+        print(res.content)
+        begin_auth_response = Steam_RSA_Public_Key_Request_pb2.SteamBeginAuthCredResponse()
+        begin_auth_response.ParseFromString(res.content)
+        print(begin_auth_response)
+
 
     def GetLibraryDetails(self):
         pass
@@ -71,7 +97,7 @@ class SteamClient(LibraryClient):
         
         rsa_pk_response = Steam_RSA_Public_Key_Request_pb2.SteamRSAPublicKeyResponse()
         print(res.status_code)
-        res.encoding = "ascii"
+#        res.encoding = "ascii"
         print(bytes(res.text,"utf-8"))
         print(res.text)
         print(res.content)

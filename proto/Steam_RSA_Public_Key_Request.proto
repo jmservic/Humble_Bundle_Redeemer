@@ -13,22 +13,27 @@ message SteamRSAPublicKeyResponse {
 }
 
 enum platformType {
+	unknown_platform = 0;
 	Windows = 1;
 	Web_maybe = 2;
 }
 
 enum persistenceType {
+	not_persist = 0;
 	persist = 1;
 }
 
 enum appType {
-	unknown = 1;
+	unknown = 0;
+	unknown_app_2 = 1;
 }
 
 enum confirmationType {
-	unknown = 1;
+	unknown_confirm_1 = 0;
+	unknown2 = 1;
 	something = 2;
 	confirmed = 3;
+	somethingElse = 4;
 }
 
 message deviceDetails {
