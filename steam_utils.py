@@ -1,7 +1,13 @@
 from Crypto.Cipher import PKCS1_OAEP, PKCS1_v1_5
 from Crypto.PublicKey import RSA
+import re
+import math
 
 CHAR_ENCODE_ARR = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/']
+
+HEX_ENCODE_STR = "0123456789abcdef"
+
+BASE_64_STR = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
 
 def EncodeProtoBuff(proto_buffer):
     buffer_len = len(proto_buffer)
@@ -48,5 +54,81 @@ def EncodeProtoSection(proto_buffer, start_index, end_index):
 #        }
 
 def EncryptPassword(password, rsa_key):
-    return password
+    print(rsa_key)
+    print(type(rsa_key.publickey_mod.encode()))	
+    key_mod = int(rsa_key.publickey_mod, 16)#int.from_bytes(rsa_key.publickey_mod.encode(encoding="utf-16"))
+    key_exponent = int(rsa_key.publickey_exp, 16)
+    print(key_mod)
+    print(key_exponent)
+	
+	
+    key = RSA.construct((key_mod, key_exponent))
+    print(key)
+    cipher = PKCS1_OAEP.new(key) #PKCS1_v1_5.new(key)
+    ciphertext = cipher.encrypt(password.encode())
+   # print(ciphertext.hex())
+   # print(password.encode())
+    decode_hex_str = decodeHexString(ciphertext.hex())
+    encode_hex_str = encodeHexString(decode_hex_str)
+    return encode_hex_str
+
+def decodeHexString(hex_value):
+    if not hex_value:
+        return 0
+    hex_value_clean = re.sub(r"/[^0-9abcdef]/g", "", hex_value)
+    hex_string_arr = []
+    index = 0
+    print(len(hex_value_clean))
+    while index < len(hex_value_clean):
+        temp_val = HEX_ENCODE_STR.index(hex_value_clean[index]) << 4 & 240
+        index += 1
+        temp_val |= 15 & HEX_ENCODE_STR.index(hex_value_clean[index])
+        index += 1
+        hex_string_arr.append(chr(temp_val))
+    hex_string = "".join(hex_string_arr)
+    return hex_string
+
+def encodeHexString(hex_string):
+    if not hex_string:
+        return 0
+    
+    index = 0
+    encode_string_arr = []
+
+    while index < len(hex_string):
+        t = ord(hex_string[index])
+        n = t >> 2
+        index += 1
+
+        try:
+            r = ord(hex_string[index])
+            s = (3 & t) << 4 | r >> 4
+        except:
+            r = float("nan")
+            s = 0
+        index += 1
+        
+        try:
+            i = ord(hex_string[index])
+            a = (15 & r) << 2 | i >> 6
+            o = 63 & i
+        except:
+            i = float("nan")
+
+        index += 1
+
+        if math.isnan(r):
+            o = 64
+            a = o
+        elif math.isnan(i):
+            o = 64
+        #print(index)
+    
+        encode_string_arr.append(f"{BASE_64_STR[n]}{BASE_64_STR[s]}{BASE_64_STR[a]}{BASE_64_STR[o]}")
+        #print(encode_string_arr[-1])
+    
+    encode_string = "".join(encode_string_arr)
+    #print(encode_string)
+    return encode_string
+
 

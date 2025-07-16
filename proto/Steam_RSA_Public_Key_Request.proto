@@ -7,8 +7,8 @@ message SteamRSAPublicKeyRequest {
 }
 
 message SteamRSAPublicKeyResponse {
-	string publickey_exp = 1;
-	string publickey_mod = 2;
+	string publickey_mod = 1;
+	string publickey_exp = 2;
 	uint64 timestamp = 3;
 }
 

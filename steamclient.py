@@ -62,7 +62,10 @@ class SteamClient(LibraryClient):
         begin_auth_req.device_details.platform_type = 2
         begin_auth_req.language = 0
 
+        #print(begin_auth_req)
         begin_auth_req_serialized = begin_auth_req.SerializeToString()
+        #print(begin_auth_req_serialized)
+        #print(EncodeProtoBuff(begin_auth_req_serialized))
         body = {"input_protobuf_encoded": EncodeProtoBuff(begin_auth_req_serialized)}
 
         res = self.__session.post(STEAM_API_DOMAIN + STEAM_BEGIN_AUTH_API, data=body)
@@ -96,19 +99,19 @@ class SteamClient(LibraryClient):
             return ""
         
         rsa_pk_response = Steam_RSA_Public_Key_Request_pb2.SteamRSAPublicKeyResponse()
-        print(res.status_code)
+        #print(res.status_code)
 #        res.encoding = "ascii"
-        print(bytes(res.text,"utf-8"))
-        print(res.text)
-        print(res.content)
-        print(len(res.text))
-        print([hex(ord(char_val)) for char_val in res.text])
-        print(len(bytes(res.text,"utf-8")))
+        #print(bytes(res.text,"utf-8"))
+        #print(res.text)
+        #print(res.content)
+        #print(len(res.text))
+        #print([hex(ord(char_val)) for char_val in res.text])
+        #print(len(bytes(res.text,"utf-8")))
         #print([bin(char_val) for char_val in bytes(res.text, "utf-8")])
         #print([char_val for char_val in bytes(res.text, "utf-8")])
         #print(bin(-128))
         #print([bin(ord(char_val)) for char_val in res.text])
-        response_text = res.text 
+        #response_text = res.text 
         #response_text = response_text.replace(response_text[1], chr(512), 1)
       #  print([ord(char_val) for char_val in response_text])
         rsa_pk_response.ParseFromString(res.content)#bytes(response_text, "utf-8"))
