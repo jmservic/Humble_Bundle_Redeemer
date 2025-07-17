@@ -2,6 +2,8 @@ beautifulsoup4==4.13.4
 certifi==2025.6.15
 charset-normalizer==3.4.2
 idna==3.10
+protobuf==6.31.1
+pycryptodome==3.23.0
 python-dotenv==1.1.1
 requests==2.32.4
 soupsieve==2.7

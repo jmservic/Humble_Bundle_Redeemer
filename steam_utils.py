@@ -64,7 +64,7 @@ def EncryptPassword(password, rsa_key):
 	
     key = RSA.construct((key_mod, key_exponent))
     print(key)
-    cipher = PKCS1_OAEP.new(key) #PKCS1_v1_5.new(key)
+    cipher = PKCS1_v1_5.new(key)#PKCS1_OAEP.new(key) 
     ciphertext = cipher.encrypt(password.encode())
    # print(ciphertext.hex())
    # print(password.encode())
@@ -86,6 +86,7 @@ def decodeHexString(hex_value):
         index += 1
         hex_string_arr.append(chr(temp_val))
     hex_string = "".join(hex_string_arr)
+    print(f"decodeHexString returns:\n {hex_string_arr}")
     return hex_string
 
 def encodeHexString(hex_string):
@@ -101,11 +102,12 @@ def encodeHexString(hex_string):
         index += 1
 
         try:
+            s = (3 & t) << 4
             r = ord(hex_string[index])
-            s = (3 & t) << 4 | r >> 4
+            s |= r >> 4
         except:
             r = float("nan")
-            s = 0
+            
         index += 1
         
         try:
@@ -114,6 +116,8 @@ def encodeHexString(hex_string):
             o = 63 & i
         except:
             i = float("nan")
+            a = 0
+            o = 0
 
         index += 1
 
@@ -128,7 +132,7 @@ def encodeHexString(hex_string):
         #print(encode_string_arr[-1])
     
     encode_string = "".join(encode_string_arr)
-    #print(encode_string)
+    print(encode_string)
     return encode_string
 
 
