@@ -27,7 +27,7 @@ enum appType {
 	unknown = 0;
 	unknown_app_2 = 1;
 }
-
+//Definitely is associated with how we confirm a session whether that's a guard key, device authentication, or push request
 enum confirmationType {
 	unknown_confirm_1 = 0;
 	unknown2 = 1;
@@ -76,4 +76,21 @@ message SteamBeginAuthCredResponse {
 message SteamConfirmationResponse {
 	confirmationType confirmation_type = 1;
 	string associated_message = 2;
+}
+
+message SteamPollAuthSessionRequest {
+	uint64 client_id = 1;
+	bytes request_id = 2;
+	//fixed64 token_to_revoke = 3;
+}
+
+message SteamPollAuthSessionResponse {
+	uint64 new_client_id = 1;
+	string new_challenge_url = 2;
+	string refresh_token = 3;
+	string access_token = 4;
+	bool had_remote_interaction = 5;
+	string account_name = 6;
+	string new_guard_data = 7;
+	string agreement_session_url = 8;
 }

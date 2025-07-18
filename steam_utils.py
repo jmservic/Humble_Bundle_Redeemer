@@ -27,7 +27,7 @@ def EncodeProtoBuff(proto_buffer):
             encode_blocks.append(CHAR_ENCODE_ARR[char_value >> 2] + CHAR_ENCODE_ARR[char_value << 4 & 63] + "==")
         case 2:
             char_value = (proto_buffer[-2] << 8) + proto_buffer[-1]
-            encode_blocks.append(CHAR_ENCODE_ARR[char_value >> 10] + CHAR_ENCODE_ARR[char_value >> 4 & 63] + "-")
+            encode_blocks.append(CHAR_ENCODE_ARR[char_value >> 10] + CHAR_ENCODE_ARR[char_value >> 4 & 63] + CHAR_ENCODE_ARR[char_value << 2 & 63] + "=")
         case _:
             pass
     return "".join(encode_blocks)
@@ -54,16 +54,16 @@ def EncodeProtoSection(proto_buffer, start_index, end_index):
 #        }
 
 def EncryptPassword(password, rsa_key):
-    print(rsa_key)
-    print(type(rsa_key.publickey_mod.encode()))	
+    # print(rsa_key)
+    #print(type(rsa_key.publickey_mod.encode()))	
     key_mod = int(rsa_key.publickey_mod, 16)#int.from_bytes(rsa_key.publickey_mod.encode(encoding="utf-16"))
     key_exponent = int(rsa_key.publickey_exp, 16)
-    print(key_mod)
-    print(key_exponent)
+    #print(key_mod)
+    #print(key_exponent)
 	
 	
     key = RSA.construct((key_mod, key_exponent))
-    print(key)
+    #print(key)
     cipher = PKCS1_v1_5.new(key)#PKCS1_OAEP.new(key) 
     ciphertext = cipher.encrypt(password.encode())
    # print(ciphertext.hex())
@@ -86,7 +86,7 @@ def decodeHexString(hex_value):
         index += 1
         hex_string_arr.append(chr(temp_val))
     hex_string = "".join(hex_string_arr)
-    print(f"decodeHexString returns:\n {hex_string_arr}")
+    #print(f"decodeHexString returns:\n {hex_string_arr}")
     return hex_string
 
 def encodeHexString(hex_string):
@@ -132,7 +132,7 @@ def encodeHexString(hex_string):
         #print(encode_string_arr[-1])
     
     encode_string = "".join(encode_string_arr)
-    print(encode_string)
+    #print(encode_string)
     return encode_string
 
 
