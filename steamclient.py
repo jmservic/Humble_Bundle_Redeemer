@@ -21,6 +21,7 @@ STEAM_PASS_RSA_PUBLIC_KEY_API = "/IAuthenticationService/GetPasswordRSAPublicKey
 STEAM_BEGIN_AUTH_API = "/IAuthenticationService/BeginAuthSessionViaCredentials/v1"
 STEAM_POLL_AUTH_STATUS_API = "/IAuthenticationService/PollAuthSessionStatus/v1"
 STEAM_FINALIZE_LOGIN_API = "/jwt/finalizelogin"
+STEAM_GAMES = "https://steamcommunity.com/my/games/"
 STEAM_MAIN = "https://store.steampowered.com"
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0"
 
@@ -141,13 +142,21 @@ class SteamClient(LibraryClient):
         return poll_auth_session_response
 
     def GetLibraryDetails(self):
-        pass
+        #return if not logged in
+        response = self.__session.get(STEAM_GAMES)
+        soup = BeautifulSoup(response.text, "html.parser")
+        gameslist_config = soup.find(id="gameslist_config")
+        gameslist_dict = json.loads(gameslist_config["data-profile-gameslist"])
+        return gameslist_dict
 
     def RegisterKey(self, gamekey):
         res = self.__session.post(f"https://{STEAM_DOMAIN}{STEAM_REGISTER_KEY_API}", data={"product_key": gamekey,
                                                                                 "sessionid": self.__session.cookies.get("sessionid", domain=STEAM_DOMAIN)})
         print(res.status_code)
-        print(res.json())
+        rtn_data = res.json()
+        print(rtn_data)
+        return rtn_data
+
     def VisitHomePage(self):
         if self.__session:
             print(f"Final URL of visit home page = {self.__session.get(STEAM_MAIN, headers={'User-Agent': self.__user_agent}).url}")

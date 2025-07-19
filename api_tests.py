@@ -74,8 +74,20 @@ print(hb.RedeemKey("fashionpolicesquad_choice_steam", "Z8KftUKAEf8zG7zY"))
 #print(EncodeProtoBuff(rsa_pk_serialized))
 #print(f"Steam RSA Public Key Request return: {steam.GetRSAPublicKey()}") 
 print(f"Steam Login Request return: {steam.Login()}") 
+gameslist_config = steam.GetLibraryDetails()
+print(f"Number of games in library: {gameslist_config['rgGames']}")
+print("Keys in gameslist_config:")
+for key in gameslist_config:
+    print(key)
+print("\nKeys in a game item:")
+gameslist = gameslist_config["rgGames"]
+for key in gameslist[0]:
+    print(key)
+
+for game in gameslist:
+    print(f"\nApp ID: {game['appid']} | Name: {game['name']} | Playtime: {game['playtime_forever']}")
 #print(f"Steam cookies {steam.GetSessionCookies()}")
-steam.RegisterKey("LDGZQ-WPB90-KDAPG")
+#steam.RegisterKey("LDGZQ-WPB90-KDAPG")
 #{base64.b64encode(steam.GetRSAPublicKey().encode('utf-8')).decode('utf-8')}")
 #print(f"Steam PollAuthSession return: {steam.PollAuthSessionStatus(10453852608360995313, bytes([86, 83, 229, 143, 204, 46, 235, 192, 31, 128, 168, 124,234, 8, 150, 66]) )}")
 exit(0)
