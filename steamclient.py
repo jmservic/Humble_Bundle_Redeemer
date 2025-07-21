@@ -142,9 +142,11 @@ class SteamClient(LibraryClient):
         return poll_auth_session_response
 
     def GetLibraryDetails(self):
-        #return if not logged in
-        response = self.__session.get(STEAM_GAMES)
-        soup = BeautifulSoup(response.text, "html.parser")
+        if not self.__loggedIn:
+            return
+
+        res = self.__session.get(STEAM_GAMES)
+        soup = BeautifulSoup(res.text, "html.parser")
         gameslist_config = soup.find(id="gameslist_config")
         gameslist_dict = json.loads(gameslist_config["data-profile-gameslist"])
         return gameslist_dict
