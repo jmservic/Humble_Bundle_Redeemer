@@ -55,7 +55,7 @@ class SteamClient(LibraryClient):
             return
         self.VisitHomePage()
         res = self.__session.get(STEAM_REGISTER_KEY)
-        print(res.url)
+        #print(res.url)
         if "login" not in res.url:
             self.__loggedIn = True
             print(f"Already logged into steam as {self.__login}")
