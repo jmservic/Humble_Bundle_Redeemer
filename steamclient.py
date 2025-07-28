@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from steam_utils import EncodeProtoBuff, EncryptPassword
 import Steam_RSA_Public_Key_Request_pb2 
 from time import sleep
+import threading
 
 STEAM_DOMAIN = "store.steampowered.com"
 STEAM_API_DOMAIN = "https://api.steampowered.com"
@@ -48,19 +49,23 @@ class SteamClient(LibraryClient):
         self.__loggedIn = False
         self.__LoadCookies()
         self.__user_agent = user_agent
+        self.__auth_session = None
+        self.polling = False
 
     def Login(self, payload=None):
         if self.__loggedIn:
             print(f"Already logged into steam as {self.__login}")
             return
-        self.VisitHomePage()
+
+        #self.VisitHomePage() Might not need this actually.
         res = self.__session.get(STEAM_REGISTER_KEY)
-        #print(res.url)
+        print(res.url)
         if "login" not in res.url:
             self.__loggedIn = True
             print(f"Already logged into steam as {self.__login}")
             return
 
+        self.__session.cookies.clear()
         #Possible do a state diagram for logging in?
         rsa_pk_response = self.GetRSAPublicKey()
         begin_auth_req = Steam_RSA_Public_Key_Request_pb2.SteamBeginAuthCredRequest()
@@ -91,14 +96,19 @@ class SteamClient(LibraryClient):
         #If auth session is created poll the request repeatedly
         print(self.GetSessionCookies())
         print(self.__CookieString())
+        self.__auth_session = begin_auth_response
+        self.polling = True
+        t = threading.Thread(target=self.PollAuthAndFinalize)
+        t.start()
 
-        while(True):
-            poll_session_response = self.PollAuthSessionStatus(begin_auth_response.client_id, begin_auth_response.request_id)
+    def PollAuthAndFinalize(self):
+        while(self.__auth_session and self.__auth_session.client_id and self.__auth_session.request_id):
+            poll_session_response = self.PollAuthSessionStatus(self.__auth_session.client_id, self.__auth_session.request_id)
             print(poll_session_response)
             if poll_session_response.refresh_token:
                 break
-            sleep(5)
-        
+            sleep(self.__auth_session.interval) if self.__auth_session.interval else sleep(5)
+        self.polling = False
         res = self.__session.post(STEAM_LOGIN_DOMAIN + STEAM_FINALIZE_LOGIN_API, data={"nonce": poll_session_response.refresh_token,
                                                                                      "sessionid": self.__session.cookies.get("sessionid", domain=STEAM_DOMAIN)})
         print(res.status_code)
@@ -109,7 +119,7 @@ class SteamClient(LibraryClient):
         for request in data["transfer_info"]:
             url = request["url"]
             params = request["params"]
-            params["steamID"] = begin_auth_response.steam_id 
+            params["steamID"] = self.__auth_session.steam_id 
             print(f"Setting token for URL: {url} and params {params}")
             res = self.__session.post(request['url'], data=request['params'])
             print(res.status_code)

@@ -7,6 +7,7 @@ import Steam_RSA_Public_Key_Request_pb2
 from steam_utils import *
 from steamclient import SteamClient
 import base64
+from time import sleep
 #We're going to use the pickle module to save and load the cookies.
 load_dotenv()
 hb_account = os.getenv("HB_ACCOUNT")
@@ -74,7 +75,11 @@ print(hb.RedeemKey("fashionpolicesquad_choice_steam", "Z8KftUKAEf8zG7zY"))
 #print(EncodeProtoBuff(rsa_pk_serialized))
 #print(f"Steam RSA Public Key Request return: {steam.GetRSAPublicKey()}") 
 print(f"Steam Login Request return: {steam.Login()}") 
+while steam.polling:
+    print("Waiting for steam authenticaiton login")
+    sleep(5)
 gameslist_config = steam.GetLibraryDetails()
+exit(0)
 print(f"Number of games in library: {gameslist_config['rgGames']}")
 print("Keys in gameslist_config:")
 for key in gameslist_config:
