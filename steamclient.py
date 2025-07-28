@@ -40,6 +40,18 @@ class LibraryClient(ABC):
     def RegisterKey(self, gamekey):
         pass
 
+class LoginResult(Enum):
+    SUCCESS = 0
+    PUBLIC_KEY_REQ_FAILED = 1
+    BAD_USERNAME = 2
+    BAD_PASSWORD = 3
+    BEGIN_AUTH_FAILED = 4
+    AUTH_SESS_INVALID = 5
+    FINALIZE_LOGIN_FAILED = 6
+    TRANSFER_INFO_FAILED = 7
+    BLOCKED = 8
+    TOO_MANY_REQUESTS = 9 
+
 class SteamClient(LibraryClient):
 
     def __init__(self, login=None, password=None, user_agent=USER_AGENT):
@@ -50,11 +62,13 @@ class SteamClient(LibraryClient):
         self.__LoadCookies()
         self.__user_agent = user_agent
         self.__auth_session = None
-        self.polling = False
+        self.__polling = False
+        self.__login_result = None
 
     def Login(self, payload=None):
         if self.__loggedIn:
             print(f"Already logged into steam as {self.__login}")
+            self.__login_result = LoginResult.SUCCESS
             return
 
         #self.VisitHomePage() Might not need this actually.
@@ -63,11 +77,18 @@ class SteamClient(LibraryClient):
         if "login" not in res.url:
             self.__loggedIn = True
             print(f"Already logged into steam as {self.__login}")
+            self.__login_result = LoginResult.SUCCESS
             return
 
+        #Currently clearing cookies because the outdated session was not cleared.
         self.__session.cookies.clear()
+
         #Possible do a state diagram for logging in?
         rsa_pk_response = self.GetRSAPublicKey()
+        if not rsa_pk_response:
+            self.__login_result = LoginResult.PUBLIC_KEY_REQ_FAILED
+            return
+
         begin_auth_req = Steam_RSA_Public_Key_Request_pb2.SteamBeginAuthCredRequest()
         begin_auth_req.account_name = self.__login
         begin_auth_req.encrypted_password = EncryptPassword(self.__password, rsa_pk_response)
@@ -87,50 +108,73 @@ class SteamClient(LibraryClient):
 
         res = self.__session.post(STEAM_API_DOMAIN + STEAM_BEGIN_AUTH_API, data=body)
 
-        print(res.status_code)
-        print(res.content)
+        #print(res.status_code)
+        #print(res.content)
+        if not res.ok:
+            self.__login_result = LoginResult.BEGIN_AUTH_FAILED
+            return
+
         begin_auth_response = Steam_RSA_Public_Key_Request_pb2.SteamBeginAuthCredResponse()
         begin_auth_response.ParseFromString(res.content)
-        print(begin_auth_response)
+        #print(begin_auth_response) 
+       # print(self.GetSessionCookies())
+       # print(self.__CookieString())
+        self.__auth_session = begin_auth_response
+        if not self.__auth_session.client_id or not self.__auth_session.request_id:
+            self.__login_result = LoginResult.BEGIN_AUTH_FAILED
+            return
 
         #If auth session is created poll the request repeatedly
-        print(self.GetSessionCookies())
-        print(self.__CookieString())
-        self.__auth_session = begin_auth_response
-        self.polling = True
+        self.__polling = True
         t = threading.Thread(target=self.PollAuthAndFinalize)
         t.start()
 
     def PollAuthAndFinalize(self):
         while(self.__auth_session and self.__auth_session.client_id and self.__auth_session.request_id):
-            poll_session_response = self.PollAuthSessionStatus(self.__auth_session.client_id, self.__auth_session.request_id)
-            print(poll_session_response)
-            if poll_session_response.refresh_token:
+            valid_session, poll_session_response = self.PollAuthSessionStatus(self.__auth_session.client_id, self.__auth_session.request_id)
+            #print(poll_session_response)
+            #print(self.__auth_session.interval)
+            if not valid_session or poll_session_response.refresh_token:
+                self.__polling = False
                 break
+
             sleep(self.__auth_session.interval) if self.__auth_session.interval else sleep(5)
-        self.polling = False
+
+        if not valid_session:
+            self.__login_result = LoginResult.AUTH_SESS_INVALID
+            return
+
         res = self.__session.post(STEAM_LOGIN_DOMAIN + STEAM_FINALIZE_LOGIN_API, data={"nonce": poll_session_response.refresh_token,
                                                                                      "sessionid": self.__session.cookies.get("sessionid", domain=STEAM_DOMAIN)})
-        print(res.status_code)
-        print(res.content)
+        #print(res.status_code)
+        #print(res.content)
+        #print(data)
+
+        if not res.ok:
+            self.__login_result = LoginResult.FINALIZE_LOGIN_FAILED
+            return
+
         data = res.json()
-        print(data)
 
         for request in data["transfer_info"]:
             url = request["url"]
             params = request["params"]
             params["steamID"] = self.__auth_session.steam_id 
-            print(f"Setting token for URL: {url} and params {params}")
-            res = self.__session.post(request['url'], data=request['params'])
-            print(res.status_code)
-            print(res.content)
-            print(res.headers)
+            #print(f"Setting token for URL: {url} and params {params}")
+            res = self.__session.post(url, data=params)
+            #print(res.status_code)
+            #print(res.content)
+            #print(res.headers)
+            if not res.ok:
+                self.__login_result = LoginResult.TRANSFER_INFO_FAILED
+                return
         
-        res = self.__session.get(STEAM_REGISTER_KEY)
-        print(res.url)
-        if "login" not in res.url:
-            self.__loggedIn = True
-            print("Successfully logged into steam!! CONGRATS!!!")
+        self.__loggedIn = True
+        self.__login_result = LoginResult.SUCCESS
+       # res = self.__session.get(STEAM_REGISTER_KEY)
+        #print(res.url)
+        #if "login" not in res.url:
+       #     print("Successfully logged into steam!! CONGRATS!!!")
 
     def PollAuthSessionStatus(self, client_id, request_id):
         poll_auth_session_req = Steam_RSA_Public_Key_Request_pb2.SteamPollAuthSessionRequest()
@@ -145,11 +189,17 @@ class SteamClient(LibraryClient):
 
         res = self.__session.post(STEAM_API_DOMAIN + STEAM_POLL_AUTH_STATUS_API, data=body)
 
-        print(res.status_code)
-        print(res.content)
+        #print(res.status_code)
+        #print(res.content)
         poll_auth_session_response = Steam_RSA_Public_Key_Request_pb2.SteamPollAuthSessionResponse()
         poll_auth_session_response.ParseFromString(res.content)
-        return poll_auth_session_response
+        return res.content is not None, poll_auth_session_response
+
+    def Polling(self):
+        return self.__polling
+
+    def GetLoginResult(self):
+        return self.__login_result
 
     def GetLibraryDetails(self):
         if not self.__loggedIn:
@@ -174,7 +224,6 @@ class SteamClient(LibraryClient):
             print(f"Final URL of visit home page = {self.__session.get(STEAM_MAIN, headers={'User-Agent': self.__user_agent}).url}")
 
     def GetRSAPublicKey(self):
-        print(self.__login)
         rsa_pk_request = Steam_RSA_Public_Key_Request_pb2.SteamRSAPublicKeyRequest()
         rsa_pk_request.account_name = self.__login
         rsa_pk_serialized = rsa_pk_request.SerializeToString()

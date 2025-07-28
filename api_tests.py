@@ -75,8 +75,8 @@ print(hb.RedeemKey("fashionpolicesquad_choice_steam", "Z8KftUKAEf8zG7zY"))
 #print(EncodeProtoBuff(rsa_pk_serialized))
 #print(f"Steam RSA Public Key Request return: {steam.GetRSAPublicKey()}") 
 print(f"Steam Login Request return: {steam.Login()}") 
-while steam.polling:
-    print("Waiting for steam authenticaiton login")
+while steam.Polling():
+    print("Waiting for steam authentication login")
     sleep(5)
 gameslist_config = steam.GetLibraryDetails()
 exit(0)

@@ -58,14 +58,14 @@ class HumbleClient(GameKeyClient):
 
     def Login(self, payload=None):
         if self.__loggedIn:
-            return (True, None)
+            return LoginResult.SUCCESS #(True, None)
         
         response = self.__session.get(HUMBLE_KEYS, headers={"User-Agent": USER_AGENT})
 
         if not HUMBLE_LOGIN in response.url:
             print("Already Logged In")
             self.__loggedIn = True
-            return (True, None)
+            return LoginResult.SUCCESS #(True, None)
 
         if not payload:
             payload = {}

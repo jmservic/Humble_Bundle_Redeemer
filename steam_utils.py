@@ -78,7 +78,7 @@ def decodeHexString(hex_value):
     hex_value_clean = re.sub(r"/[^0-9abcdef]/g", "", hex_value)
     hex_string_arr = []
     index = 0
-    print(len(hex_value_clean))
+    #print(len(hex_value_clean))
     while index < len(hex_value_clean):
         temp_val = HEX_ENCODE_STR.index(hex_value_clean[index]) << 4 & 240
         index += 1
