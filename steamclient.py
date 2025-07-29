@@ -72,7 +72,7 @@ class SteamClient(LibraryClient):
             return
 
         #self.VisitHomePage() Might not need this actually.
-        res = self.__session.get(STEAM_REGISTER_KEY)
+        res = self.__session.get(STEAM_REGISTER_KEY, headers={'User-Agent': self.__user_agent})
         print(res.url)
         if "login" not in res.url:
             self.__loggedIn = True

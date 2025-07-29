@@ -59,7 +59,13 @@ while login_result != LoginResult.SUCCESS and counter < 5:
             exit(1)
     counter += 1
 
-#hb.GetOrdersDetail()
+#hb_orders = hb.GetOrdersDetail()
+#category_set = set()
+#for order in hb_orders.values():
+#    category_set.add(order["product"]["category"])
+
+#print(category_set)
+#exit(0)
 #print(hb.ChooseContent("rw3m6TUnb3eqmHzM", "tchia"))#["nobodywantstodie", "dungeonsofhinterberg"]))
 #print(hb.RedeemKey("dungeonsofhinterberg_choice_steam", "rw3m6TUnb3eqmHzM"))
 print(hb.RedeemKey("fashionpolicesquad_choice_steam", "Z8KftUKAEf8zG7zY"))
@@ -78,9 +84,12 @@ print(f"Steam Login Request return: {steam.Login()}")
 while steam.Polling():
     print("Waiting for steam authentication login")
     sleep(5)
+#steam_cookies = steam.GetSessionCookies()
+#for cookie in steam_cookies.items():
+#    print(cookie)
 gameslist_config = steam.GetLibraryDetails()
 exit(0)
-print(f"Number of games in library: {gameslist_config['rgGames']}")
+print(f"Number of games in library: {len(gameslist_config['rgGames'])}")
 print("Keys in gameslist_config:")
 for key in gameslist_config:
     print(key)
