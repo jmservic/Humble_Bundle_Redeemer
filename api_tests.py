@@ -84,12 +84,13 @@ print(f"Steam Login Request return: {steam.Login()}")
 while steam.Polling():
     print("Waiting for steam authentication login")
     sleep(5)
-#steam_cookies = steam.GetSessionCookies()
-#for cookie in steam_cookies.items():
-#    print(cookie)
+steam_store_cookies = steam.GetSessionCookies().get_dict(domain="store.steampowered.com")
+for cookie in steam_store_cookies.items():
+    print(cookie)
+#steam.VisitRegisterKeyPage()
 gameslist_config = steam.GetLibraryDetails()
-exit(0)
 print(f"Number of games in library: {len(gameslist_config['rgGames'])}")
+exit(0)
 print("Keys in gameslist_config:")
 for key in gameslist_config:
     print(key)

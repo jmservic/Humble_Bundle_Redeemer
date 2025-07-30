@@ -80,6 +80,8 @@ class SteamClient(LibraryClient):
             self.__login_result = LoginResult.SUCCESS
             return
 
+        return
+
         #Currently clearing cookies because the outdated session was not cleared.
         self.__session.cookies.clear()
 
@@ -204,12 +206,26 @@ class SteamClient(LibraryClient):
     def GetLibraryDetails(self):
         if not self.__loggedIn:
             return
-
+        self.RefreshLogin(STEAM_GAMES)
         res = self.__session.get(STEAM_GAMES)
         soup = BeautifulSoup(res.text, "html.parser")
         gameslist_config = soup.find(id="gameslist_config")
         gameslist_dict = json.loads(gameslist_config["data-profile-gameslist"])
         return gameslist_dict
+    
+    def VisitRegisterKeyPage(self):
+        res = self.__session.get(STEAM_REGISTER_KEY, headers={"User-Agent": self.__user_agent})
+        print(res.status_code)
+        print(res.url)
+        for cookie in res.cookies:
+            print(cookie)
+        #self.RefreshLogin(STEAM_REGISTER_KEY)
+
+    def RefreshLogin(self, redir):
+        res = self.__session.get("https://login.steampowered.com/jwt/refresh", params={"redir": redir}, headers={"User-Agent": self.__user_agent})
+        print(res.status_code)
+        print(res.url)
+        print(res.content)
 
     def RegisterKey(self, gamekey):
         res = self.__session.post(f"https://{STEAM_DOMAIN}{STEAM_REGISTER_KEY_API}", data={"product_key": gamekey,
