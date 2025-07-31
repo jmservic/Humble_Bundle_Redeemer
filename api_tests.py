@@ -59,7 +59,9 @@ while login_result != LoginResult.SUCCESS and counter < 5:
             exit(1)
     counter += 1
 
-#hb_orders = hb.GetOrdersDetail()
+hb_orders = hb.GetOrdersDetail()
+for key in hb_orders.keys():
+    print(key)
 #category_set = set()
 #for order in hb_orders.values():
 #    category_set.add(order["product"]["category"])
@@ -84,23 +86,22 @@ print(f"Steam Login Request return: {steam.Login()}")
 while steam.Polling():
     print("Waiting for steam authentication login")
     sleep(5)
-steam_store_cookies = steam.GetSessionCookies().get_dict(domain="store.steampowered.com")
-for cookie in steam_store_cookies.items():
-    print(cookie)
+#steam_store_cookies = steam.GetSessionCookies().get_dict(domain="store.steampowered.com")
+#for cookie in steam_store_cookies.items():
+#    print(cookie)
 #steam.VisitRegisterKeyPage()
 gameslist_config = steam.GetLibraryDetails()
 print(f"Number of games in library: {len(gameslist_config['rgGames'])}")
-exit(0)
-print("Keys in gameslist_config:")
-for key in gameslist_config:
-    print(key)
-print("\nKeys in a game item:")
-gameslist = gameslist_config["rgGames"]
-for key in gameslist[0]:
-    print(key)
+#print("Keys in gameslist_config:")
+#for key in gameslist_config:
+#    print(key)
+#print("\nKeys in a game item:")
+#gameslist = gameslist_config["rgGames"]
+#for key in gameslist[0]:
+#    print(key)
 
-for game in gameslist:
-    print(f"\nApp ID: {game['appid']} | Name: {game['name']} | Playtime: {game['playtime_forever']}")
+#for game in gameslist:
+#    print(f"\nApp ID: {game['appid']} | Name: {game['name']} | Playtime: {game['playtime_forever']}")
 #print(f"Steam cookies {steam.GetSessionCookies()}")
 #steam.RegisterKey("LDGZQ-WPB90-KDAPG")
 #{base64.b64encode(steam.GetRSAPublicKey().encode('utf-8')).decode('utf-8')}")

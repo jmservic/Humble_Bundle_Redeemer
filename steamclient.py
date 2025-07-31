@@ -71,16 +71,14 @@ class SteamClient(LibraryClient):
             self.__login_result = LoginResult.SUCCESS
             return
 
-        #self.VisitHomePage() Might not need this actually.
-        res = self.__session.get(STEAM_REGISTER_KEY, headers={'User-Agent': self.__user_agent})
-        print(res.url)
+        res = self.VisitRegisterKeyPage()
+
+        #print(res.url)
         if "login" not in res.url:
             self.__loggedIn = True
             print(f"Already logged into steam as {self.__login}")
             self.__login_result = LoginResult.SUCCESS
             return
-
-        return
 
         #Currently clearing cookies because the outdated session was not cleared.
         self.__session.cookies.clear()
@@ -206,28 +204,39 @@ class SteamClient(LibraryClient):
     def GetLibraryDetails(self):
         if not self.__loggedIn:
             return
-        self.RefreshLogin(STEAM_GAMES)
-        res = self.__session.get(STEAM_GAMES)
+
+        res = self.__VisitAuthRequiredPage(STEAM_GAMES)
         soup = BeautifulSoup(res.text, "html.parser")
         gameslist_config = soup.find(id="gameslist_config")
         gameslist_dict = json.loads(gameslist_config["data-profile-gameslist"])
         return gameslist_dict
     
     def VisitRegisterKeyPage(self):
-        res = self.__session.get(STEAM_REGISTER_KEY, headers={"User-Agent": self.__user_agent})
-        print(res.status_code)
-        print(res.url)
-        for cookie in res.cookies:
-            print(cookie)
+        res = self.__VisitAuthRequiredPage(STEAM_REGISTER_KEY)
+        #print(res.status_code)
+        #print(res.url)
+        #for cookie in res.cookies:
+        #    print(cookie)
         #self.RefreshLogin(STEAM_REGISTER_KEY)
+        return res
+
+    def __VisitAuthRequiredPage(self, url):
+        res = self.__session.get(url, headers={"User-Agent": self.__user_agent})
+        if "login" not in res.url:
+            return res
+
+        self.RefreshLogin(url)
+        return self.__session.get(url, headers={"User-Agent": self.__user_agent})
 
     def RefreshLogin(self, redir):
         res = self.__session.get("https://login.steampowered.com/jwt/refresh", params={"redir": redir}, headers={"User-Agent": self.__user_agent})
-        print(res.status_code)
-        print(res.url)
-        print(res.content)
+        #print(res.status_code)
+        #print(res.url)
+        #print(res.content)
 
     def RegisterKey(self, gamekey):
+        if not self.__loggedIn:
+            return
         res = self.__session.post(f"https://{STEAM_DOMAIN}{STEAM_REGISTER_KEY_API}", data={"product_key": gamekey,
                                                                                 "sessionid": self.__session.cookies.get("sessionid", domain=STEAM_DOMAIN)})
         print(res.status_code)
