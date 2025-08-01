@@ -6,7 +6,9 @@ class OrderFactory():
         category = order_dict["product"]["category"]
         match category:
             case "storefront":
-                order = self.CreateStoreKeyOrder(order_dict)
+                order_info_dict = {"gamekey": order_dict["gamekey"], "created": order_dict["created"]}
+                order_info_dict.update(order_dict["product"])
+                order = self.CreateStoreKeyOrder(order_info_dict, order_dict["tpkd_dict"]["all_tpks"][0])
             case "subscriptionplan" | "subscriptioncontent":
                 order = self.CreateChoiceOrder(order_dict)
             case "bundle":
@@ -15,14 +17,24 @@ class OrderFactory():
                 raise ValueError(f"HumbleBundle order category '{category}' is an unknown category type.")
         return order
 
-    def CreateStoreKeyOrder(self, order_dict):
-        pass
+    def CreateStoreKeyOrder(self, order_dict, product_dict):
+        init_dict = {"order_machine_name": order_dict["machine_name"],
+                     "name": order_dict["human_name"],
+                     "humblekey": order_dict["gamekey"],
+                     "created": order_dict["created"],
+                     "product_machine_name": product_dict["machine_name"],
+                     "redeem_key": product_dict.get("redeemed_key_val", None),
+                     "key_type": product_dict.get("key_type_human_name", None),
+                     "platform_id": product_dict.get("steam_app_id", None),
+                     "is_expired": product_dict["is_expired"]
+                     }
+        return HumbleStoreKey(init_dict)
 
     def CreateChoiceOrder(self, order_dict):
-        pass
+        return HumbleChoice()
 
-    def CreateBundleOrder(order_dict):
-        pass
+    def CreateBundleOrder(self, order_dict):
+        return HumbleBundle()
 
 class HumbleLibrary():
 
@@ -43,7 +55,7 @@ class HumbleLibrary():
 
 class HumbleChoice():
 
-    def __init__(self):
+    def __init__(self)
         pass
 
 class HumbleBundle():
@@ -53,7 +65,24 @@ class HumbleBundle():
 
 class HumbleStoreKey():
 
-    def __init__(self):
-        pass
+    def __init__(self, init_dict):
+        self.__order_machine_name = init_dict["order_machine_name"]
+        self.__name = init_dict["name"]
+        self.__humblekey = init_dict["humblekey"]
+        self.__product_machine_name = init_dict["product_machine_name"]
+        self.__created = init_dict["created"]
+        self.__redeem_key = init_dict["redeem_key"]
+        self.__key_type = init_dict["key_type"]
+        self.__platform_id = init_dict["platform_id"]
+        self.__is_expired = init_dict["is_expired"]
+
+    def __eq__(self, other):
+        return (self.__order_machine_name == other.__order_machine_name and self.__name == other.__name
+                and self.__humblekey == other.__humblekey and self.__created == other.__created
+                and self.__redeem_key == other.__redeem_key and self.__key_type == other.__key_type
+                and self.__platform_id == other.__platform_id and self.__is_expired == other.__is_expired
+                and self.__product_machine_name == other.__product_machine_name)
+        
+        
     
 
