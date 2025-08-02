@@ -45,13 +45,7 @@ class OrderFactory():
                      "choices_remaining": order_dict["choices_remaining"],
                      "total_choices": order_dict["total_choices"]
                      }
-        products = []
-        for product_dict in product_dicts:
-            order_info_dict = {"gamekey": order_dict["gamekey"],
-                               "created": order_dict["created"],
-                               "machine_name": order_dict["machine_name"],
-                               }
-            products.append(self.CreateStoreKeyOrder(order_info_dict, product_dict))
+        products = [self.CreateStoreKeyOrder(order_dict, product_dict) for product_dict in product_dicts]
         return HumbleChoice(init_dict, products)
 
     def CreateBundleOrder(self, order_dict):
