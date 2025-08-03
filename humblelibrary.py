@@ -76,25 +76,97 @@ class HumbleChoice():
         self.__products = products
         self.__chosen = True
         self.__choices_remaining = init_dict["choices_remaining"]
+
         if init_dict["all_choices"] is None:
+            self.__chosen = self.__choices_remaining == 0 and len(self.__products) > 0
+            self.__all_choices = []
+            return
+
+        self.__choiceless = init_dict["all_choices"]["productIsChoiceless"]
+        self.__all_choices = self.__getAllChoices(init_dict["all_choices"]["contentChoiceOptions"]["contentChoiceData"])
+
+        #limited Choice bundle
+        if not self.__choiceless:
             self.__chosen = self.__choices_remaining == 0
             return
-        self.__choiceless = init_dict["all_choices"]["productIsChoiceless"]
-        game_data_dicts = init_dict["all_choices"]["contentChoiceOptions"]["contentChoiceData"].get("game_data",{}).values()
-        self.__all_choices = [game_data["tpkds"][0]["machine_name"] for game_data in game_data_dicts]
-        product_names = set([product.MachineName() for product in self.__products])
+        
+        #Choiceless bundle
+        choice_names = []
         for choice in self.__all_choices:
-            if choice not in product_names:
-                self.__chosen = False
-                break
+            choice_names += choice.ProductMachineNames()
+        product_names = [product.MachineName() for product in self.__products]
+        self.__chosen = len(choice_names) == len(product_names)
             
+    def __getAllChoices(self, contentChoiceData):
+        choice_info = self.__getGameData(contentChoiceData)
+        return [ChoiceContent(machine_name, tpkds) for machine_name, tpkds in choice_info.items()]
 
+    def __getGameData(self, contentChoiceData):
+        if "game_data" in contentChoiceData:
+            return self.__getChoiceTpkds(contentChoiceData["game_data"])
+        if "initial" in contentChoiceData:
+            return self.__getChoiceTpkds(contentChoiceData["initial"]["content_choices"])
+        raise KeyError("Unable to find choice game data in all_choices dictionary")
+
+    def __getChoiceTpkds(self, game_data_dicts):
+        tpkds = {}
+        for display_machine_name, game_data_dict in game_data_dicts.items():
+            if "tpkds" in game_data_dict:
+                tpkds[display_machine_name] = game_data_dict["tpkds"]
+            elif "nested_choice_tpkds" in game_data_dict:
+                tpkds[display_machine_name] = [game_data_dict["nested_choice_tpkds"]]
+            else: 
+                raise KeyError(f"Unable to find tpkds for {display_machine_name} in all_choices")
+        return tpkds
 
     def contains(self, product):
         return product in self.__products 
 
     def FullyChosen(self):
         return self.__chosen
+
+    def AllProductsRedeemed(self):
+        for product in self.__products:
+            if product.RedeemKey() is None:
+                return False
+        return True
+
+class ChoiceContent():
+
+    def __init__(self, machine_name, tpkds):
+        if machine_name is None:
+            raise ValueError("Choice Content must have a machine_name.")
+        if tpkds is None:
+            raise ValueError("Choice Content must have tpkds.")
+        self.__machine_name = machine_name
+        self.__items = tpkds
+
+    def MachineName(self):
+        return self.__machine_name
+
+    def ProductMachineNames(self, platform_preference = []):
+        return self.__productMachineNamesRecur(self.__items, platform_preference)
+    
+    def __productMachineNamesRecur(self, items, platform_preference):
+        machine_names = []
+        for item in items:
+            if "machine_name" in item:
+                machine_names.append(item["machine_name"])
+                continue
+            
+            #nested_choice_tpkds
+            platform_nested_item = None
+            for platform in platform_preference:
+                for nested_item in item.values():
+                    if platform in nested_item[0]["key_type"]:
+                        platform_nested_item = nested_item
+                        break
+                if platform_nested_item:
+                    break
+            if platform_nested_item is None:
+                platform_nested_item = list(item.values())[0]
+            machine_names += self.__productMachineNamesRecur(platform_nested_item, platform_preference)                
+        return machine_names
 
 class HumbleBundle():
 
@@ -116,6 +188,9 @@ class HumbleStoreKey():
 
     def MachineName(self):
         return self.__product_machine_name
+
+    def RedeemKey(self):
+        return self.__redeem_key
 
     def __eq__(self, other):
         return (self.__order_machine_name == other.__order_machine_name and self.__name == other.__name

@@ -1,5 +1,5 @@
 import unittest
-from humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey
+from humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey, ChoiceContent
 from humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice
 
 class TestHumbleChoice(unittest.TestCase):
@@ -17,14 +17,60 @@ class TestHumbleChoice(unittest.TestCase):
         self.assertTrue(sut.FullyChosen())
 
     def test_MissingAllChoiceInfo_and_choices_remaining_returns_False_for_fully_chosen_choice_bundle(self):
-        january_2019_monthly["choices_remaining"] = 1
-        sut = self.CreateHumbleChoice(january_2019_monthly)
+        order_dict = {}
+        order_dict.update(january_2019_monthly)
+        order_dict["choices_remaining"] = 1
+        sut = self.CreateHumbleChoice(order_dict)
         self.assertFalse(sut.FullyChosen())
 
+    def test_AllProductsRedeemed_returns_True_for_fully_redeemed_choice_bundle(self):
+        sut = self.CreateHumbleChoice(april_2021_choice)
+        self.assertTrue(sut.AllProductsRedeemed())
+
+    def test_AllProductsRedeemed_returns_False_for_choice_bundle_with_redeemable_products(self):
+        sut = self.CreateHumbleChoice(april_2024_choice)
+        self.assertFalse(sut.AllProductsRedeemed())
+
+    def test_FullyChosen_returns_True_for_limited_choice_bundle_and_0_choices_remaining(self):
+        sut = self.CreateHumbleChoice(june_2020_choice)
+        self.assertTrue(sut.FullyChosen())
+
+    def test_FullyChosen_returns_False_for_limited_choice_bundle_and_choices_remaining(self):
+        order_dict = {}
+        order_dict.update(june_2020_choice)
+        order_dict["choices_remaining"] = 1
+        sut = self.CreateHumbleChoice(order_dict)
+        self.assertFalse(sut.FullyChosen())
+        
     def CreateHumbleChoice(self, order_dict):
         order_factory = OrderFactory()
         return order_factory.CreateOrder(order_dict)
 
+class TestChoiceContent(unittest.TestCase):
+
+    def test_ProductMachineNames_returns_product_machine_name_for_single_tpkds(self):
+        machine_name = "popupdungeon"
+        tpkds = [{'machine_name': 'popupdungeon_row_choice_steam', 'show_custom_instructions_in_user_libraries': False, 'key_type': 'steam', 'visible': True, 'is_partial_gift': False, 'display_separately': False, 'steam_app_id': 349730, 'exclusive_countries': [], 'class': 'steambutton', 'num_days_until_expired': -1, 'is_gift': False, 'auto_expand': True, 'gamekey': 'A7CESV6Pp4ZWFarX', 'disallowed_countries': ['AR', 'AM', 'AZ', 'BD', 'BY', 'BT', 'BR', 'CL', 'CN', 'CO', 'CR', 'GE', 'HK', 'IN', 'ID', 'KZ', 'KG', 'MY', 'MX', 'MD', 'NP', 'PK', 'PE', 'PH', 'RU', 'SG', 'LK', 'TW', 'TJ', 'TH', 'TM', 'UA', 'UY', 'UZ', 'VN'], 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'>Steam Instructions</a>", 'key_type_human_name': 'Steam', 'human_name': 'Popup Dungeon', 'preinstruction_text': 'Copy this key into the Steam client, or click Redeem to redeem in-browser.', 'redeemed_key_val': 'FE5F2-IZM8G-BF685', 'is_expired': False, 'partial_gift_enabled': True, 'disclaimer': 'Steam will not provide extra giftable copies of games you already own.'}]
+        sut = ChoiceContent(machine_name, tpkds)
+        self.assertEqual(sut.ProductMachineNames(), ["popupdungeon_row_choice_steam"])
+
+    def test_ProductMachineNames_returns_product_machine_names_for_multiple_tpkds(self):
+        machine_name = "simulacra1and2"
+        tpkds = [{'machine_name': 'simulacra_choice_steam', 'show_custom_instructions_in_user_libraries': False, 'key_type': 'steam', 'visible': True, 'is_partial_gift': False, 'display_separately': False, 'steam_app_id': 712730, 'exclusive_countries': [], 'class': 'steambutton', 'num_days_until_expired': -1, 'is_gift': False, 'auto_expand': True, 'gamekey': 'A7CESV6Pp4ZWFarX', 'disallowed_countries': [], 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'>Steam Instructions</a>", 'key_type_human_name': 'Steam', 'human_name': 'SIMULACRA', 'preinstruction_text': 'Copy this key into the Steam client, or click Redeem to redeem in-browser.', 'redeemed_key_val': 'K05PA-BLZYB-TZP39', 'is_expired': False, 'partial_gift_enabled': True, 'disclaimer': 'Steam will not provide extra giftable copies of games you already own.'}, {'machine_name': 'simulacra2_choice_steam', 'show_custom_instructions_in_user_libraries': False, 'key_type': 'steam', 'visible': True, 'is_partial_gift': False, 'display_separately': False, 'steam_app_id': 1011190, 'exclusive_countries': [], 'class': 'steambutton', 'num_days_until_expired': -1, 'is_gift': False, 'auto_expand': True, 'gamekey': 'A7CESV6Pp4ZWFarX', 'disallowed_countries': [], 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'>Steam Instructions</a>", 'key_type_human_name': 'Steam', 'human_name': 'SIMULACRA 2', 'preinstruction_text': 'Copy this key into the Steam client, or click Redeem to redeem in-browser.', 'redeemed_key_val': 'ITBPA-KEDJZ-FEAXE', 'is_expired': False, 'partial_gift_enabled': True, 'disclaimer': 'Steam will not provide extra giftable copies of games you already own.'}]
+        sut = ChoiceContent(machine_name, tpkds)
+        self.assertEqual(sut.ProductMachineNames(), ["simulacra_choice_steam", "simulacra2_choice_steam"])
+
+    def test_ProductMachineNames_returns_first_product_machine_name_for_single_tpkds_with_redemption_options_with_no_platform_pref(self):
+        machine_name = "shenmue3"
+        tpkds = [{'shenmue3_steam': [{'machine_name': 'shenmue3_choice_steam', 'show_custom_instructions_in_user_libraries': False, 'key_type': 'steam', 'visible': True, 'is_partial_gift': False, 'display_separately': False, 'steam_app_id': 878670, 'exclusive_countries': [], 'class': 'steambutton', 'num_days_until_expired': -1, 'is_gift': False, 'auto_expand': True, 'gamekey': 'A7CESV6Pp4ZWFarX', 'disallowed_countries': [], 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'>Steam Instructions</a>", 'key_type_human_name': 'Steam', 'human_name': 'Shenmue III', 'preinstruction_text': 'Copy this key into the Steam client, or click Redeem to redeem in-browser.', 'redeemed_key_val': 'N5HFI-8CQRV-K4BTK', 'is_expired': False, 'partial_gift_enabled': True, 'disclaimer': 'Steam will not provide extra giftable copies of games you already own.'}], 'shenmue3_epic': [{'is_partial_gift': False, 'key_type': 'epic_keyless', 'machine_name': 'shenmue3_choice_epic_keyless', 'gamekey': 'A7CESV6Pp4ZWFarX', 'exclusive_countries': [], 'disallowed_countries': [], 'show_custom_instructions_in_user_libraries': False, 'third_party_product_id': '5d582c08e31a43128a61093a2c3ff7f0', 'visible': True, 'sold_out': False, 'instructions_html': '<a href="https://support.humblebundle.com/hc/articles/360020257973" target="_blank">Epic Game Store Instructions</a>', 'display_separately': True, 'direct_redeem': True, 'key_type_human_name': 'Epic Games', 'human_name': 'Shenmue III', 'auto_expand': False, 'is_expired': False, 'partial_gift_enabled': True, 'num_days_until_expired': -1}]}]
+        sut = ChoiceContent(machine_name, tpkds)
+        self.assertEqual(sut.ProductMachineNames(),["shenmue3_choice_steam"])
+
+    def test_ProductMachineNames_returns_first_product_machine_name_for_single_tpkds_with_redemption_options_with_platform_pref(self):
+        machine_name = "shenmue3"
+        tpkds = [{'shenmue3_steam': [{'machine_name': 'shenmue3_choice_steam', 'show_custom_instructions_in_user_libraries': False, 'key_type': 'steam', 'visible': True, 'is_partial_gift': False, 'display_separately': False, 'steam_app_id': 878670, 'exclusive_countries': [], 'class': 'steambutton', 'num_days_until_expired': -1, 'is_gift': False, 'auto_expand': True, 'gamekey': 'A7CESV6Pp4ZWFarX', 'disallowed_countries': [], 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'>Steam Instructions</a>", 'key_type_human_name': 'Steam', 'human_name': 'Shenmue III', 'preinstruction_text': 'Copy this key into the Steam client, or click Redeem to redeem in-browser.', 'redeemed_key_val': 'N5HFI-8CQRV-K4BTK', 'is_expired': False, 'partial_gift_enabled': True, 'disclaimer': 'Steam will not provide extra giftable copies of games you already own.'}], 'shenmue3_epic': [{'is_partial_gift': False, 'key_type': 'epic_keyless', 'machine_name': 'shenmue3_choice_epic_keyless', 'gamekey': 'A7CESV6Pp4ZWFarX', 'exclusive_countries': [], 'disallowed_countries': [], 'show_custom_instructions_in_user_libraries': False, 'third_party_product_id': '5d582c08e31a43128a61093a2c3ff7f0', 'visible': True, 'sold_out': False, 'instructions_html': '<a href="https://support.humblebundle.com/hc/articles/360020257973" target="_blank">Epic Game Store Instructions</a>', 'display_separately': True, 'direct_redeem': True, 'key_type_human_name': 'Epic Games', 'human_name': 'Shenmue III', 'auto_expand': False, 'is_expired': False, 'partial_gift_enabled': True, 'num_days_until_expired': -1}]}]
+        sut = ChoiceContent(machine_name, tpkds)
+        self.assertEqual(sut.ProductMachineNames(["epic","steam"]),["shenmue3_choice_epic_keyless"])
 
 class TestOrderFactory(unittest.TestCase):
 
