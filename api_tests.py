@@ -61,6 +61,10 @@ while login_result != LoginResult.SUCCESS and counter < 5:
 
 hb_orders = hb.GetOrdersDetail()
 for key, value in hb_orders.items():
+    if value["product"]["category"] == "storefront" and len(value["subproducts"]) > 0:
+        print(key, value["subproducts"])
+exit(0)
+for key, value in hb_orders.items():
     if "machine_name" not in value["product"].keys():
         print(key, "\n")
         continue

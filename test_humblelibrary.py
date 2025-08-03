@@ -87,6 +87,7 @@ class TestOrderFactory(unittest.TestCase):
                                   "human_name": None},
                       "gamekey": None,
                       "created": None,
+                      "subproducts": [],
                       "tpkd_dict": {
                           "all_tpks":
                             [
@@ -215,6 +216,7 @@ class TestOrderFactory(unittest.TestCase):
                                                 "humblekey": "TSskvEHeqSfUbZAs",
                                                 "product_machine_name": "enshrouded_steam",
                                                 "created": "2025-02-14T01:51:25.738781",
+                                                "subproducts": [],
                                                 "redeem_key": "TMQTG-FRRFB-NY4EZ",
                                                 "key_type": "steam",
                                                 "platform_id": None,
@@ -287,6 +289,7 @@ class TestOrderFactory(unittest.TestCase):
                                         "humblekey": "Z8KftUKAEf8zG7zY",
                                         "product_machine_name": "victoria3_choice_steam",
                                         "created": "2024-04-30T18:51:02.620236",
+                                        "subproducts": [],
                                         "redeem_key": "Z7AQM-3XTNN-PAATK",
                                         "key_type": "steam",
                                         "platform_id": 529340,

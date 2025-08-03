@@ -6,7 +6,7 @@ class OrderFactory():
         category = order_dict["product"]["category"]
         match category:
             case "storefront":
-                order_info_dict = {"gamekey": order_dict["gamekey"], "created": order_dict["created"]}
+                order_info_dict = {"gamekey": order_dict["gamekey"], "created": order_dict["created"], "subproducts": order_dict["subproducts"]}
                 order_info_dict.update(order_dict["product"])
                 order = self.CreateStoreKeyOrder(order_info_dict, order_dict["tpkd_dict"]["all_tpks"][0])
             case "subscriptionplan" | "subscriptioncontent":
@@ -29,6 +29,7 @@ class OrderFactory():
                      "name": product_dict["human_name"],
                      "humblekey": order_dict["gamekey"],
                      "created": order_dict["created"],
+                     "subproducts": order_dict["subproducts"],
                      "product_machine_name": product_dict["machine_name"],
                      "redeem_key": product_dict.get("redeemed_key_val", None),
                      "key_type": product_dict.get("key_type", None),
@@ -44,6 +45,7 @@ class OrderFactory():
                      "created": order_dict["created"],
                      "choices_remaining": order_dict["choices_remaining"],
                      "total_choices": order_dict["total_choices"],
+                     "subproducts": order_dict["subproducts"],
                      "all_choices": order_dict.get("all_choices", None)
                      }
         products = [self.CreateStoreKeyOrder(order_dict, product_dict) for product_dict in product_dicts]
@@ -76,6 +78,11 @@ class HumbleChoice():
         self.__products = products
         self.__chosen = True
         self.__choices_remaining = init_dict["choices_remaining"]
+        self.__subproducts = init_dict["subproducts"]
+        self.__order_machine_name = init_dict["order_machine_name"]
+        self.__name = init_dict["name"]
+        self.__humblekey = init_dict["humblekey"]
+        self.__created = init_dict["created"]
 
         if init_dict["all_choices"] is None:
             self.__chosen = self.__choices_remaining == 0 and len(self.__products) > 0
@@ -181,6 +188,7 @@ class HumbleStoreKey():
         self.__humblekey = init_dict["humblekey"]
         self.__product_machine_name = init_dict["product_machine_name"]
         self.__created = init_dict["created"]
+        self.__subproducts = init_dict["subproducts"]
         self.__redeem_key = init_dict["redeem_key"]
         self.__key_type = init_dict["key_type"]
         self.__platform_id = init_dict["platform_id"]
