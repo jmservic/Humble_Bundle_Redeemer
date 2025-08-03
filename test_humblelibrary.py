@@ -1,5 +1,29 @@
 import unittest
 from humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey
+from humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice
+
+class TestHumbleChoice(unittest.TestCase):
+    
+    def test_FullyChosen_returns_True_for_fully_chosen_choice_bundle(self):
+        sut = self.CreateHumbleChoice(april_2021_choice)
+        self.assertTrue(sut.FullyChosen())
+
+    def test_FullyChosen_returns_False_for_not_fully_chosen_choice_bundle(self):
+        sut = self.CreateHumbleChoice(june_2025_choice)
+        self.assertFalse(sut.FullyChosen())
+
+    def test_MissingAllChoiceInfo_and_0_choices_remaining_returns_True_for_fully_chosen_choice_bundle(self):
+        sut = self.CreateHumbleChoice(january_2019_monthly)
+        self.assertTrue(sut.FullyChosen())
+
+    def test_MissingAllChoiceInfo_and_choices_remaining_returns_False_for_fully_chosen_choice_bundle(self):
+        january_2019_monthly["choices_remaining"] = 1
+        sut = self.CreateHumbleChoice(january_2019_monthly)
+        self.assertFalse(sut.FullyChosen())
+
+    def CreateHumbleChoice(self, order_dict):
+        order_factory = OrderFactory()
+        return order_factory.CreateOrder(order_dict)
 
 
 class TestOrderFactory(unittest.TestCase):
@@ -223,6 +247,7 @@ class TestOrderFactory(unittest.TestCase):
                                         "is_expired": False
                                         }) 
         self.assertTrue(order.contains(comp_storefront))
+
 
 
 

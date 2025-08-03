@@ -43,7 +43,8 @@ class OrderFactory():
                      "humblekey": order_dict["gamekey"],
                      "created": order_dict["created"],
                      "choices_remaining": order_dict["choices_remaining"],
-                     "total_choices": order_dict["total_choices"]
+                     "total_choices": order_dict["total_choices"],
+                     "all_choices": order_dict.get("all_choices", None)
                      }
         products = [self.CreateStoreKeyOrder(order_dict, product_dict) for product_dict in product_dicts]
         return HumbleChoice(init_dict, products)
@@ -68,13 +69,32 @@ class HumbleLibrary():
     def GiftableContent(self):
         pass
 
+
 class HumbleChoice():
 
     def __init__(self, init_dict, products):
         self.__products = products
+        self.__chosen = True
+        self.__choices_remaining = init_dict["choices_remaining"]
+        if init_dict["all_choices"] is None:
+            self.__chosen = self.__choices_remaining == 0
+            return
+        self.__choiceless = init_dict["all_choices"]["productIsChoiceless"]
+        game_data_dicts = init_dict["all_choices"]["contentChoiceOptions"]["contentChoiceData"].get("game_data",{}).values()
+        self.__all_choices = [game_data["tpkds"][0]["machine_name"] for game_data in game_data_dicts]
+        product_names = set([product.MachineName() for product in self.__products])
+        for choice in self.__all_choices:
+            if choice not in product_names:
+                self.__chosen = False
+                break
+            
+
 
     def contains(self, product):
         return product in self.__products 
+
+    def FullyChosen(self):
+        return self.__chosen
 
 class HumbleBundle():
 
@@ -93,6 +113,9 @@ class HumbleStoreKey():
         self.__key_type = init_dict["key_type"]
         self.__platform_id = init_dict["platform_id"]
         self.__is_expired = init_dict["is_expired"]
+
+    def MachineName(self):
+        return self.__product_machine_name
 
     def __eq__(self, other):
         return (self.__order_machine_name == other.__order_machine_name and self.__name == other.__name
