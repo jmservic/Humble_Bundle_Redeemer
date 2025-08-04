@@ -2,6 +2,8 @@ import unittest
 from humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey, ChoiceContent
 from humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice
 
+#class TestHumbleBundle(unittest.TestCase):
+
 class TestHumbleChoice(unittest.TestCase):
     
     def test_FullyChosen_returns_True_for_fully_chosen_choice_bundle(self):
@@ -162,7 +164,18 @@ class TestOrderFactory(unittest.TestCase):
 
     def test_bundle_category_returns_humblebundle_object(self):
         sut = OrderFactory()
-        order_dict = {"product": {"category": "bundle"}}
+        order_dict = {"product": {"category": "bundle",
+                                  "machine_name": None,
+                                  "human_name": None},
+                        "gamekey": None,
+                        "created": None,
+                        "subproducts": [],
+                        "total_choices": 0,
+                        "tpkd_dict": {
+                            "all_tpks": []
+                            }
+                      }
+                       
         order = sut.CreateOrder(order_dict)
         self.assertIsInstance(order, HumbleBundle) 
 
@@ -295,7 +308,7 @@ class TestOrderFactory(unittest.TestCase):
                                         "platform_id": 529340,
                                         "is_expired": False
                                         }) 
-        self.assertTrue(order.contains(comp_storefront))
+        self.assertTrue(order.Contains(comp_storefront))
 
 
 

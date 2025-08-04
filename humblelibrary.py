@@ -19,7 +19,12 @@ class OrderFactory():
                 order_info_dict.update(order_dict["product"])
                 order = self.CreateChoiceOrder(order_info_dict, order_dict["tpkd_dict"]["all_tpks"])
             case "bundle":
-                order = self.CreateBundleOrder(order_dict)
+                order_info_dict = {"gamekey": order_dict["gamekey"],
+                                   "created": order_dict["created"],
+                                   "subproducts": order_dict["subproducts"]                                  
+                                   }
+                order_info_dict.update(order_dict["product"])
+                order = self.CreateBundleOrder(order_info_dict, order_dict["tpkd_dict"]["all_tpks"])
             case _:
                 raise ValueError(f"HumbleBundle order category '{category}' is an unknown category type.")
         return order
@@ -51,8 +56,15 @@ class OrderFactory():
         products = [self.CreateStoreKeyOrder(order_dict, product_dict) for product_dict in product_dicts]
         return HumbleChoice(init_dict, products)
 
-    def CreateBundleOrder(self, order_dict):
-        return HumbleBundle()
+    def CreateBundleOrder(self, order_dict, product_dicts):
+        init_dict = {"order_machine_name": order_dict["machine_name"],
+                     "name": order_dict["human_name"],
+                     "humblekey": order_dict["gamekey"],
+                     "created": order_dict["created"],
+                     "subproducts": order_dict["subproducts"]
+                    }
+        products = [self.CreateStoreKeyOrder(order_dict, product_dict) for product_dict in product_dicts]
+        return HumbleBundle(init_dict, products)
 
 class HumbleLibrary():
 
@@ -71,21 +83,48 @@ class HumbleLibrary():
     def GiftableContent(self):
         pass
 
+class Order():
+    def __init__(self, init_dict):
+        self._order_machine_name = init_dict["order_machine_name"]
+        self._humblekey = init_dict["humblekey"]
+        self._created = init_dict["created"]
+        self._name = init_dict["name"]
+        self._subproducts = init_dict["subproducts"]
 
-class HumbleChoice():
+class HumbleBundle(Order):
 
     def __init__(self, init_dict, products):
-        self.__products = products
+        super().__init__(init_dict)
+        self._products = products
+
+    def ProductInfo(self, platforms = []): #Just use this function instead of the others.
+        pass
+
+    def ProductMachineNames(self, platforms = []):
+        products = self.__getGamesByPlatform(platforms)
+
+    def ProductRegisterKeys(self, platforms = []):
+        pass
+
+    def ProductNames(self, platforms = []):
+        pass
+
+    def Products(self, platform = []):
+        pass
+
+    def _getGamesByPlatform(platforms):
+        pass
+
+
+class HumbleChoice(HumbleBundle):
+
+    def __init__(self, init_dict, products):
+        super().__init__(init_dict, products)
         self.__chosen = True
         self.__choices_remaining = init_dict["choices_remaining"]
-        self.__subproducts = init_dict["subproducts"]
-        self.__order_machine_name = init_dict["order_machine_name"]
-        self.__name = init_dict["name"]
-        self.__humblekey = init_dict["humblekey"]
-        self.__created = init_dict["created"]
 
         if init_dict["all_choices"] is None:
-            self.__chosen = self.__choices_remaining == 0 and len(self.__products) > 0
+            self.__chosen = self.__choices_remaining == 0 and len(self._products) > 0
             self.__all_choices = []
             return
 
@@ -101,7 +140,7 @@ class HumbleChoice():
         choice_names = []
         for choice in self.__all_choices:
             choice_names += choice.ProductMachineNames()
-        product_names = [product.MachineName() for product in self.__products]
+        product_names = [product.MachineName() for product in self._products]
         self.__chosen = len(choice_names) == len(product_names)
             
     def __getAllChoices(self, contentChoiceData):
@@ -126,17 +165,24 @@ class HumbleChoice():
                 raise KeyError(f"Unable to find tpkds for {display_machine_name} in all_choices")
         return tpkds
 
-    def contains(self, product):
-        return product in self.__products 
+    def Contains(self, product):
+        return product in self._products 
 
     def FullyChosen(self):
         return self.__chosen
 
     def AllProductsRedeemed(self):
-        for product in self.__products:
+        for product in self._products:
             if product.RedeemKey() is None:
                 return False
         return True
+
+    def UnChosenChoices(self):
+        if self.__chosen:
+            return []
+
+    def RedeemableProducts(self):
+        pass
 
 class ChoiceContent():
 
@@ -170,25 +216,18 @@ class ChoiceContent():
                         break
                 if platform_nested_item:
                     break
+
             if platform_nested_item is None:
                 platform_nested_item = list(item.values())[0]
             machine_names += self.__productMachineNamesRecur(platform_nested_item, platform_preference)                
         return machine_names
 
-class HumbleBundle():
 
-    def __init__(self):
-        pass
-
-class HumbleStoreKey():
+class HumbleStoreKey(Order):
 
     def __init__(self, init_dict):
-        self.__order_machine_name = init_dict["order_machine_name"]
-        self.__name = init_dict["name"]
-        self.__humblekey = init_dict["humblekey"]
+        super().__init__(init_dict)
         self.__product_machine_name = init_dict["product_machine_name"]
-        self.__created = init_dict["created"]
-        self.__subproducts = init_dict["subproducts"]
         self.__redeem_key = init_dict["redeem_key"]
         self.__key_type = init_dict["key_type"]
         self.__platform_id = init_dict["platform_id"]
@@ -201,8 +240,8 @@ class HumbleStoreKey():
         return self.__redeem_key
 
     def __eq__(self, other):
-        return (self.__order_machine_name == other.__order_machine_name and self.__name == other.__name
-                and self.__humblekey == other.__humblekey and self.__created == other.__created
+        return (self._order_machine_name == other._order_machine_name and self._name == other._name
+                and self._humblekey == other._humblekey and self._created == other._created
                 and self.__redeem_key == other.__redeem_key and self.__key_type == other.__key_type
                 and self.__platform_id == other.__platform_id and self.__is_expired == other.__is_expired
                 and self.__product_machine_name == other.__product_machine_name)
