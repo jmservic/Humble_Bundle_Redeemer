@@ -82,6 +82,9 @@ class HumbleLibrary():
 
     def GiftableContent(self):
         pass
+    
+    def RedeemContent(self):
+        pass
 
 class Order():
     def __init__(self, init_dict):
@@ -177,12 +180,26 @@ class HumbleChoice(HumbleBundle):
                 return False
         return True
 
-    def UnChosenChoices(self):
-        if self.__chosen:
-            return []
+    def UnChosenChoices(self, platform_preference = []):
+        if self.FullyChosen():
+            return {}
+        choices = {}
+        product_names = [product.MachineName() for product in self._products]
+        for choice in self.__all_choices:
+            choice_products = choice.AllProductMachineNames()
+            chosen = False
+            for product_name in choice_products:
+                if product_name in product_names:
+                    chosen = True
+                    break
+            if chosen:
+                continue
+            choices[choice.MachineName()] = choice.ProductMachineNames(platform_preference)
+
+        return choices
 
     def RedeemableProducts(self):
-        pass
+        return [product.MachineName() for product in self._products if product.RedeemKey() == None]
 
 class ChoiceContent():
 
@@ -220,6 +237,21 @@ class ChoiceContent():
             if platform_nested_item is None:
                 platform_nested_item = list(item.values())[0]
             machine_names += self.__productMachineNamesRecur(platform_nested_item, platform_preference)                
+        return machine_names
+
+    def AllProductMachineNames(self):
+        return self.__allProductMachineNamesRecur(self.__items)
+
+    def __allProductMachineNamesRecur(self, items):
+        machine_names = []
+        for item in items:
+            if "machine_name" in item:
+                machine_names.append(item["machine_name"])
+                continue
+            
+            #nested_choice_tpkds
+            for nested_item in item.values():
+                machine_names += self.__allProductMachineNamesRecur(nested_item)                
         return machine_names
 
 
