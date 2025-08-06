@@ -8,7 +8,8 @@ class OrderFactory():
             case "storefront":
                 order_info_dict = {"gamekey": order_dict["gamekey"], "created": order_dict["created"], "subproducts": order_dict["subproducts"]}
                 order_info_dict.update(order_dict["product"])
-                order = self.CreateStoreKeyOrder(order_info_dict, order_dict["tpkd_dict"]["all_tpks"][0])
+                product_dict = order_dict["tpkd_dict"]["all_tpks"][0] if order_dict["tpkd_dict"]["all_tpks"] else {}
+                order = self.CreateStoreKeyOrder(order_info_dict, product_dict)
             case "subscriptionplan" | "subscriptioncontent":
                 order_info_dict = {"gamekey": order_dict["gamekey"], 
                                    "created": order_dict["created"],
@@ -31,16 +32,16 @@ class OrderFactory():
 
     def CreateStoreKeyOrder(self, order_dict, product_dict):
         init_dict = {"order_machine_name": order_dict["machine_name"],
-                     "name": product_dict["human_name"],
+                     "name": product_dict.get("human_name", None),
                      "humblekey": order_dict["gamekey"],
                      "created": order_dict["created"],
                      "subproducts": order_dict["subproducts"],
-                     "product_machine_name": product_dict["machine_name"],
+                     "product_machine_name": product_dict.get("machine_name",None),
                      "redeem_key": product_dict.get("redeemed_key_val", None),
                      "key_type": product_dict.get("key_type", None),
                      "platform_id": product_dict.get("steam_app_id", None),
                      "keyindex": product_dict.get("keyindex", None),
-                     "is_expired": product_dict["is_expired"]
+                     "is_expired": product_dict.get("is_expired", None)
                      }
         return HumbleStoreKey(init_dict)
 
@@ -70,16 +71,40 @@ class OrderFactory():
 class HumbleLibrary():
 
     def __init__(self, orders_dict):
-        self.__orders = {}
-        order_factory = OrderFactory
-        for (key, order) in orders_dict.item():
-            self.__orders[key] = order_factory.CreateOrder(order)
+        self.__store_keys = {}
+        self.__bundles = {}
+        self.__choice_bundles = {}
+        self.__platforms = ["steam", "epic", "uplay", "origin"]
+
+        order_factory = OrderFactory()
+        for (key, order_dict) in orders_dict.items():
+            order = order_factory.CreateOrder(order_dict)
+            if isinstance(order, HumbleStoreKey):
+                self.__store_keys[key] = order
+            elif isinstance(order, HumbleChoice):
+                self.__choice_bundles[key] = order
+            else:
+                self.__bundles[key] = order
 
     def ChoiceChooseContent(self):
-        pass
+        unchosen_content_dict = {}
+
+        for humblekey, choice_bundle in self.__choice_bundles.items():
+            unchosen_content = choice_bundle.UnChosenChoices(self.__platforms)
+            if unchosen_content:
+                unchosen_content_dict[humblekey] = unchosen_content
+        
+        return unchosen_content_dict
     
-    def ChoiceRedeemContent(self):
-        pass
+    def ChoiceRedeemableContent(self):
+        redeemable_content_dict = {}
+
+        for humblekey, choice_bundle in self.__choice_bundles.items():
+            redeemable_content = choice_bundle.RedeemableProducts()
+            if redeemable_content:
+                redeemable_content_dict[humblekey] = redeemable_content
+
+        return redeemable_content_dict
 
     def GiftableContent(self):
         pass
@@ -132,9 +157,9 @@ class HumbleBundle(Order):
         return[product.RedeemKey() for product in self._getProductsByPlatform(platforms)]
 
     def ProductNames(self, platforms = []):
-        pass
+        return[product.Name() for product in self._getProductsByPlatform(platforms)]
 
-    def Products(self, platform = []):
+    def Products(self, platforms = []):
         return self._getProductsByPlatform(platforms)
 
     def _getProductsByPlatform(self, platforms):
@@ -176,6 +201,8 @@ class HumbleChoice(HumbleBundle):
             return self.__getChoiceTpkds(contentChoiceData["game_data"])
         if "initial" in contentChoiceData:
             return self.__getChoiceTpkds(contentChoiceData["initial"]["content_choices"])
+        if "initial-get-all-games" in contentChoiceData:
+            return self.__getChoiceTpkds(contentChoiceData["initial-get-all-games"]["content_choices"])
         raise KeyError("Unable to find choice game data in all_choices dictionary")
 
     def __getChoiceTpkds(self, game_data_dicts):

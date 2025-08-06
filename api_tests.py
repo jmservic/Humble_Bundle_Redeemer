@@ -8,6 +8,7 @@ from steam_utils import *
 from steamclient import SteamClient
 import base64
 from time import sleep
+from humblelibrary import HumbleLibrary
 #We're going to use the pickle module to save and load the cookies.
 load_dotenv()
 hb_account = os.getenv("HB_ACCOUNT")
@@ -60,6 +61,22 @@ while login_result != LoginResult.SUCCESS and counter < 5:
     counter += 1
 
 hb_orders = hb.GetOrdersDetail()
+humble_library = HumbleLibrary(hb_orders)
+unchosen_content = humble_library.ChoiceChooseContent()
+redeemable_content = humble_library.ChoiceRedeemableContent()
+for order, choose_content in unchosen_content.items():
+    print(f"Unchosen Content for {order}")
+    for display_name, product_machine_name in choose_content.items():
+        print(f"{display_name}, {product_machine_name}")
+    print("\n")
+
+for order, redeemable_content in redeemable_content.items():
+    print(f"Redeemable Content for {order}")
+    for content in redeemable_content:
+        print(content)
+    print("\n")
+
+exit(0)
 #for key, value in hb_orders.items():
 #    if value["product"]["category"] == "storefront" and len(value["subproducts"]) > 0:
 #        print(key, value["subproducts"])

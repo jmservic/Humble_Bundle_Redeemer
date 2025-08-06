@@ -14,3 +14,94 @@ april_2021_choice = {'amount_spent': 0.0, 'product': {'category': 'subscriptionc
 
 assassinscreed_bundle = {'amount_spent': 25.0, 'product': {'category': 'bundle', 'machine_name': 'assassinscreed_bundle', 'empty_tpkds': {}, 'post_purchase_text': '', 'human_name': "Humble Assassin's Creed Bundle", 'partial_gift_enabled': True}, 'gamekey': 'Yv8pEek2ehcSppPk', 'uid': 'XD7GPD10BFA8J', 'created': '2017-01-16T15:38:08.924170', 'missed_credit': None, 'subproducts': [], 'total_choices': 0, 'tpkd_dict': {'all_tpks': [{'is_gift': False, 'exclusive_countries': ['US', 'CA', 'AS', 'PR', 'VI'], 'machine_name': 'assassinscreed_chronicles_india_bundle_na_uplay', 'gamekey': 'Yv8pEek2ehcSppPk', 'custom_instructions_html': 'To redeem your Ubisoft product, please login to your Ubisoft account through <a href="https://ubisoftconnect.com/">our website connection</a>, wait 5 minutes, and then refresh the page. If you continue to experience issues, please reach out to <a href="https://support.humblebundle.com">Humble customer service</a>.', 'disallowed_countries': [], 'show_custom_instructions_in_user_libraries': False, 'key_type': 'uplay', 'visible': True, 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/115004546107-Uplay-Redemption-Instructions' target='_blank'>Ubisoft Connect PC Key Instructions</a>", 'display_separately': False, 'redeemed_key_val': 'AP3C-XN4R-8V4E-CLPM', 'key_type_human_name': 'Uplay', 'keyindex': 0, 'human_name': "Assassin's Creed® Chronicles India", 'preinstruction_text': 'Copy this key into the Ubisoft Connect Desktop App.', 'auto_expand': True, 'is_expired': False, 'class': 'uplaybutton', 'num_days_until_expired': -1}, {'is_gift': False, 'exclusive_countries': ['US', 'CA', 'AS', 'PR', 'VI'], 'machine_name': 'assassinscreed_chronicles_china_bundle_na_uplay', 'gamekey': 'Yv8pEek2ehcSppPk', 'custom_instructions_html': 'To redeem your Ubisoft product, please login to your Ubisoft account through <a href="https://ubisoftconnect.com/">our website connection</a>, wait 5 minutes, and then refresh the page. If you continue to experience issues, please reach out to <a href="https://support.humblebundle.com">Humble customer service</a>.', 'disallowed_countries': [], 'show_custom_instructions_in_user_libraries': False, 'key_type': 'uplay', 'visible': True, 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/115004546107-Uplay-Redemption-Instructions' target='_blank'>Ubisoft Connect PC Key Instructions</a>", 'display_separately': False, 'redeemed_key_val': 'UXV7-3L7M-TW67-WAET', 'key_type_human_name': 'Uplay', 'keyindex': 0, 'human_name': "Assassin's Creed® Chronicles China", 'preinstruction_text': 'Copy this key into the Ubisoft Connect Desktop App.', 'auto_expand': True, 'is_expired': False, 'class': 'uplaybutton', 'num_days_until_expired': -1}, {'is_gift': False, 'exclusive_countries': ['US', 'CA', 'AS', 'PR', 'VI'], 'machine_name': 'assassinscreed_chronicles_russia_bundle_na_uplay', 'gamekey': 'Yv8pEek2ehcSppPk', 'custom_instructions_html': 'To redeem your Ubisoft product, please login to your Ubisoft account through <a href="https://ubisoftconnect.com/">our website connection</a>, wait 5 minutes, and then refresh the page. If you continue to experience issues, please reach out to <a href="https://support.humblebundle.com">Humble customer service</a>.', 'disallowed_countries': [], 'show_custom_instructions_in_user_libraries': False, 'key_type': 'uplay', 'visible': True, 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/115004546107-Uplay-Redemption-Instructions' target='_blank'>Ubisoft Connect PC Key Instructions</a>", 'display_separately': False, 'redeemed_key_val': 'VKJY-7AVN-TKG7-MVUH', 'key_type_human_name': 'Uplay', 'keyindex': 0, 'human_name': "Assassin's Creed® Chronicles Russia", 'preinstruction_text': 'Copy this key into the Ubisoft Connect Desktop App.', 'auto_expand': True, 'is_expired': False, 'class': 'uplaybutton', 'num_days_until_expired': -1}, {'is_gift': False, 'exclusive_countries': [], 'machine_name': 'assassinscreed_bundle_uplay', 'gamekey': 'Yv8pEek2ehcSppPk', 'custom_instructions_html': 'To redeem your Ubisoft product, please login to your Ubisoft account through <a href="https://ubisoftconnect.com/">our website connection</a>, wait 5 minutes, and then refresh the page. If you continue to experience issues, please reach out to <a href="https://support.humblebundle.com">Humble customer service</a>.', 'disallowed_countries': [], 'show_custom_instructions_in_user_libraries': False, 'key_type': 'uplay', 'visible': True, 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/115004546107-Uplay-Redemption-Instructions' target='_blank'>Ubisoft Connect PC Key Instructions</a>", 'display_separately': False, 'redeemed_key_val': 'UP3-4DED-A2FA-8086-E322', 'key_type_human_name': 'Uplay', 'keyindex': 0, 'human_name': "Assassin's Creed®", 'preinstruction_text': 'Copy this key into the Ubisoft Connect Desktop App.', 'auto_expand': True, 'is_expired': False, 'class': 'uplaybutton', 'num_days_until_expired': -1}, {'is_gift': False, 'exclusive_countries': [], 'machine_name': 'assassinscreed_liberationhd_bundle_uplay', 'gamekey': 'Yv8pEek2ehcSppPk', 'custom_instructions_html': 'To redeem your Ubisoft product, please login to your Ubisoft account through <a href="https://ubisoftconnect.com/">our website connection</a>, wait 5 minutes, and then refresh the page. If you continue to experience issues, please reach out to <a href="https://support.humblebundle.com">Humble customer service</a>.', 'disallowed_countries': [], 'show_custom_instructions_in_user_libraries': False, 'key_type': 'uplay', 'visible': True, 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/115004546107-Uplay-Redemption-Instructions' target='_blank'>Ubisoft Connect PC Key Instructions</a>", 'display_separately': False, 'redeemed_key_val': 'W9QG-KVGB-YX6M-6W8W', 'key_type_human_name': 'Uplay', 'keyindex': 0, 'human_name': "Assassin's Creed® Liberation HD", 'preinstruction_text': 'Copy this key into the Ubisoft Connect Desktop App.', 'auto_expand': True, 'is_expired': False, 'class': 'uplaybutton', 'num_days_until_expired': -1}, {'is_gift': False, 'exclusive_countries': [], 'machine_name': 'assassinscreed3_bundle_uplay', 'gamekey': 'Yv8pEek2ehcSppPk', 'custom_instructions_html': 'To redeem your Ubisoft product, please login to your Ubisoft account through <a href="https://ubisoftconnect.com/">our website connection</a>, wait 5 minutes, and then refresh the page. If you continue to experience issues, please reach out to <a href="https://support.humblebundle.com">Humble customer service</a>.', 'disallowed_countries': [], 'show_custom_instructions_in_user_libraries': False, 'key_type': 'uplay', 'visible': True, 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/115004546107-Uplay-Redemption-Instructions' target='_blank'>Ubisoft Connect PC Key Instructions</a>", 'display_separately': False, 'redeemed_key_val': 'UVNL-LHY7-GKR6-GE6A', 'key_type_human_name': 'Uplay', 'keyindex': 0, 'human_name': "Assassin's Creed® III", 'preinstruction_text': 'Copy this key into the Ubisoft Connect Desktop App.', 'auto_expand': True, 'is_expired': False, 'class': 'uplaybutton', 'num_days_until_expired': -1}, {'is_gift': False, 'exclusive_countries': [], 'machine_name': 'assassinscreed3_washingtondlc_bundle_uplay', 'gamekey': 'Yv8pEek2ehcSppPk', 'custom_instructions_html': 'To redeem your Ubisoft product, please login to your Ubisoft account through <a href="https://ubisoftconnect.com/">our website connection</a>, wait 5 minutes, and then refresh the page. If you continue to experience issues, please reach out to <a href="https://support.humblebundle.com">Humble customer service</a>.', 'disallowed_countries': [], 'show_custom_instructions_in_user_libraries': False, 'key_type': 'uplay', 'visible': True, 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/115004546107-Uplay-Redemption-Instructions' target='_blank'>Ubisoft Connect PC Key Instructions</a>", 'display_separately': False, 'redeemed_key_val': 'WBMB-GP83-9MWX-86NF', 'key_type_human_name': 'Uplay', 'keyindex': 0, 'human_name': "Assassin's Creed® III - Tyranny of King Washington: The Infamy (DLC)", 'preinstruction_text': 'Copy this key into the Ubisoft Connect Desktop App.', 'auto_expand': True, 'is_expired': False, 'class': 'uplaybutton', 'num_days_until_expired': -1}, {'is_gift': False, 'exclusive_countries': [], 'machine_name': 'assassinscreed2_deluxe_bundle_uplay', 'gamekey': 'Yv8pEek2ehcSppPk', 'custom_instructions_html': 'To redeem your Ubisoft product, please login to your Ubisoft account through <a href="https://ubisoftconnect.com/">our website connection</a>, wait 5 minutes, and then refresh the page. If you continue to experience issues, please reach out to <a href="https://support.humblebundle.com">Humble customer service</a>.', 'disallowed_countries': [], 'show_custom_instructions_in_user_libraries': False, 'key_type': 'uplay', 'visible': True, 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/115004546107-Uplay-Redemption-Instructions' target='_blank'>Ubisoft Connect PC Key Instructions</a>", 'display_separately': False, 'redeemed_key_val': 'WCGF-AEJX-GACU-XUBX', 'key_type_human_name': 'Uplay', 'keyindex': 0, 'human_name': "Assassin's Creed® II Deluxe Edition", 'preinstruction_text': 'Copy this key into the Ubisoft Connect Desktop App.', 'auto_expand': True, 'is_expired': False, 'class': 'uplaybutton', 'num_days_until_expired': -1}, {'is_gift': False, 'exclusive_countries': ['US', 'CA', 'AS', 'PR', 'VI'], 'machine_name': 'assassinscreed_unity_bundle_na_uplay', 'gamekey': 'Yv8pEek2ehcSppPk', 'custom_instructions_html': 'To redeem your Ubisoft product, please login to your Ubisoft account through <a href="https://ubisoftconnect.com/">our website connection</a>, wait 5 minutes, and then refresh the page. If you continue to experience issues, please reach out to <a href="https://support.humblebundle.com">Humble customer service</a>.', 'disallowed_countries': [], 'show_custom_instructions_in_user_libraries': False, 'key_type': 'uplay', 'visible': True, 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/115004546107-Uplay-Redemption-Instructions' target='_blank'>Ubisoft Connect PC Key Instructions</a>", 'display_separately': False, 'redeemed_key_val': 'X8C7-GR6M-D87X-DM6E', 'key_type_human_name': 'Uplay', 'keyindex': 0, 'human_name': "Assassin's Creed® Unity", 'preinstruction_text': 'Copy this key into the Ubisoft Connect Desktop App.', 'auto_expand': True, 'is_expired': False, 'class': 'uplaybutton', 'num_days_until_expired': -1}, {'is_gift': False, 'exclusive_countries': [], 'machine_name': 'assassinscreed_brotherhood_bundle_uplay', 'gamekey': 'Yv8pEek2ehcSppPk', 'custom_instructions_html': 'To redeem your Ubisoft product, please login to your Ubisoft account through <a href="https://ubisoftconnect.com/">our website connection</a>, wait 5 minutes, and then refresh the page. If you continue to experience issues, please reach out to <a href="https://support.humblebundle.com">Humble customer service</a>.', 'disallowed_countries': [], 'show_custom_instructions_in_user_libraries': False, 'key_type': 'uplay', 'visible': True, 'instructions_html': "<a href='https://support.humblebundle.com/hc/articles/115004546107-Uplay-Redemption-Instructions' target='_blank'>Ubisoft Connect PC Key Instructions</a>", 'display_separately': False, 'redeemed_key_val': 'WPAT-4YKP-AAMM-X4RG', 'key_type_human_name': 'Uplay', 'keyindex': 0, 'human_name': "Assassin's Creed® Brotherhood", 'preinstruction_text': 'Copy this key into the Ubisoft Connect Desktop App.', 'auto_expand': True, 'is_expired': False, 'class': 'uplaybutton', 'num_days_until_expired': -1}]}, 'choices_remaining': 0, 'currency': 'USD', 'is_giftee': False, 'claimed': True, 'total': 25.0, 'path_ids': ['5247318872948736']}
 
+mixed_key_bundle = {
+        "product": {
+            "category": "bundle",
+            "machine_name" : "mixedkey_bundle",
+            "empty_tpkds": {},
+            "human_name": "Mixed Key Bundle"
+            },
+        "gamekey": "AvBcDeF041124034",
+        "created": "2025-08-06T15:48:08.923170",
+        "subproducts": [],
+        "total_choices": 0,
+        "tpkd_dict": {
+            "all_tpks": [
+                    {
+                        "is_gift": False,
+                        "exclusive_countries": [
+                        "US",
+                        "CA",
+                        "AS",
+                        "PR",
+                        "VI"
+                        ],
+                        "machine_name": "assassinscreed_chronicles_india_bundle_na_uplay",
+                        "gamekey": "Yv8pEek2ehcSppPk",
+                        "custom_instructions_html": "To redeem your Ubisoft product, please login to your Ubisoft account through \u003Ca href=\"https://ubisoftconnect.com/\"\u003Eour website connection\u003C/a\u003E, wait 5 minutes, and then refresh the page. If you continue to experience issues, please reach out to \u003Ca href=\"https://support.humblebundle.com\"\u003EHumble customer service\u003C/a\u003E.",
+                        "disallowed_countries": [],
+                        "show_custom_instructions_in_user_libraries": False,
+                        "key_type": "uplay",
+                        "visible": True,
+                        "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/115004546107-Uplay-Redemption-Instructions' target='_blank'\u003EUbisoft Connect PC Key Instructions\u003C/a\u003E",
+                        "display_separately": False,
+                        "redeemed_key_val": "AP3C-XN4R-8V4E-CLPM",
+                        "key_type_human_name": "Uplay",
+                        "keyindex": 0,
+                        "human_name": "Assassin's Creed® Chronicles India",
+                        "preinstruction_text": "Copy this key into the Ubisoft Connect Desktop App.",
+                        "auto_expand": True,
+                        "is_expired": False,
+                        "class": "uplaybutton",
+                        "num_days_until_expired": -1
+                    },
+                    {
+                        "is_gift": False,
+                        "machine_name": "donotfeedthemonkeys_monthly_steam",
+                        "gamekey": "WtY8pAudxaGx7f2d",
+                        "exclusive_countries": [],
+                        "num_days_until_expired": -1,
+                        "disallowed_countries": [],
+                        "show_custom_instructions_in_user_libraries": False,
+                        "key_type": "steam",
+                        "visible": True,
+                        "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'\u003ESteam Instructions\u003C/a\u003E",
+                        "display_separately": False,
+                        "redeemed_key_val": "I8M0C-J4QHW-LGAH7",
+                        "key_type_human_name": "Steam",
+                        "steam_app_id": 658850,
+                        "human_name": "Do Not Feed the Monkeys",
+                        "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+                        "auto_expand": True,
+                        "is_expired": False,
+                        "class": "steambutton",
+                        "keyindex": 0,
+                        "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+                    },
+                    {
+                        "machine_name": "starwars_squadrons_choice_origin",
+                        "custom_instructions_html": "\u003Cp\u003E\u003Cstrong\u003E\u003Ca style=\"color:#1695df\" href=\"https://www.origin.com/usa/en-us/redeem\" target=\"_blank\"\u003ERedeem\u003C/a\u003E\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003EThis EA title is redeemable on Origin and subject to EA terms and user agreements.\u003C/p\u003E\u003Cp\u003E\u003Cdiv style=\"text-align: center;\"\u003E\u003Cspan style=\"color: #1695df;\"\u003E\u003Cstrong\u003EMust be redeemed by January 13th, 2023 by 11:59 PM Pacific Time.\u003C/strong\u003E\u003C/span\u003E\u003C/div\u003E\u003Cp\u003E",
+                        "key_type": "origin",
+                        "visible": True,
+                        "exclusive_countries": [],
+                        "gamekey": "m4CBTMxk8kTFUaF5",
+                        "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/360012258294' target='_blank'\u003EOrigin Instructions\u003C/a\u003E",
+                        "preinstruction_text": "Copy this key into the Origin client.",
+                        "num_days_until_expired": 0,
+                        "keyindex": 0,
+                        "show_custom_instructions_in_user_libraries": False,
+                        "expiry_date": "2023-01-14T07:59:59",
+                        "display_separately": False,
+                        "class": "originbutton",
+                        "redeemed_key_val": "99HH-F8R4-DGX5-VTMK-4NH4",
+                        "is_gift": False,
+                        "expiration_date": "2023-01-14T07:59:59",
+                        "disallowed_countries": [],
+                        "key_type_human_name": "Origin",
+                        "human_name": "Star Wars Squadrons",
+                        "auto_expand": True,
+                        "is_expired": True
+                    },
+                ]
+            }
+        }

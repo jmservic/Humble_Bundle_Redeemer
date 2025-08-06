@@ -1,6 +1,36 @@
 import unittest
 from humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey, ChoiceContent
-from humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice, assassinscreed_bundle
+from humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice, assassinscreed_bundle, mixed_key_bundle
+
+class TestHumbleLibrary(unittest.TestCase):
+    orders_dict = {"NUDtNZdxFP7seeap": january_2019_monthly,
+                  "pAqvWHcU26DfphXe": june_2020_choice,
+                  "A7CESV6Pp4ZWFarX": april_2021_choice,
+                  "Z8KftUKAEf8zG7zY": april_2024_choice,
+                  "rw3m6TUnb3eqmHzM": june_2025_choice,
+                  "Yv8pEek2ehcSppPk": assassinscreed_bundle                      
+            }
+
+    def test_ChoiceChooseContent_returns_dict_of_unchosen_content(self):
+        sut = HumbleLibrary(TestHumbleLibrary.orders_dict)
+        unchosen_content = {"rw3m6TUnb3eqmHzM": {
+                    "havendock": ["havendock_choice_steam"],
+                    "warhammer40000_boltgun": ["warhammer40k_boltgun_row_choice_steam"],
+                    "legacyofkainsoulreaver12remastered": ["legacyofkaintmsoulreaver1and2remastered_row_choice_steam"],
+                    "skerritual": ["skerrittual_choice_steam"],
+                    "biped": ["biped_choice_steam"],
+                    "bootdev_june2025_onemonthfree": ["bootdev1monthsubscription_june_choice_coupon"]    
+               }
+            }
+        self.assertEqual(sut.ChoiceChooseContent(), unchosen_content)
+
+    def test_ChoiceRedeemableContent_returns_unredeemed_choice_content(self):
+        sut = HumbleLibrary(TestHumbleLibrary.orders_dict)
+        redeemable_content = {"Z8KftUKAEf8zG7zY": [ 
+                                "fashionpolicesquad_choice_steam"            
+                                ]
+                              }
+        self.assertEqual(sut.ChoiceRedeemableContent(), redeemable_content)
 
 class TestHumbleBundle(unittest.TestCase):
     
@@ -21,13 +51,17 @@ class TestHumbleBundle(unittest.TestCase):
 
     def test_ProductMachineNames_returns_empty_list_when_no_products_match(self):
         sut = self.CreateHumbleBundle(assassinscreed_bundle)
-        platforms =["steam"]
+        platforms = ["steam"]
         product_machine_names = []
         self.assertEqual(sut.ProductMachineNames(platforms), product_machine_names)
 
-    #Test with a bundle that has mixed keys
-    def test_ProductMachineNames_returns_list_containing_product_machine_names_for_the_given_platforms(self):
-        pass
+    def test_ProductMachineNames_returns_list_containing_product_machine_names_for_given_platforms(self):
+        sut = self.CreateHumbleBundle(mixed_key_bundle)
+        platforms = ["steam", "origin"]
+        product_machine_names = ["donotfeedthemonkeys_monthly_steam",
+                                 "starwars_squadrons_choice_origin"
+                                 ]
+        self.assertEqual(sut.ProductMachineNames(platforms), product_machine_names)
 
     def test_ProductRedeemKeys_returns_list_containing_product_redeem_keys(self):
         sut = self.CreateHumbleBundle(assassinscreed_bundle)
@@ -43,6 +77,57 @@ class TestHumbleBundle(unittest.TestCase):
                                "WPAT-4YKP-AAMM-X4RG"
                                ]
         self.assertEqual(sut.ProductRedeemKeys(), product_redeem_keys)
+
+    def test_ProductRedeemKeys_returns_list_containing_product_redeem_keys_for_given_platforms(self):
+        sut = self.CreateHumbleBundle(mixed_key_bundle)
+        platforms = ["steam", "origin"]
+        product_redeem_keys = ["I8M0C-J4QHW-LGAH7",
+                               "99HH-F8R4-DGX5-VTMK-4NH4"
+                               ]
+        self.assertEqual(sut.ProductRedeemKeys(platforms), product_redeem_keys)
+
+    def test_ProductNames_returns_list_containing_product_names(self):
+        sut = self.CreateHumbleBundle(mixed_key_bundle)
+        product_names = ["Assassin's Creed® Chronicles India",
+                         "Do Not Feed the Monkeys",
+                         "Star Wars Squadrons"
+                         ]
+        self.assertEqual(sut.ProductNames(), product_names)
+
+    def test_ProductNames_returns_list_containing_product_names_for_given_platforms(self):
+        sut = self.CreateHumbleBundle(mixed_key_bundle)
+        platforms = ["steam", "origin"]
+        product_names = ["Do Not Feed the Monkeys",
+                         "Star Wars Squadrons"
+                         ]
+        self.assertEqual(sut.ProductNames(platforms), product_names)
+
+    def test_Products_returns_list_containing_products(self):
+        sut = self.CreateHumbleBundle(mixed_key_bundle)
+        order_dict = {"machine_name": mixed_key_bundle["product"]["machine_name"],
+                     "name": mixed_key_bundle["product"]["human_name"],
+                     "gamekey": mixed_key_bundle["gamekey"],
+                     "created": mixed_key_bundle["created"],
+                     "subproducts": mixed_key_bundle["subproducts"]
+                      }
+        product_dicts = mixed_key_bundle["tpkd_dict"]["all_tpks"]
+        order_factory = OrderFactory()
+        products = [order_factory.CreateStoreKeyOrder(order_dict, product_dict) for product_dict in product_dicts]
+        self.assertEqual(sut.Products(), products)
+
+    def test_Products_returns_list_containing_products_for_given_platforms(self):
+        sut = self.CreateHumbleBundle(mixed_key_bundle)
+        platforms = ["steam", "origin"]
+        order_dict = {"machine_name": mixed_key_bundle["product"]["machine_name"],
+                     "name": mixed_key_bundle["product"]["human_name"],
+                     "gamekey": mixed_key_bundle["gamekey"],
+                     "created": mixed_key_bundle["created"],
+                     "subproducts": mixed_key_bundle["subproducts"]
+                      }
+        product_dicts = mixed_key_bundle["tpkd_dict"]["all_tpks"]
+        order_factory = OrderFactory()
+        products = [order_factory.CreateStoreKeyOrder(order_dict, product_dict) for product_dict in product_dicts if product_dict["key_type"] in platforms]
+        self.assertEqual(sut.Products(platforms), products)
 
     def CreateHumbleBundle(self, order_dict):
         order_factory = OrderFactory()
