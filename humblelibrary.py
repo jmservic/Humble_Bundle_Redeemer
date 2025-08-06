@@ -39,6 +39,7 @@ class OrderFactory():
                      "redeem_key": product_dict.get("redeemed_key_val", None),
                      "key_type": product_dict.get("key_type", None),
                      "platform_id": product_dict.get("steam_app_id", None),
+                     "keyindex": product_dict.get("keyindex", None),
                      "is_expired": product_dict["is_expired"]
                      }
         return HumbleStoreKey(init_dict)
@@ -94,30 +95,50 @@ class Order():
         self._name = init_dict["name"]
         self._subproducts = init_dict["subproducts"]
 
+    def MachineName(self):
+        return self._order_machine_name
+
+    def Key(self):
+        return self._humblekey
+
+    def Created(self):
+        return self._created
+
+    def Name(self):
+        return self._name
+
 class HumbleBundle(Order):
 
     def __init__(self, init_dict, products):
         super().__init__(init_dict)
         self._products = products
 
-    def ProductInfo(self, platforms = []): #Just use this function instead of the others.
-        pass
+    #def ProductInfo(self, platforms = []): #Just use this function instead of the others.
+    #    products = self._getProductsByPlatform(platforms)
+    #    product_info = []
+    #    for product in products:
+    #        info_dict = {"machine_name": product.ProductMachineName(),
+    #                     "name": product.Name(),
+    #                     "redeem_key": product.RedeemKey(),
+    #                     }
+    #        product_info.append(info_dict)
+    #    return product_info
 
     def ProductMachineNames(self, platforms = []):
-        products = self.__getGamesByPlatform(platforms)
+        return[product.ProductMachineName() for product in self._getProductsByPlatform(platforms)]
+        
 
-    def ProductRegisterKeys(self, platforms = []):
-        pass
+    def ProductRedeemKeys(self, platforms = []):
+        return[product.RedeemKey() for product in self._getProductsByPlatform(platforms)]
 
     def ProductNames(self, platforms = []):
         pass
 
     def Products(self, platform = []):
-        pass
+        return self._getProductsByPlatform(platforms)
 
-    def _getGamesByPlatform(platforms):
-        pass
-
+    def _getProductsByPlatform(self, platforms):
+        return [product for product in self._products if not platforms or product.KeyType() in platforms]
 
 class HumbleChoice(HumbleBundle):
 
@@ -143,7 +164,7 @@ class HumbleChoice(HumbleBundle):
         choice_names = []
         for choice in self.__all_choices:
             choice_names += choice.ProductMachineNames()
-        product_names = [product.MachineName() for product in self._products]
+        product_names = [product.ProductMachineName() for product in self._products]
         self.__chosen = len(choice_names) == len(product_names)
             
     def __getAllChoices(self, contentChoiceData):
@@ -184,7 +205,7 @@ class HumbleChoice(HumbleBundle):
         if self.FullyChosen():
             return {}
         choices = {}
-        product_names = [product.MachineName() for product in self._products]
+        product_names = [product.ProductMachineName() for product in self._products]
         for choice in self.__all_choices:
             choice_products = choice.AllProductMachineNames()
             chosen = False
@@ -199,7 +220,7 @@ class HumbleChoice(HumbleBundle):
         return choices
 
     def RedeemableProducts(self):
-        return [product.MachineName() for product in self._products if product.RedeemKey() == None]
+        return [product.ProductMachineName() for product in self._products if product.RedeemKey() == None]
 
 class ChoiceContent():
 
@@ -262,14 +283,27 @@ class HumbleStoreKey(Order):
         self.__product_machine_name = init_dict["product_machine_name"]
         self.__redeem_key = init_dict["redeem_key"]
         self.__key_type = init_dict["key_type"]
+        self.__key_index = init_dict["keyindex"]
         self.__platform_id = init_dict["platform_id"]
         self.__is_expired = init_dict["is_expired"]
 
-    def MachineName(self):
+    def ProductMachineName(self):
         return self.__product_machine_name
 
     def RedeemKey(self):
         return self.__redeem_key
+
+    def KeyType(self):
+        return self.__key_type
+
+    def PlatformId(self):
+        return self.__platform_id
+
+    def Expired(self):
+        return self.__is_expired
+    
+    def KeyIndex(self):
+        return self.__key_index
 
     def __eq__(self, other):
         return (self._order_machine_name == other._order_machine_name and self._name == other._name

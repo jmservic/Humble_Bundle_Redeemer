@@ -1,8 +1,53 @@
 import unittest
 from humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey, ChoiceContent
-from humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice
+from humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice, assassinscreed_bundle
 
-#class TestHumbleBundle(unittest.TestCase):
+class TestHumbleBundle(unittest.TestCase):
+    
+    def test_ProductMachineNames_returns_list_containing_product_machine_names(self):
+        sut = self.CreateHumbleBundle(assassinscreed_bundle)
+        product_machine_names = ["assassinscreed_chronicles_india_bundle_na_uplay",
+                        "assassinscreed_chronicles_china_bundle_na_uplay",
+                        "assassinscreed_chronicles_russia_bundle_na_uplay",
+                        "assassinscreed_bundle_uplay",
+                        "assassinscreed_liberationhd_bundle_uplay",
+                        "assassinscreed3_bundle_uplay",
+                        "assassinscreed3_washingtondlc_bundle_uplay",
+                        "assassinscreed2_deluxe_bundle_uplay",
+                        "assassinscreed_unity_bundle_na_uplay",
+                        "assassinscreed_brotherhood_bundle_uplay"
+                        ]
+        self.assertEqual(sut.ProductMachineNames(), product_machine_names)
+
+    def test_ProductMachineNames_returns_empty_list_when_no_products_match(self):
+        sut = self.CreateHumbleBundle(assassinscreed_bundle)
+        platforms =["steam"]
+        product_machine_names = []
+        self.assertEqual(sut.ProductMachineNames(platforms), product_machine_names)
+
+    #Test with a bundle that has mixed keys
+    def test_ProductMachineNames_returns_list_containing_product_machine_names_for_the_given_platforms(self):
+        pass
+
+    def test_ProductRedeemKeys_returns_list_containing_product_redeem_keys(self):
+        sut = self.CreateHumbleBundle(assassinscreed_bundle)
+        product_redeem_keys = ["AP3C-XN4R-8V4E-CLPM",
+                               "UXV7-3L7M-TW67-WAET",
+                               "VKJY-7AVN-TKG7-MVUH",
+                               "UP3-4DED-A2FA-8086-E322",
+                               "W9QG-KVGB-YX6M-6W8W",
+                               "UVNL-LHY7-GKR6-GE6A",
+                               "WBMB-GP83-9MWX-86NF",
+                               "WCGF-AEJX-GACU-XUBX",
+                               "X8C7-GR6M-D87X-DM6E",
+                               "WPAT-4YKP-AAMM-X4RG"
+                               ]
+        self.assertEqual(sut.ProductRedeemKeys(), product_redeem_keys)
+
+    def CreateHumbleBundle(self, order_dict):
+        order_factory = OrderFactory()
+        return order_factory.CreateOrder(order_dict)
+
 
 class TestHumbleChoice(unittest.TestCase):
     
@@ -295,6 +340,7 @@ class TestOrderFactory(unittest.TestCase):
                                                 "subproducts": [],
                                                 "redeem_key": "TMQTG-FRRFB-NY4EZ",
                                                 "key_type": "steam",
+                                                "keyindex": 0,
                                                 "platform_id": None,
                                                 "is_expired": False
                                                 })) 
@@ -368,6 +414,7 @@ class TestOrderFactory(unittest.TestCase):
                                         "subproducts": [],
                                         "redeem_key": "Z7AQM-3XTNN-PAATK",
                                         "key_type": "steam",
+                                        "keyindex": 0,
                                         "platform_id": 529340,
                                         "is_expired": False
                                         }) 

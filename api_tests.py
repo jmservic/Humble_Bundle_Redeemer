@@ -60,16 +60,16 @@ while login_result != LoginResult.SUCCESS and counter < 5:
     counter += 1
 
 hb_orders = hb.GetOrdersDetail()
-for key, value in hb_orders.items():
-    if value["product"]["category"] == "storefront" and len(value["subproducts"]) > 0:
-        print(key, value["subproducts"])
-exit(0)
+#for key, value in hb_orders.items():
+#    if value["product"]["category"] == "storefront" and len(value["subproducts"]) > 0:
+#        print(key, value["subproducts"])
+#exit(0)
 for key, value in hb_orders.items():
     if "machine_name" not in value["product"].keys():
         print(key, "\n")
         continue
 
-    if value["product"]["machine_name"] == "april_2021_choice": #in  ["april_2024_choice", "june_2025_choice", "june_2020_choice", "january_2019_monthly", "april_2021_choce"]:
+    if value["product"]["machine_name"] == "assassinscreed_bundle": #"april_2021_choice": #in  ["april_2024_choice", "june_2025_choice", "june_2020_choice", "january_2019_monthly", "april_2021_choce"]:
         print(f'\n{value["product"]["machine_name"]} = {value}\n')
 
 exit(0)
