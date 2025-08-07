@@ -12,6 +12,8 @@ from steam_utils import EncodeProtoBuff, EncryptPassword
 import Steam_RSA_Public_Key_Request_pb2 
 from time import sleep
 import threading
+import datetime
+import time
 
 STEAM_DOMAIN = "store.steampowered.com"
 STEAM_API_DOMAIN = "https://api.steampowered.com"
@@ -210,6 +212,35 @@ class SteamClient(LibraryClient):
         gameslist_config = soup.find(id="gameslist_config")
         gameslist_dict = json.loads(gameslist_config["data-profile-gameslist"])
         return gameslist_dict
+
+    def GetBundleInfo(self, bundle_id):
+        #print(self.__CookieString())
+        res = self.__session.get(f"https://store.steampowered.com/bundle/{bundle_id}/", headers={"User-Agent": self.__user_agent})
+        #print(res.url)
+        if "agecheck" in res.url:
+            #birthday = datetime.datetime.now()
+            #res = self.__session.post("https://store.steampowered.com/agecheckset/bundle/{bundle_id}", headers={"User-Agent": self.__user_agent},
+            #                    json={"sessionid": self.__session.cookies.get("sessionid", domain=STEAM_DOMAIN),
+            #                          "ageDay": 21,#birthday.day,
+            #                          "ageMonth": "november",#birthday.month,
+            #                          "ageYear": 1994})#birthday.year - 23})
+            #print(res.status_code)
+            #print(res.text)
+            #print(res.headers)
+            #print(res.request.headers)
+            self.__session.cookies.set("birthtime", "785394001", domain=STEAM_DOMAIN)
+            self.__session.cookies.set("lastagecheckage", "21-November-1994", domain=STEAM_DOMAIN, expires=int(time.time() + 31536000))
+            self.__session.cookies.set("wants_mature_content", "1", domain=STEAM_DOMAIN, path=f"/bundle/{bundle_id}")
+            res = self.__session.get(f"https://store.steampowered.com/bundle/{bundle_id}/", headers={"User-Agent": self.__user_agent})
+            #print(res.url)
+        soup = BeautifulSoup(res.text, "html.parser")
+        #print(soup)
+        #print(self.__CookieString())
+        bundle_div = soup.select_one("div#game_area_purchase_top .game_area_purchase_game")
+        bundle_data = json.loads(bundle_div["data-ds-bundle-data"])
+        print(bundle_data)
+        return bundle_data
+
     
     def VisitRegisterKeyPage(self):
         res = self.__VisitAuthRequiredPage(STEAM_REGISTER_KEY)

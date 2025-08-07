@@ -60,9 +60,17 @@ while login_result != LoginResult.SUCCESS and counter < 5:
             exit(1)
     counter += 1
 
+#print(hb.ChooseContent("qqnZwGv4YXWAvdGm", "dcuniverseinfinite_onemonthfreetrial"))
+#print(hb.RedeemKey("dccomicsfreetrial_november2023choice_coupon","qqnZwGv4YXWAvdGm"))
+steam.GetBundleInfo(15367)
+exit(0)
+print("Obtaining Order Details")
 hb_orders = hb.GetOrdersDetail()
+print("Creating the Humble Library Object")
 humble_library = HumbleLibrary(hb_orders)
+print("Obtaining Unchosen Content")
 unchosen_content = humble_library.ChoiceChooseContent()
+print("Obtaining Redeemable Content")
 redeemable_content = humble_library.ChoiceRedeemableContent()
 for order, choose_content in unchosen_content.items():
     print(f"Unchosen Content for {order}")
