@@ -63,41 +63,41 @@ while login_result != LoginResult.SUCCESS and counter < 5:
 #print(hb.ChooseContent("qqnZwGv4YXWAvdGm", "dcuniverseinfinite_onemonthfreetrial"))
 #print(hb.RedeemKey("dccomicsfreetrial_november2023choice_coupon","qqnZwGv4YXWAvdGm"))
 steam.GetBundleInfo(15367)
-exit(0)
-print("Obtaining Order Details")
-hb_orders = hb.GetOrdersDetail()
-print("Creating the Humble Library Object")
-humble_library = HumbleLibrary(hb_orders)
-print("Obtaining Unchosen Content")
-unchosen_content = humble_library.ChoiceChooseContent()
-print("Obtaining Redeemable Content")
-redeemable_content = humble_library.ChoiceRedeemableContent()
-for order, choose_content in unchosen_content.items():
-    print(f"Unchosen Content for {order}")
-    for display_name, product_machine_name in choose_content.items():
-        print(f"{display_name}, {product_machine_name}")
-    print("\n")
+#exit(0)
+#print("Obtaining Order Details")
+#hb_orders = hb.GetOrdersDetail()
+#print("Creating the Humble Library Object")
+#humble_library = HumbleLibrary(hb_orders)
+#print("Obtaining Unchosen Content")
+#unchosen_content = humble_library.ChoiceChooseContent()
+#print("Obtaining Redeemable Content")
+#redeemable_content = humble_library.ChoiceRedeemableContent()
+#for order, choose_content in unchosen_content.items():
+#    print(f"Unchosen Content for {order}")
+#    for display_name, product_machine_name in choose_content.items():
+#        print(f"{display_name}, {product_machine_name}")
+#    print("\n")
 
-for order, redeemable_content in redeemable_content.items():
-    print(f"Redeemable Content for {order}")
-    for content in redeemable_content:
-        print(content)
-    print("\n")
+#for order, redeemable_content in redeemable_content.items():
+#    print(f"Redeemable Content for {order}")
+#    for content in redeemable_content:
+#        print(content)
+#    print("\n")
 
-exit(0)
+#exit(0)
 #for key, value in hb_orders.items():
 #    if value["product"]["category"] == "storefront" and len(value["subproducts"]) > 0:
 #        print(key, value["subproducts"])
 #exit(0)
-for key, value in hb_orders.items():
-    if "machine_name" not in value["product"].keys():
-        print(key, "\n")
-        continue
+#for key, value in hb_orders.items():
+#    if "machine_name" not in value["product"].keys():
+#        print(key, "\n")
+#        continue
 
-    if value["product"]["machine_name"] == "assassinscreed_bundle": #"april_2021_choice": #in  ["april_2024_choice", "june_2025_choice", "june_2020_choice", "january_2019_monthly", "april_2021_choce"]:
-        print(f'\n{value["product"]["machine_name"]} = {value}\n')
+#    if value["product"]["machine_name"] == "assassinscreed_bundle": #"april_2021_choice": #in  ["april_2024_choice", "june_2025_choice", "june_2020_choice", "january_2019_monthly", "april_2021_choce"]:
+#        print(f'\n{value["product"]["machine_name"]} = {value}\n')
 
-exit(0)
+#exit(0)
         
 #category_set = set()
 #for order in hb_orders.values():
@@ -128,6 +128,7 @@ while steam.Polling():
 #    print(cookie)
 #steam.VisitRegisterKeyPage()
 gameslist_config = steam.GetLibraryDetails()
+steam.GetLicenses()
 print(f"Number of games in library: {len(gameslist_config['rgGames'])}")
 #print("Keys in gameslist_config:")
 #for key in gameslist_config:

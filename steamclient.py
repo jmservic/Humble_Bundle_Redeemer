@@ -243,6 +243,15 @@ class SteamClient(LibraryClient):
         print(bundle_data)
         return bundle_data
 
+    def GetLicenses(self):
+        res = self.__VisitAuthRequiredPage(STEAM_LICENSES)
+        print(res.url)
+        soup = BeautifulSoup(res.text, "html.parser")
+        license_table_rows = soup.find_all("tr")
+        for tr in license_table_rows:
+            game_title = tr.find("td", class_=False)
+            if game_title is not None:
+                print(game_title.get_text())
     
     def VisitRegisterKeyPage(self):
         res = self.__VisitAuthRequiredPage(STEAM_REGISTER_KEY)
