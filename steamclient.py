@@ -26,6 +26,8 @@ STEAM_POLL_AUTH_STATUS_API = "/IAuthenticationService/PollAuthSessionStatus/v1"
 STEAM_FINALIZE_LOGIN_API = "/jwt/finalizelogin"
 STEAM_GAMES = "https://steamcommunity.com/my/games/"
 STEAM_MAIN = "https://store.steampowered.com"
+STEAM_LICENSES = "https://store.steampowered.com/account/licenses/"
+STEAM_BUNDLES = "https://store.steampowered.com/bundle/"
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0"
 
 class LibraryClient(ABC):
@@ -215,7 +217,7 @@ class SteamClient(LibraryClient):
 
     def GetBundleInfo(self, bundle_id):
         #print(self.__CookieString())
-        res = self.__session.get(f"https://store.steampowered.com/bundle/{bundle_id}/", headers={"User-Agent": self.__user_agent})
+        res = self.__session.get(f"{STEAM_BUNDLES}{bundle_id}/", headers={"User-Agent": self.__user_agent})
         #print(res.url)
         if "agecheck" in res.url:
             #birthday = datetime.datetime.now()
@@ -231,7 +233,7 @@ class SteamClient(LibraryClient):
             self.__session.cookies.set("birthtime", "785394001", domain=STEAM_DOMAIN)
             self.__session.cookies.set("lastagecheckage", "21-November-1994", domain=STEAM_DOMAIN, expires=int(time.time() + 31536000))
             self.__session.cookies.set("wants_mature_content", "1", domain=STEAM_DOMAIN, path=f"/bundle/{bundle_id}")
-            res = self.__session.get(f"https://store.steampowered.com/bundle/{bundle_id}/", headers={"User-Agent": self.__user_agent})
+            res = self.__session.get(f"{STEAM_BUNDLES}{bundle_id}/", headers={"User-Agent": self.__user_agent})
             #print(res.url)
         soup = BeautifulSoup(res.text, "html.parser")
         #print(soup)
