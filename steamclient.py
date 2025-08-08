@@ -12,7 +12,7 @@ from steam_utils import EncodeProtoBuff, EncryptPassword
 import Steam_RSA_Public_Key_Request_pb2 
 from time import sleep
 import threading
-import datetime
+from datetime import datetime
 import time
 
 STEAM_DOMAIN = "store.steampowered.com"
@@ -234,24 +234,51 @@ class SteamClient(LibraryClient):
             self.__session.cookies.set("lastagecheckage", "21-November-1994", domain=STEAM_DOMAIN, expires=int(time.time() + 31536000))
             self.__session.cookies.set("wants_mature_content", "1", domain=STEAM_DOMAIN, path=f"/bundle/{bundle_id}")
             res = self.__session.get(f"{STEAM_BUNDLES}{bundle_id}/", headers={"User-Agent": self.__user_agent})
-            #print(res.url)
+
+        if "agecheck" in res.url:
+            raise Exception("Failed to pass the agecheck for this bundle")
+
         soup = BeautifulSoup(res.text, "html.parser")
-        #print(soup)
-        #print(self.__CookieString())
         bundle_div = soup.select_one("div#game_area_purchase_top .game_area_purchase_game")
         bundle_data = json.loads(bundle_div["data-ds-bundle-data"])
-        print(bundle_data)
+        #print(bundle_data)
         return bundle_data
 
     def GetLicenses(self):
         res = self.__VisitAuthRequiredPage(STEAM_LICENSES)
-        print(res.url)
+        licenses_info = []
         soup = BeautifulSoup(res.text, "html.parser")
         license_table_rows = soup.find_all("tr")
         for tr in license_table_rows:
-            game_title = tr.find("td", class_=False)
-            if game_title is not None:
-                print(game_title.get_text())
+
+            acquisition_method_td = tr.find("td", class_="license_acquisition_col")
+            acquisition_method = ""
+
+            if acquisition_method_td is not None:
+                acquisition_method = next(acquisition_method_td.stripped_strings).lower()
+                if acquisition_method == "complimentary":
+                    continue
+
+            game_title_td = tr.find("td", class_=False)
+            
+            if game_title_td is None:
+                continue
+
+            for string in game_title_td.stripped_strings:
+                str_lower = string.lower()
+                if str_lower != "remove":
+                    game_title = str_lower
+
+            date_td = tr.find("td", class_="license_date_col")
+
+            if date_td is None:
+                continue
+
+            date = datetime.strptime(next(date_td.stripped_strings), "%b %d, %Y").date()
+            
+            license_info = {"date": date, "title": game_title, "aq_method": acquisition_method}
+            licenses_info.insert(0, license_info)
+        return licenses_info
     
     def VisitRegisterKeyPage(self):
         res = self.__VisitAuthRequiredPage(STEAM_REGISTER_KEY)

@@ -1,4 +1,4 @@
-
+from datetime import datetime
 
 class OrderFactory():
     
@@ -41,7 +41,8 @@ class OrderFactory():
                      "key_type": product_dict.get("key_type", None),
                      "platform_id": product_dict.get("steam_app_id", None),
                      "keyindex": product_dict.get("keyindex", None),
-                     "is_expired": product_dict.get("is_expired", None)
+                     "expiration_date": product_dict.get("expiration_date", None)
+                     #"is_expired": product_dict.get("is_expired", None)
                      }
         return HumbleStoreKey(init_dict)
 
@@ -109,14 +110,14 @@ class HumbleLibrary():
     def GiftableContent(self):
         pass
     
-    def RedeemContent(self):
+    def UnownedKeysContent(self):
         pass
 
 class Order():
     def __init__(self, init_dict):
         self._order_machine_name = init_dict["order_machine_name"]
         self._humblekey = init_dict["humblekey"]
-        self._created = init_dict["created"]
+        self._created = datetime.fromisoformat(init_dict["created"])
         self._name = init_dict["name"]
         self._subproducts = init_dict["subproducts"]
 
@@ -224,7 +225,7 @@ class HumbleChoice(HumbleBundle):
 
     def AllProductsRedeemed(self):
         for product in self._products:
-            if product.RedeemKey() is None:
+            if not product.Expired() and product.RedeemKey() is None:
                 return False
         return True
 
@@ -247,7 +248,7 @@ class HumbleChoice(HumbleBundle):
         return choices
 
     def RedeemableProducts(self):
-        return [product.ProductMachineName() for product in self._products if product.RedeemKey() == None]
+        return [product.ProductMachineName() for product in self._products if product.RedeemKey() == None and not product.Expired()]
 
 class ChoiceContent():
 
@@ -312,7 +313,8 @@ class HumbleStoreKey(Order):
         self.__key_type = init_dict["key_type"]
         self.__key_index = init_dict["keyindex"]
         self.__platform_id = init_dict["platform_id"]
-        self.__is_expired = init_dict["is_expired"]
+        self.__expiration_date = datetime.fromisoformat(init_dict["expiration_date"]) if init_dict.get("expiration_date", None) else None  
+        #self.__is_expired = init_dict["is_expired"]
 
     def ProductMachineName(self):
         return self.__product_machine_name
@@ -327,7 +329,9 @@ class HumbleStoreKey(Order):
         return self.__platform_id
 
     def Expired(self):
-        return self.__is_expired
+        if self.__expiration_date is None:
+            return False
+        return self.__expiration_date < datetime.now()
     
     def KeyIndex(self):
         return self.__key_index
@@ -336,7 +340,7 @@ class HumbleStoreKey(Order):
         return (self._order_machine_name == other._order_machine_name and self._name == other._name
                 and self._humblekey == other._humblekey and self._created == other._created
                 and self.__redeem_key == other.__redeem_key and self.__key_type == other.__key_type
-                and self.__platform_id == other.__platform_id and self.__is_expired == other.__is_expired
+                and self.__platform_id == other.__platform_id and self.Expired() == other.Expired()
                 and self.__product_machine_name == other.__product_machine_name)
         
         

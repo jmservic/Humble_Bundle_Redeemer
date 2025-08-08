@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime, timedelta
 from humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey, ChoiceContent
 from humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice, assassinscreed_bundle, mixed_key_bundle
 
@@ -159,6 +160,21 @@ class TestHumbleChoice(unittest.TestCase):
         sut = self.CreateHumbleChoice(april_2021_choice)
         self.assertTrue(sut.AllProductsRedeemed())
 
+    def test_AllProductsRedeemed_returns_True_for_choice_bundle_with_expired_products(self):
+        order_dict = {}
+        order_dict.update(april_2024_choice)
+        order_dict["tpkd_dict"] = {"all_tpks": []}
+        for tpks in april_2024_choice["tpkd_dict"]["all_tpks"]:
+            temp_dict = {}
+            temp_dict.update(tpks)
+            if not tpks.get("redeemed_key_val", None):
+                dateStr = (datetime.now() + timedelta(days=-1)).isoformat()
+                temp_dict["expiration_date"] = dateStr 
+            order_dict["tpkd_dict"]["all_tpks"].append(temp_dict)
+
+        sut = self.CreateHumbleChoice(order_dict)
+        self.assertTrue(sut.AllProductsRedeemed())
+
     def test_AllProductsRedeemed_returns_False_for_choice_bundle_with_redeemable_products(self):
         sut = self.CreateHumbleChoice(april_2024_choice)
         self.assertFalse(sut.AllProductsRedeemed())
@@ -213,8 +229,23 @@ class TestHumbleChoice(unittest.TestCase):
     def test_RedeemableProducts_returns_empty_list_for_redeemed_chosen_choices_for_fully_chosen_bundle(self):
         sut = self.CreateHumbleChoice(april_2021_choice)
         self.assertEqual(sut.RedeemableProducts(), [])
-        
-    def test_RedeemableProducts_returns_unredeemed_products(self):
+
+    def test_RedeemableProducts_returns_unexpired_redeemable_products(self):
+        order_dict = {}
+        order_dict.update(april_2024_choice)
+        order_dict["tpkd_dict"] = {"all_tpks": []}
+        for tpks in april_2024_choice["tpkd_dict"]["all_tpks"]:
+            temp_dict = {}
+            temp_dict.update(tpks)
+            if not tpks.get("redeemed_key_val", None):
+                dateStr = (datetime.now() + timedelta(days=-1)).isoformat()
+                temp_dict["expiration_date"] = dateStr 
+            order_dict["tpkd_dict"]["all_tpks"].append(temp_dict)
+
+        sut = self.CreateHumbleChoice(order_dict)
+        self.assertEqual(sut.RedeemableProducts(), [])
+
+    def test_RedeemableProducts_returns_unredeemable_products(self):
         sut = self.CreateHumbleChoice(april_2024_choice)
         products = ["fashionpolicesquad_choice_steam"]
         self.assertEqual(sut.RedeemableProducts(), products)
@@ -267,6 +298,87 @@ class TestChoiceContent(unittest.TestCase):
         sut = ChoiceContent(machine_name, tpkds)
         self.assertEqual(sut.ProductMachineNames(["epic","steam"]),["shenmue3_choice_epic_keyless"])
 
+class TestHumbleStoreKey(unittest.TestCase):
+    
+    def test_Expired_returns_false_for_key_without_expiration(self):
+        order_factory = OrderFactory()
+        order_dict = {"product": {"category": "storefront",
+                                  "machine_name": None,
+                                  "human_name": None},
+                      "gamekey": None,
+                      "created": "2024-04-30T18:51:02.620236",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": None,
+                                      "redeem_key_val": None,
+                                      "key_type": None,
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": None
+                                  }
+                            ]
+                        }
+                      }
+        sut = order_factory.CreateOrder(order_dict)
+        self.assertFalse(sut.Expired())
+
+    def test_Expired_returns_false_for_key_that_has_not_expired(self):
+        order_factory = OrderFactory()
+        future_date = datetime.now() + timedelta(days=1)
+        order_dict = {"product": {"category": "storefront",
+                                  "machine_name": None,
+                                  "human_name": None},
+                      "gamekey": None,
+                      "created": "2024-04-30T18:51:02.620236",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": None,
+                                      "redeem_key_val": None,
+                                      "key_type": None,
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": None,
+                                      "expiration_date": future_date.isoformat()
+                                  }
+                            ]
+                        }
+                      }
+        sut = order_factory.CreateOrder(order_dict)
+        self.assertFalse(sut.Expired())
+
+    def test_Expired_returns_true_for_key_that_has_expired(self):
+        order_factory = OrderFactory()
+        future_date = datetime.now() + timedelta(days=-1)
+        order_dict = {"product": {"category": "storefront",
+                                  "machine_name": None,
+                                  "human_name": None},
+                      "gamekey": None,
+                      "created": "2024-04-30T18:51:02.620236",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": None,
+                                      "redeem_key_val": None,
+                                      "key_type": None,
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": None,
+                                      "expiration_date": future_date.isoformat()
+                                  }
+                            ]
+                        }
+                      }
+        sut = order_factory.CreateOrder(order_dict)
+        self.assertTrue(sut.Expired())
+
 class TestOrderFactory(unittest.TestCase):
 
     def test_unknown_category_raises_error(self):
@@ -281,7 +393,7 @@ class TestOrderFactory(unittest.TestCase):
                                   "machine_name": None,
                                   "human_name": None},
                       "gamekey": None,
-                      "created": None,
+                      "created": "2024-04-30T18:51:02.620236",
                       "subproducts": [],
                       "tpkd_dict": {
                           "all_tpks":
@@ -306,7 +418,7 @@ class TestOrderFactory(unittest.TestCase):
                                   "machine_name": None,
                                   "human_name": None},
                       "gamekey": None,
-                      "created": None,
+                      "created": "2024-04-30T18:51:02.620236",
                       "subproducts": [],
                       "total_choices": 0,
                       "tpkd_dict": {
@@ -333,7 +445,7 @@ class TestOrderFactory(unittest.TestCase):
                                   "machine_name": None,
                                   "human_name": None},
                         "gamekey": None,
-                        "created": None,
+                        "created": "2024-04-30T18:51:02.620236",
                         "subproducts": [],
                         "total_choices": 0,
                         "tpkd_dict": {
@@ -361,7 +473,7 @@ class TestOrderFactory(unittest.TestCase):
                                   "machine_name": None,
                                   "human_name": None},
                         "gamekey": None,
-                        "created": None,
+                        "created": "2024-04-30T18:51:02.620236",
                         "subproducts": [],
                         "total_choices": 0,
                         "tpkd_dict": {
