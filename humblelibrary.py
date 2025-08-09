@@ -1,5 +1,7 @@
 from datetime import datetime
 
+PLATFORMS = ["steam", "epic", "uplay", "origin"]
+
 class OrderFactory():
     
     def CreateOrder(self, order_dict):
@@ -75,7 +77,8 @@ class HumbleLibrary():
         self.__store_keys = {}
         self.__bundles = {}
         self.__choice_bundles = {}
-        self.__platforms = ["steam", "epic", "uplay", "origin"]
+        self.__platforms = PLATFORMS
+        #self.__libraries = game_libraries
 
         order_factory = OrderFactory()
         for (key, order_dict) in orders_dict.items():
@@ -107,11 +110,53 @@ class HumbleLibrary():
 
         return redeemable_content_dict
 
+    def ChoiceKeyContent(self, platforms=[]):
+        key_content = []
+        for choice in self.__choice_bundles.values():
+            content = choice.Products(platforms)
+            key_content.extend([{"key": product.RedeemKey(),
+                                 "key_type": product.KeyType(),
+                                 "platform_id": product.PlatformId(),
+                                 "name": product.Name(),
+                                 "created": product.Created(),
+                                 "expired": product.Expired()
+                                }
+                               for product in content
+                               ])
+        return key_content
+
     def GiftableContent(self):
         pass
     
-    def UnownedKeysContent(self):
-        pass
+    def KeysContent(self, platforms=[]):
+        key_content = self.ChoiceKeyContent(platforms)
+
+        for bundle in self.__bundles.values():
+            content = bundle.Products(platforms)
+            key_content.extend([{"key": product.RedeemKey(),
+                                 "key_type": product.KeyType(),
+                                 "platform_id": product.PlatformId(),
+                                 "name": product.Name(),
+                                 "created": product.Created(),
+                                 "expired": product.Expired()
+                                }
+                               for product in content
+                               ])
+
+        for product in self.__store_keys.values():
+            if not platforms or product.KeyType() in platforms: 
+                key_content.append({"key": product.RedeemKey(),
+                                     "key_type": product.KeyType(),
+                                     "platform_id": product.PlatformId(),
+                                     "name": product.Name(),
+                                     "created": product.Created(),
+                                     "expired": product.Expired()
+                                    })
+
+        return key_content
+
+    def AllKeys(self):
+        return self.KeysContent()
 
 class Order():
     def __init__(self, init_dict):
@@ -314,6 +359,12 @@ class HumbleStoreKey(Order):
         self.__key_index = init_dict["keyindex"]
         self.__platform_id = init_dict["platform_id"]
         self.__expiration_date = datetime.fromisoformat(init_dict["expiration_date"]) if init_dict.get("expiration_date", None) else None  
+
+        if self.__key_type and self.__key_type not in PLATFORMS:
+            for platform in PLATFORMS:
+                if platform in self.__key_type:
+                    self.__key_type = platform
+                    return
         #self.__is_expired = init_dict["is_expired"]
 
     def ProductMachineName(self):

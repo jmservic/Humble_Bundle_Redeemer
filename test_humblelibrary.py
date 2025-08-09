@@ -2,6 +2,17 @@ import unittest
 from datetime import datetime, timedelta
 from humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey, ChoiceContent
 from humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice, assassinscreed_bundle, mixed_key_bundle
+#from steamlibrary import SteamLibrary
+
+def EqualInContent(collection_1, collection_2):
+    if not collection_1 or not collection_2 or len(collection_1) != len(collection_2):
+        print(collection_1)
+        return False
+    for item in collection_1:
+        if item not in collection_2:
+            print(item)
+            return False
+    return True
 
 class TestHumbleLibrary(unittest.TestCase):
     orders_dict = {"NUDtNZdxFP7seeap": january_2019_monthly,
@@ -32,6 +43,648 @@ class TestHumbleLibrary(unittest.TestCase):
                                 ]
                               }
         self.assertEqual(sut.ChoiceRedeemableContent(), redeemable_content)
+
+    def test_ChoiceKeyContent_returns_product_info_for_choice_bundles(self):
+        sut = HumbleLibrary({"NUDtNZdxFP7seeap": january_2019_monthly,
+                             "Yv8pEek2ehcSppPk": assassinscreed_bundle,
+                             "mvHZvHGE7dzzcGTC":{"amount_spent": 71.99,
+                                                 "product": {
+                                                    "category": "storefront",
+                                                    "machine_name": "dragonsdogma2_deluxe_storefront",
+                                                    "empty_tpkds": {},
+                                                    "post_purchase_text": "",
+                                                    "human_name": "Dragon's Dogma 2 - Deluxe Edition",
+                                                    "partial_gift_enabled": True
+                                                    },
+                                                "gamekey": "mvHZvHGE7dzzcGTC",
+                                                "uid": "XX5FHNZNHP351",
+                                                "created": "2024-03-19T20:08:02.142843",
+                                                "missed_credit": None,
+                                                "subproducts": [],
+                                                "total_choices": 0,
+                                                "tpkd_dict": {
+                                                    "all_tpks": [
+                                                        {
+                                                        "is_gift": False,
+                                                        "machine_name": "dragonsdogma2_deluxe_preorder_us_steam",
+                                                        "gamekey": "mvHZvHGE7dzzcGTC",
+                                                        "exclusive_countries": [
+                                                            "CA",
+                                                            "US"
+                                                        ],
+                                                        "num_days_until_expired": -1,
+                                                        "disallowed_countries": [],
+                                                        "show_custom_instructions_in_user_libraries": False,
+                                                        "key_type": "steam",
+                                                        "visible": True,
+                                                        "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'\u003ESteam Instructions\u003C/a\u003E",
+                                                        "display_separately": False,
+                                                        "redeemed_key_val": "GRAC5-P2ATX-T88AV",
+                                                        "key_type_human_name": "Steam",
+                                                        "steam_app_id": None,
+                                                        "human_name": "Dragon's Dogma 2 - Deluxe Edition (Pre-order)",
+                                                        "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+                                                        "auto_expand": False,
+                                                        "is_expired": False,
+                                                        "class": "steambutton",
+                                                        "keyindex": 0,
+                                                        "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+                                                        }
+                                                    ]
+                                                },
+                                                "choices_remaining": 0,
+                                                "currency": "USD",
+                                                "is_giftee": False,
+                                                "claimed": True,
+                                                "total": 79.99,
+                                                "path_ids": [
+                                                "6337784953110528",
+                                                "5906387817922560"
+                                                ]
+                                              }
+                                              })
+        product_info = [{"key": "8WB97-DXQQ8-CQW4T",
+                         "key_type": "steam",
+                         "platform_id": 445980,
+                         "name": "Wizard of Legend",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key":"M0968-5PKWM-2LFAH",
+                         "key_type": "steam",
+                         "platform_id": 225540,
+                         "name": "Just Cause 3 XXL Edition",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "LCGM6-DYY4V-RAQYH",
+                         "key_type": "steam",
+                         "platform_id": 378860,
+                         "name": "Project CARS 2",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "K6RJG-75NKD-68ANV",
+                         "key_type": "steam",
+                         "platform_id": 359100,
+                         "name": "Q.U.B.E. 2",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "L0K0D-F4MXW-EXC94",
+                         "key_type": "steam",
+                         "platform_id": 514900,
+                         "name": "\u003Eobserver_",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "K7WEC-FTCJ4-7LHI6",
+                         "key_type": "steam",
+                         "platform_id": 535480,
+                         "name": "Sundered",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "K7YP7-PXXFK-M7PN5",
+                         "key_type": "steam",
+                         "platform_id": 680360,
+                         "name": "Regions of Ruin",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "K4NIP-5CAKI-HA5BG",
+                         "key_type": "steam",
+                         "platform_id": 368390,
+                         "name": "Darkside Detective",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        #{"key": "GRAC5-P2ATX-T88AV",
+                        # "key_type": "steam",
+                        # "platform_id": None,
+                        # "name": "Dragon's Dogma 2 - Deluxe Edition (Pre-order)",
+                        # "expired": False
+                        # }
+                        ]
+        self.assertTrue(EqualInContent(sut.ChoiceKeyContent(), product_info))
+
+
+    def test_ChoiceKeyContent_returns_platform_specific_product_info_for_choice_bundles(self):
+        sut = HumbleLibrary({"NUDtNZdxFP7seeap": january_2019_monthly,
+                             "Yv8pEek2ehcSppPk": assassinscreed_bundle,
+                             "mvHZvHGE7dzzcGTC":{"amount_spent": 71.99,
+                                                 "product": {
+                                                    "category": "storefront",
+                                                    "machine_name": "dragonsdogma2_deluxe_storefront",
+                                                    "empty_tpkds": {},
+                                                    "post_purchase_text": "",
+                                                    "human_name": "Dragon's Dogma 2 - Deluxe Edition",
+                                                    "partial_gift_enabled": True
+                                                    },
+                                                "gamekey": "mvHZvHGE7dzzcGTC",
+                                                "uid": "XX5FHNZNHP351",
+                                                "created": "2024-03-19T20:08:02.142843",
+                                                "missed_credit": None,
+                                                "subproducts": [],
+                                                "total_choices": 0,
+                                                "tpkd_dict": {
+                                                    "all_tpks": [
+                                                        {
+                                                        "is_gift": False,
+                                                        "machine_name": "dragonsdogma2_deluxe_preorder_us_steam",
+                                                        "gamekey": "mvHZvHGE7dzzcGTC",
+                                                        "exclusive_countries": [
+                                                            "CA",
+                                                            "US"
+                                                        ],
+                                                        "num_days_until_expired": -1,
+                                                        "disallowed_countries": [],
+                                                        "show_custom_instructions_in_user_libraries": False,
+                                                        "key_type": "steam",
+                                                        "visible": True,
+                                                        "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'\u003ESteam Instructions\u003C/a\u003E",
+                                                        "display_separately": False,
+                                                        "redeemed_key_val": "GRAC5-P2ATX-T88AV",
+                                                        "key_type_human_name": "Steam",
+                                                        "steam_app_id": None,
+                                                        "human_name": "Dragon's Dogma 2 - Deluxe Edition (Pre-order)",
+                                                        "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+                                                        "auto_expand": False,
+                                                        "is_expired": False,
+                                                        "class": "steambutton",
+                                                        "keyindex": 0,
+                                                        "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+                                                        }
+                                                    ]
+                                                },
+                                                "choices_remaining": 0,
+                                                "currency": "USD",
+                                                "is_giftee": False,
+                                                "claimed": True,
+                                                "total": 79.99,
+                                                "path_ids": [
+                                                "6337784953110528",
+                                                "5906387817922560"
+                                                ]
+                                              }
+                                              })
+        product_info = []
+        self.assertEqual(sut.ChoiceKeyContent("uplay"), [])
+
+    def test_KeysContent_returns_product_info_for_all_orders(self):
+        sut = HumbleLibrary({"NUDtNZdxFP7seeap": january_2019_monthly,
+                             "Yv8pEek2ehcSppPk": assassinscreed_bundle,
+                             "mvHZvHGE7dzzcGTC":{"amount_spent": 71.99,
+                                                 "product": {
+                                                    "category": "storefront",
+                                                    "machine_name": "dragonsdogma2_deluxe_storefront",
+                                                    "empty_tpkds": {},
+                                                    "post_purchase_text": "",
+                                                    "human_name": "Dragon's Dogma 2 - Deluxe Edition",
+                                                    "partial_gift_enabled": True
+                                                    },
+                                                "gamekey": "mvHZvHGE7dzzcGTC",
+                                                "uid": "XX5FHNZNHP351",
+                                                "created": "2024-03-19T20:08:02.142843",
+                                                "missed_credit": None,
+                                                "subproducts": [],
+                                                "total_choices": 0,
+                                                "tpkd_dict": {
+                                                    "all_tpks": [
+                                                        {
+                                                        "is_gift": False,
+                                                        "machine_name": "dragonsdogma2_deluxe_preorder_us_steam",
+                                                        "gamekey": "mvHZvHGE7dzzcGTC",
+                                                        "exclusive_countries": [
+                                                            "CA",
+                                                            "US"
+                                                        ],
+                                                        "num_days_until_expired": -1,
+                                                        "disallowed_countries": [],
+                                                        "show_custom_instructions_in_user_libraries": False,
+                                                        "key_type": "steam",
+                                                        "visible": True,
+                                                        "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'\u003ESteam Instructions\u003C/a\u003E",
+                                                        "display_separately": False,
+                                                        "redeemed_key_val": "GRAC5-P2ATX-T88AV",
+                                                        "key_type_human_name": "Steam",
+                                                        "steam_app_id": None,
+                                                        "human_name": "Dragon's Dogma 2 - Deluxe Edition (Pre-order)",
+                                                        "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+                                                        "auto_expand": False,
+                                                        "is_expired": False,
+                                                        "class": "steambutton",
+                                                        "keyindex": 0,
+                                                        "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+                                                        }
+                                                    ]
+                                                },
+                                                "choices_remaining": 0,
+                                                "currency": "USD",
+                                                "is_giftee": False,
+                                                "claimed": True,
+                                                "total": 79.99,
+                                                "path_ids": [
+                                                "6337784953110528",
+                                                "5906387817922560"
+                                                ]
+                                              }
+                                              })
+        product_info = [{"key": "8WB97-DXQQ8-CQW4T",
+                         "key_type": "steam",
+                         "platform_id": 445980,
+                         "name": "Wizard of Legend",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key":"M0968-5PKWM-2LFAH",
+                         "key_type": "steam",
+                         "platform_id": 225540,
+                         "name": "Just Cause 3 XXL Edition",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "LCGM6-DYY4V-RAQYH",
+                         "key_type": "steam",
+                         "platform_id": 378860,
+                         "name": "Project CARS 2",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "K6RJG-75NKD-68ANV",
+                         "key_type": "steam",
+                         "platform_id": 359100,
+                         "name": "Q.U.B.E. 2",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "L0K0D-F4MXW-EXC94",
+                         "key_type": "steam",
+                         "platform_id": 514900,
+                         "name": "\u003Eobserver_",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "K7WEC-FTCJ4-7LHI6",
+                         "key_type": "steam",
+                         "platform_id": 535480,
+                         "name": "Sundered",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "K7YP7-PXXFK-M7PN5",
+                         "key_type": "steam",
+                         "platform_id": 680360,
+                         "name": "Regions of Ruin",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "K4NIP-5CAKI-HA5BG",
+                         "key_type": "steam",
+                         "platform_id": 368390,
+                         "name": "Darkside Detective",
+                         "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
+                         "expired": False
+                         },
+                        {"key": "GRAC5-P2ATX-T88AV",
+                         "key_type": "steam",
+                         "platform_id": None,
+                         "name": "Dragon's Dogma 2 - Deluxe Edition (Pre-order)",
+                         "created": datetime.fromisoformat("2024-03-19T20:08:02.142843"),
+                         "expired": False
+                         },
+                        {"key": "AP3C-XN4R-8V4E-CLPM",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® Chronicles India",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "UXV7-3L7M-TW67-WAET",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® Chronicles China",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "VKJY-7AVN-TKG7-MVUH",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® Chronicles Russia",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "UP3-4DED-A2FA-8086-E322",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed®",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "W9QG-KVGB-YX6M-6W8W",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® Liberation HD",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "UVNL-LHY7-GKR6-GE6A",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® III",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "WBMB-GP83-9MWX-86NF",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® III - Tyranny of King Washington: The Infamy (DLC)",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "WCGF-AEJX-GACU-XUBX",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® II Deluxe Edition",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "X8C7-GR6M-D87X-DM6E",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® Unity",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "WPAT-4YKP-AAMM-X4RG",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® Brotherhood",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         }
+                        ]
+        self.assertTrue(EqualInContent(sut.KeysContent(), product_info))
+
+    def test_KeysContent_returns_platform_specific_product_info_for_all_orders(self):
+        sut = HumbleLibrary({"NUDtNZdxFP7seeap": january_2019_monthly,
+                             "Yv8pEek2ehcSppPk": assassinscreed_bundle,
+                             "mvHZvHGE7dzzcGTC":{"amount_spent": 71.99,
+                                                 "product": {
+                                                    "category": "storefront",
+                                                    "machine_name": "dragonsdogma2_deluxe_storefront",
+                                                    "empty_tpkds": {},
+                                                    "post_purchase_text": "",
+                                                    "human_name": "Dragon's Dogma 2 - Deluxe Edition",
+                                                    "partial_gift_enabled": True
+                                                    },
+                                                "gamekey": "mvHZvHGE7dzzcGTC",
+                                                "uid": "XX5FHNZNHP351",
+                                                "created": "2024-03-19T20:08:02.142843",
+                                                "missed_credit": None,
+                                                "subproducts": [],
+                                                "total_choices": 0,
+                                                "tpkd_dict": {
+                                                    "all_tpks": [
+                                                        {
+                                                        "is_gift": False,
+                                                        "machine_name": "dragonsdogma2_deluxe_preorder_us_steam",
+                                                        "gamekey": "mvHZvHGE7dzzcGTC",
+                                                        "exclusive_countries": [
+                                                            "CA",
+                                                            "US"
+                                                        ],
+                                                        "num_days_until_expired": -1,
+                                                        "disallowed_countries": [],
+                                                        "show_custom_instructions_in_user_libraries": False,
+                                                        "key_type": "steam",
+                                                        "visible": True,
+                                                        "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'\u003ESteam Instructions\u003C/a\u003E",
+                                                        "display_separately": False,
+                                                        "redeemed_key_val": "GRAC5-P2ATX-T88AV",
+                                                        "key_type_human_name": "Steam",
+                                                        "steam_app_id": None,
+                                                        "human_name": "Dragon's Dogma 2 - Deluxe Edition (Pre-order)",
+                                                        "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+                                                        "auto_expand": False,
+                                                        "is_expired": False,
+                                                        "class": "steambutton",
+                                                        "keyindex": 0,
+                                                        "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+                                                        }
+                                                    ]
+                                                },
+                                                "choices_remaining": 0,
+                                                "currency": "USD",
+                                                "is_giftee": False,
+                                                "claimed": True,
+                                                "total": 79.99,
+                                                "path_ids": [
+                                                "6337784953110528",
+                                                "5906387817922560"
+                                                ]
+                                              }
+                                              })
+        product_info = [{"key": "AP3C-XN4R-8V4E-CLPM",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® Chronicles India",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "UXV7-3L7M-TW67-WAET",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® Chronicles China",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "VKJY-7AVN-TKG7-MVUH",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® Chronicles Russia",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "UP3-4DED-A2FA-8086-E322",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed®",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "W9QG-KVGB-YX6M-6W8W",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® Liberation HD",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "UVNL-LHY7-GKR6-GE6A",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® III",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "WBMB-GP83-9MWX-86NF",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® III - Tyranny of King Washington: The Infamy (DLC)",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "WCGF-AEJX-GACU-XUBX",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® II Deluxe Edition",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "X8C7-GR6M-D87X-DM6E",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® Unity",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         },
+                        {"key": "WPAT-4YKP-AAMM-X4RG",
+                         "key_type": "uplay",
+                         "platform_id": None,
+                         "name": "Assassin's Creed® Brotherhood",
+                         "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
+                         "expired": False
+                         }
+                        ]
+        self.assertTrue(EqualInContent(sut.KeysContent(platforms=["uplay"]), product_info))
+
+
+    def test_UnownedKeysContent_returns_unowned_registerable_keys(self):
+        library_info = {"rgGames": [
+            {"appid": 2674810,
+             "name": "Dragon's Dogma 2 Character Creator"
+                },
+            {"appid": 2054970,
+             "name": "Dragon's Dogma 2"
+                },
+            {"appid": 445980,
+             "name": "Wizard of Legend"
+             },
+            {"appid": 225540,
+             "name": "Just Cause 3"
+             },
+            {"appid": 378860,
+             "name": "Project CARS 2"
+             }
+            ]}
+        license_info = [
+                {"date": datetime(2024, 3, 19),
+                 "title": "Dragon's Dogma 2 Character Creator & Storage",
+                 "aq_method": "Complimentary"
+                    },
+                {"date": datetime(2024, 3, 19),
+                 "title": "Dragon's Dogma 2",
+                 "aq_method": "Retail"},
+                {"date": datetime(2018, 12, 28),
+                 "title": "Wizard of Legend",
+                 "aq_method": "Retail"},
+                {"date": datetime(2024, 3, 19),
+                 "title": "Dragon's Dogma 2",
+                 "aq_method": "Retail"},
+                {"date": datetime(2024, 3, 19),
+                 "title": "Dragon's Dogma 2",
+                 "aq_method": "Retail"},
+                ]
+        #steam_library = SteamLibrary(library_info, license_info)
+        sut = HumbleLibrary({"NUDtNZdxFP7seeap": january_2019_monthly,
+                             "Yv8pEek2ehcSppPk": assassinscreed_bundle,
+                             "mvHZvHGE7dzzcGTC":{"amount_spent": 71.99,
+                                                 "product": {
+                                                    "category": "storefront",
+                                                    "machine_name": "dragonsdogma2_deluxe_storefront",
+                                                    "empty_tpkds": {},
+                                                    "post_purchase_text": "",
+                                                    "human_name": "Dragon's Dogma 2 - Deluxe Edition",
+                                                    "partial_gift_enabled": True
+                                                    },
+                                                "gamekey": "mvHZvHGE7dzzcGTC",
+                                                "uid": "XX5FHNZNHP351",
+                                                "created": "2024-03-19T20:08:02.142843",
+                                                "missed_credit": None,
+                                                "subproducts": [],
+                                                "total_choices": 0,
+                                                "tpkd_dict": {
+                                                    "all_tpks": [
+                                                        {
+                                                        "is_gift": False,
+                                                        "machine_name": "dragonsdogma2_deluxe_preorder_us_steam",
+                                                        "gamekey": "mvHZvHGE7dzzcGTC",
+                                                        "exclusive_countries": [
+                                                            "CA",
+                                                            "US"
+                                                        ],
+                                                        "num_days_until_expired": -1,
+                                                        "disallowed_countries": [],
+                                                        "show_custom_instructions_in_user_libraries": False,
+                                                        "key_type": "steam",
+                                                        "visible": True,
+                                                        "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'\u003ESteam Instructions\u003C/a\u003E",
+                                                        "display_separately": False,
+                                                        "redeemed_key_val": "GRAC5-P2ATX-T88AV",
+                                                        "key_type_human_name": "Steam",
+                                                        "steam_app_id": None,
+                                                        "human_name": "Dragon's Dogma 2 - Deluxe Edition (Pre-order)",
+                                                        "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+                                                        "auto_expand": False,
+                                                        "is_expired": False,
+                                                        "class": "steambutton",
+                                                        "keyindex": 0,
+                                                        "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+                                                        }
+                                                    ]
+                                                },
+                                                "choices_remaining": 0,
+                                                "currency": "USD",
+                                                "is_giftee": False,
+                                                "claimed": True,
+                                                "total": 79.99,
+                                                "path_ids": [
+                                                "6337784953110528",
+                                                "5906387817922560"
+                                                ]
+                                              }
+                                              })
+
+        registerable_keys = [{"key": "K6RJG-75NKD-68ANV",
+                              "key_type": "steam"},
+                             {"key": "L0K0D-F4MXW-EXC94",
+                              "key_type": "steam"},
+                             {"key": "K7WEC-FTCJ4-7LHI6",
+                              "key_type": "steam"},
+                             {"key": "K7YP7-PXXFK-M7PN5",
+                              "key_type": "steam"},
+                             {"key": "K4NIP-5CAKI-HA5BG",
+                              "key_type": "steam"},
+                             {"key": "AP3C-XN4R-8V4E-CLPM",
+                              "key_type": "uplay"},
+                             {"key": "UXV7-3L7M-TW67-WAET",
+                              "key_type": "uplay"},
+                             {"key": "VKJY-7AVN-TKG7-MVUH",
+                              "key_type": "uplay"},
+                             {"key": "UP3-4DED-A2FA-8086-E322",
+                              "key_type": "uplay"},
+                             {"key": "W9QG-KVGB-YX6M-6W8W",
+                              "key_type": "uplay"},
+                             {"key": "UVNL-LHY7-GKR6-GE6A",
+                              "key_type": "uplay"},
+                             {"key": "WBMB-GP83-9MWX-86NF",
+                              "key_type": "uplay"},
+                             {"key": "WCGF-AEJX-GACU-XUBX",
+                              "key_type": "uplay"},
+                             {"key": "X8C7-GR6M-D87X-DM6E",
+                              "key_type": "uplay"},
+                             {"key": "WPAT-4YKP-AAMM-X4RG",
+                              "key_type": "uplay"}]
 
 class TestHumbleBundle(unittest.TestCase):
     

@@ -238,6 +238,9 @@ class SteamClient(LibraryClient):
         if "agecheck" in res.url:
             raise Exception("Failed to pass the agecheck for this bundle")
 
+        if "bundle" not in res.url:
+            return None
+
         soup = BeautifulSoup(res.text, "html.parser")
         bundle_div = soup.select_one("div#game_area_purchase_top .game_area_purchase_game")
         bundle_data = json.loads(bundle_div["data-ds-bundle-data"])

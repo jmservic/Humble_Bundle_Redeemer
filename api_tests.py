@@ -63,28 +63,30 @@ while login_result != LoginResult.SUCCESS and counter < 5:
 
 #print(hb.ChooseContent("qqnZwGv4YXWAvdGm", "dcuniverseinfinite_onemonthfreetrial"))
 #print(hb.RedeemKey("dccomicsfreetrial_november2023choice_coupon","qqnZwGv4YXWAvdGm"))
-steam.GetBundleInfo(15367)
+#print(steam.GetBundleInfo(38150))#(15367))
 #exit(0)
-#print("Obtaining Order Details")
-#hb_orders = hb.GetOrdersDetail()
-#print("Creating the Humble Library Object")
-#humble_library = HumbleLibrary(hb_orders)
-#print("Obtaining Unchosen Content")
-#unchosen_content = humble_library.ChoiceChooseContent()
-#print("Obtaining Redeemable Content")
-#redeemable_content = humble_library.ChoiceRedeemableContent()
-#for order, choose_content in unchosen_content.items():
-#    print(f"Unchosen Content for {order}")
-#    for display_name, product_machine_name in choose_content.items():
-#        print(f"{display_name}, {product_machine_name}")
-#    print("\n")
+print("Obtaining Order Details")
+hb_orders = hb.GetOrdersDetail()
+print("Creating the Humble Library Object")
+humble_library = HumbleLibrary(hb_orders)
+print("Obtaining Unchosen Content")
+unchosen_content = humble_library.ChoiceChooseContent()
+print("Obtaining Redeemable Content")
+redeemable_content = humble_library.ChoiceRedeemableContent()
 
-#for order, redeemable_content in redeemable_content.items():
-#    print(f"Redeemable Content for {order}")
-#    for content in redeemable_content:
-#        print(content)
-#    print("\n")
+for order, choose_content in unchosen_content.items():
+    print(f"Unchosen Content for {order}")
+    for display_name, product_machine_name in choose_content.items():
+        print(f"{display_name}, {product_machine_name}")
+    print("\n")
 
+for order, redeemable_content in redeemable_content.items():
+    print(f"Redeemable Content for {order}")
+    for content in redeemable_content:
+        print(content)
+    print("\n")
+
+steam_keys_on_humble = humble_library.KeysContent(platforms=["steam"])
 #exit(0)
 #for key, value in hb_orders.items():
 #    if value["product"]["category"] == "storefront" and len(value["subproducts"]) > 0:
@@ -133,6 +135,56 @@ gameslist_config = steam.GetLibraryDetails()
 licenses_info = steam.GetLicenses()
 print(f"Number of games in library: {len(gameslist_config['rgGames'])}")
 steam_library = SteamLibrary(gameslist_config, licenses_info)
+
+print(f"Seeing if any keys are possibly unregistered")
+unregistered_keys = []
+for key_info in steam_keys_on_humble:
+    if key_info["platform_id"]:
+        found_product = steam_library.ContainsProduct(id=key_info["platform_id"])
+        if found_product:
+            print(f"Found {key_info['name']} by id in library")
+            product_date = steam_library.ProductRegisterDate(id=key_info["platform_id"])
+            if not product_date or (key_info["created"].date() - product_date).days > 1:
+                print(f"Created after the steam acquisition date, probably not registered steam_date: {product_date} | humble_date: {key_info['created'].date()}")
+                unregistered_keys.append(key_info)
+        else:
+            print(f"Checking if {key_info['name']} is a bundle")
+            bundle_data = steam.GetBundleInfo(key_info["platform_id"])
+            if bundle_data:
+                print(f"{key_info['name']} is a bundle.")
+                if steam_library.ContainsBundle(bundle_data):
+                    bundle_date = steam_library.BundleRegisterDate(bundle_data)
+                    print(f"All bundle products are owned.")
+                    if not bundle_date or (key_info["created"] - bundle_date).days > 1:
+                        print(f"Most likely used to obtain the bundle.")
+                    else:
+                        print(f"{key_info['name']} is most likely unregistered")
+                        unregistered_keys.append(key_info)
+                else:
+                    print(f"Not all products of the bundle are owned.")
+                    unregistered_keys.append(key_info)
+            else:
+                print(f"{key_info['name']} is not a bundle. Checking by name.")
+                found_product , exact_match = steam_library.ContainsProduct(key_info["name"])
+                if found_product:
+                    print(f"Found {key_info['name']} with an exact match value of: {exact_match}")
+                else:
+                    print(f"Didn't Find {key_info['name']}")
+                    unregistered_keys.append(key_info)
+    else:
+        print(f"No steam id for {key_info['name']}, checking by name")
+        found_product , exact_match = steam_library.ContainsProduct(key_info["name"])
+        if found_product:
+            print(f"Found {key_info['name']} with an exact match value of: {exact_match}")
+            product_date = steam_library.ProductRegisterDate(key_info["name"])
+            if  not product_date or (key_info["created"].date() - product_date).days > 1:
+                print(f"Created after the steam acquisition date, probably not registered steam_date: {product_date} | humble_date: {key_info['created'].date()}")
+                unregistered_keys.append(key_info)
+        else:
+            print(f"Didn't Find {key_info['name']}")
+            unregistered_keys.append(key_info)
+for key_info in unregistered_keys:
+    print(key_info)
 #print("Keys in gameslist_config:")
 #for key in gameslist_config:
 #    print(key)
