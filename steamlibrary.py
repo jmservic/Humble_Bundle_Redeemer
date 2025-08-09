@@ -1,5 +1,8 @@
 import string
 import re
+
+punctuation = "".join({char for char in string.punctuation} - {"[","]","(",")","&",";"})
+
 class SteamLibrary():
 
     def __init__(self, library_info, licenses_info):
@@ -9,6 +12,7 @@ class SteamLibrary():
 
         for license_info in licenses_info:
             license_info["title"] = SanitizeText(license_info["title"]) #.lower().translate(str.maketrans("", "", string.punctuation))
+            print(license_info["title"])
 
         for game_dict in self.__library_dict.values():
             for license_info in licenses_info:
@@ -51,5 +55,5 @@ class SteamLibrary():
         return match
 
 def SanitizeText(text):
-    lower_and_removed_punc = text.lower().translate(str.maketrans("","", string.punctuation))
-    return re.sub(" {2,}"," ","".join([char for char in lower_and_removed_punc if str.isascii(char)]))
+    lower_and_removed_punc = re.sub("&.*;|;", "", text.lower().translate(str.maketrans("", "", punctuation)))
+    return re.sub("  +|[([].*[])]"," ","".join([char for char in lower_and_removed_punc if str.isascii(char)])).strip()
