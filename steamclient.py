@@ -256,8 +256,8 @@ class SteamClient(LibraryClient):
 
             if acquisition_method_td is not None:
                 acquisition_method = next(acquisition_method_td.stripped_strings).lower()
-                if acquisition_method == "complimentary":
-                    continue
+                #if acquisition_method == "complimentary":
+                 #   continue
 
             game_title_td = tr.find("td", class_=False)
             

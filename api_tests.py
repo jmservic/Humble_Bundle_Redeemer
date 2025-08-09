@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import Steam_RSA_Public_Key_Request_pb2 
 from steam_utils import *
 from steamclient import SteamClient
+from steamlibrary import SteamLibrary
 import base64
 from time import sleep
 from humblelibrary import HumbleLibrary
@@ -128,8 +129,10 @@ while steam.Polling():
 #    print(cookie)
 #steam.VisitRegisterKeyPage()
 gameslist_config = steam.GetLibraryDetails()
-steam.GetLicenses()
+#print(gameslist_config)
+licenses_info = steam.GetLicenses()
 print(f"Number of games in library: {len(gameslist_config['rgGames'])}")
+steam_library = SteamLibrary(gameslist_config, licenses_info)
 #print("Keys in gameslist_config:")
 #for key in gameslist_config:
 #    print(key)
