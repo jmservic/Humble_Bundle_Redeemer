@@ -500,7 +500,3 @@ class HumbleStoreKey(Order):
                 and self.__redeem_key == other.__redeem_key and self.__key_type == other.__key_type
                 and self.__platform_id == other.__platform_id and self.__expiration_date == other.__expiration_date
                 and self.__product_machine_name == other.__product_machine_name)
-        
-        
-    
-
