@@ -44,7 +44,6 @@ class OrderFactory():
                      "platform_id": product_dict.get("steam_app_id", None),
                      "keyindex": product_dict.get("keyindex", None),
                      "expiration_date": product_dict.get("expiration_date", None)
-                     #"is_expired": product_dict.get("is_expired", None)
                      }
         return HumbleStoreKey(init_dict)
 
@@ -78,17 +77,11 @@ class HumbleLibrary():
         self.__bundles = {}
         self.__choice_bundles = {}
         self.__platforms = PLATFORMS
-        #self.__libraries = game_libraries
 
         order_factory = OrderFactory()
         for (key, order_dict) in orders_dict.items():
             order = order_factory.CreateOrder(order_dict)
-            if isinstance(order, HumbleStoreKey):
-                self.__store_keys[key] = order
-            elif isinstance(order, HumbleChoice):
-                self.__choice_bundles[key] = order
-            else:
-                self.__bundles[key] = order
+            self.__insertOrder(key, order)
 
     def ChoiceChooseContent(self):
         unchosen_content_dict = {}
@@ -158,8 +151,47 @@ class HumbleLibrary():
     def AllKeys(self):
         return self.KeysContent()
 
+    def GetOrder(self, humblekey):
+        if humblekey in self.__store_keys:
+            return self.__store_keys[humblekey]
+
+        if humblekey in self.__bundles:
+            return self.__bundles[humblekey]
+
+        if humblekey in self.__choice_bundles:
+            return self.__choice_bundles[humblekey]
+
+        return None
+
+    def GetStoreKeys(self):
+        return {key: value for key, value in self.__store_keys.items()}
+
+    def GetHumbleBundles(self):
+        {key: value for key, value in self.__bundles.items()}
+
+    def GetChoiceBundles(self):
+        {key: value for key, value in self.__choice_bundles.items()}
+
     def UpdateOrder(self, order_dict):
-        pass
+        order_factory = OrderFactory()
+        updated_order = order_factory.CreateOrder(order_dict)
+
+        order = self.GetOrder(order_dict["gamekey"])
+        if order is None:
+            self.__insertOrder(order_dict["gamekey"], updated_order)
+            return
+
+        order.Update(updated_order)
+
+    def __insertOrder(self, key, new_order):
+        if isinstance(new_order, HumbleStoreKey):
+            self.__store_keys[key] = new_order
+        elif isinstance(new_order, HumbleChoice):
+            self.__choice_bundles[key] = new_order
+        else:
+            self.__bundles[key] = new_order
+
+        
 
 class Order():
     def __init__(self, init_dict):
@@ -191,17 +223,6 @@ class HumbleBundle(Order):
         super().__init__(init_dict)
         self._products = products
 
-    #def ProductInfo(self, platforms = []): #Just use this function instead of the others.
-    #    products = self._getProductsByPlatform(platforms)
-    #    product_info = []
-    #    for product in products:
-    #        info_dict = {"machine_name": product.ProductMachineName(),
-    #                     "name": product.Name(),
-    #                     "redeem_key": product.RedeemKey(),
-    #                     }
-    #        product_info.append(info_dict)
-    #    return product_info
-
     def ProductMachineNames(self, platforms = []):
         return[product.ProductMachineName() for product in self._getProductsByPlatform(platforms)]
         
@@ -218,8 +239,20 @@ class HumbleBundle(Order):
     def _getProductsByPlatform(self, platforms):
         return [product for product in self._products if not platforms or product.KeyType() in platforms]
 
-    def Update(self, raw_order_dict):
-        pass
+    def Update(self, other):
+        if self._order_machine_name != other._order_machine_name or self._created != other._created \
+                or not isinstance(other, HumbleBundle) or self._humblekey != other._humblekey:
+            return
+
+        product_machine_names = set(self.ProductMachineNames())
+        products_dict = {product.ProductMachineName(): product for product in self.Products()}
+
+        for product in other.Products():
+            if product.ProductMachineName() not in product_machine_names:
+                self._products.append(product)
+                self._updated = True
+            else:
+                products_dict[product.ProductMachineName()].Update(product)
 
 class HumbleChoice(HumbleBundle):
 
@@ -227,30 +260,20 @@ class HumbleChoice(HumbleBundle):
         super().__init__(init_dict, products)
         self.__chosen = True
         self.__choices_remaining = init_dict["choices_remaining"]
-        self.__all_choices = init_dict["all_choices"] 
+        self.__all_choices_dict = init_dict["all_choices"]
 
-        if init_dict["all_choices"] is None:
+        if self.__all_choices_dict is None:
             self.__chosen = self.__choices_remaining == 0 and len(self._products) > 0
             self.__all_choices = []
             return
 
-        self.__choiceless = init_dict["all_choices"]["productIsChoiceless"]
-        self.__all_choices = self.__getAllChoices(init_dict["all_choices"]["contentChoiceOptions"]["contentChoiceData"])
-
-        #limited Choice bundle
-        if not self.__choiceless:
-            self.__chosen = self.__choices_remaining == 0
-            return
+        self.__choiceless = self.__all_choices_dict["productIsChoiceless"]
+        self.__all_choices = self.__getAllChoices(self.__all_choices_dict)
         
-        #Choiceless bundle
-        choice_names = []
-        for choice in self.__all_choices:
-            choice_names += choice.ProductMachineNames()
-        product_names = [product.ProductMachineName() for product in self._products]
-        self.__chosen = len(choice_names) == len(product_names)
+        self.__setChosenFlag()
             
-    def __getAllChoices(self, contentChoiceData):
-        choice_info = self.__getGameData(contentChoiceData)
+    def __getAllChoices(self, all_choices):
+        choice_info = self.__getGameData(all_choices["contentChoiceOptions"]["contentChoiceData"])
         return [ChoiceContent(machine_name, tpkds) for machine_name, tpkds in choice_info.items()]
 
     def __getGameData(self, contentChoiceData):
@@ -272,6 +295,20 @@ class HumbleChoice(HumbleBundle):
             else: 
                 raise KeyError(f"Unable to find tpkds for {display_machine_name} in all_choices")
         return tpkds
+
+    def __setChosenFlag(self):
+
+        #limited Choice bundle
+        if not self.__choiceless:
+            self.__chosen = self.__choices_remaining == 0
+            return
+        
+        #Choiceless bundle
+        choice_names = []
+        for choice in self.__all_choices:
+            choice_names += choice.ProductMachineNames()
+        product_names = [product.ProductMachineName() for product in self._products]
+        self.__chosen = len(choice_names) == len(product_names)
 
     def Contains(self, product):
         return product in self._products 
@@ -306,8 +343,24 @@ class HumbleChoice(HumbleBundle):
     def RedeemableProducts(self):
         return [product.ProductMachineName() for product in self._products if product.RedeemKey() == None and not product.Expired()]
 
-    def Update(self, raw_order_dict):
-        pass
+    def Update(self, other):
+        if self._order_machine_name != other._order_machine_name or self._created != other._created \
+                or not isinstance(other, HumbleChoice) or self._humblekey != other._humblekey:
+            return
+        
+        #Update products through HumbleBundle's update method
+        super().Update(other)
+                    
+        if self.__all_choices_dict != other.__all_choices_dict:
+            self.__all_choices_dict = other.__all_choices_dict
+            self.__all_choices = self.__getAllChoices(self.__all_choices_dict)
+            self._updated = True
+
+        if self.__choices_remaining != other.__choices_remaining:
+            self.__choices_remaining = other.__choices_remaining
+            self._updated = True
+
+        self.__setChosenFlag()
 
 class ChoiceContent():
 
@@ -406,27 +459,29 @@ class HumbleStoreKey(Order):
         return self.__key_index
 
     def Update(self, other):
-        if not isinstance(other, HumbleStoreKey):
+        if not isinstance(other, HumbleStoreKey) or self._humblekey != other._humblekey \
+        or self._order_machine_name != other._order_machine_name or self._created != other._created \
+        or self.__product_machine_name != other.__product_machine_name:
             return
-        if self._humblekey != other._humblekey or self._order_machine_name != other._order_machine_name \
-            or self._created != other._created:
-            return
 
-    def __UpdateFromStoreKey(self, store_key):
-        pass
+        if self.__redeem_key is None and other.__redeem_key is not None:
+            self.__redeem_key = other.__redeem_key
+            self.__key_type = other.__key_type
+            self._updated = True
 
-    def __UpdateFromInitDict(self, init_dict):
-        created = datetime.fromisoformat(init_dict["created"])
-        if self._humblekey != init_dict["humble_key"] or self._order_machine_name != init_dict["order_machine_name"] \
-            or self._created != created:
-                    return
+        if self.__platform_id != other.__platform_id:
+            self.__platform_id = other.__platform_id
+            self._updated = True
 
+        if self.__expiration_date != other.__expiration_date:
+            self.__expiration_date = other.__expiration_date
+            self._updated = True
 
     def __eq__(self, other):
         return (self._order_machine_name == other._order_machine_name and self._name == other._name
                 and self._humblekey == other._humblekey and self._created == other._created
                 and self.__redeem_key == other.__redeem_key and self.__key_type == other.__key_type
-                and self.__platform_id == other.__platform_id and self.Expired() == other.Expired()
+                and self.__platform_id == other.__platform_id and self.__expiration_date == other.__expiration_date
                 and self.__product_machine_name == other.__product_machine_name)
         
         

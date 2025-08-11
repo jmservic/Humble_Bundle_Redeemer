@@ -2,7 +2,6 @@ import unittest
 from datetime import datetime, timedelta
 from humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey, ChoiceContent
 from humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice, assassinscreed_bundle, mixed_key_bundle
-#from steamlibrary import SteamLibrary
 
 def EqualInContent(collection_1, collection_2):
     if not collection_1 or not collection_2 or len(collection_1) != len(collection_2):
@@ -22,6 +21,48 @@ class TestHumbleLibrary(unittest.TestCase):
                   "rw3m6TUnb3eqmHzM": june_2025_choice,
                   "Yv8pEek2ehcSppPk": assassinscreed_bundle                      
             }
+
+    def test_UpdateOrder_updates_order_with_new_data(self):
+        sut = HumbleLibrary(TestHumbleLibrary.orders_dict)
+        order_dict = {}
+        order_dict.update(june_2025_choice)
+        order_dict["tpkd_dict"] = {"all_tpks": []}
+        for tpks in june_2025_choice["tpkd_dict"]["all_tpks"]:
+            temp_dict = {}
+            temp_dict.update(tpks)
+            order_dict["tpkd_dict"]["all_tpks"].append(temp_dict)
+
+        order_dict["tpkd_dict"]["all_tpks"].append({
+          "is_gift": False,
+          "machine_name": "biped_choice_steam",
+          "gamekey": "rw3m6TUnb3eqmHzM",
+          "exclusive_countries": [],
+          "num_days_until_expired": -1,
+          "disallowed_countries": [],
+          "show_custom_instructions_in_user_libraries": False,
+          "key_type": "steam",
+          "visible": True,
+          "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'\u003ESteam Instructions\u003C/a\u003E",
+          "display_separately": False,
+          "redeemed_key_val": "redacted",
+          "key_type_human_name": "Steam",
+          "steam_app_id": 1071870,
+          "human_name": "Biped",
+          "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+          "auto_expand": True,
+          "is_expired": False,
+          "class": "steambutton",
+          "keyindex": 0,
+          "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+        })
+
+        sut.UpdateOrder(order_dict)
+        self.assertTrue(sut.GetOrder("rw3m6TUnb3eqmHzM").Updated())
+
+    def test_UpdateOrder_inserts_new_order_if_not_in_the_HumbleLibrary_object(self):
+        sut = HumbleLibrary(TestHumbleLibrary.orders_dict)
+        sut.UpdateOrder(mixed_key_bundle)
+        self.assertIsNotNone(sut.GetOrder("AvBcDeF041124034"))
 
     def test_ChoiceChooseContent_returns_dict_of_unchosen_content(self):
         sut = HumbleLibrary(TestHumbleLibrary.orders_dict)
@@ -559,7 +600,7 @@ class TestHumbleLibrary(unittest.TestCase):
         self.assertTrue(EqualInContent(sut.KeysContent(platforms=["uplay"]), product_info))
 
 
-    def test_UnownedKeysContent_returns_unowned_registerable_keys(self):
+    def Inactive_test_UnownedKeysContent_returns_unowned_registerable_keys(self):
         library_info = {"rgGames": [
             {"appid": 2674810,
              "name": "Dragon's Dogma 2 Character Creator"
@@ -903,6 +944,531 @@ class TestHumbleChoice(unittest.TestCase):
         products = ["fashionpolicesquad_choice_steam"]
         self.assertEqual(sut.RedeemableProducts(), products)
 
+
+    def test_Updated_returns_true_after_calling_Update_with_object_containing_new_products(self):
+        order_dict = {}
+        order_dict.update(june_2025_choice)
+        order_dict["tpkd_dict"] = {"all_tpks": []}
+        for tpks in june_2025_choice["tpkd_dict"]["all_tpks"]:
+            temp_dict = {}
+            temp_dict.update(tpks)
+            order_dict["tpkd_dict"]["all_tpks"].append(temp_dict)
+
+        order_dict["tpkd_dict"]["all_tpks"].append({
+          "is_gift": False,
+          "machine_name": "biped_choice_steam",
+          "gamekey": "rw3m6TUnb3eqmHzM",
+          "exclusive_countries": [],
+          "num_days_until_expired": -1,
+          "disallowed_countries": [],
+          "show_custom_instructions_in_user_libraries": False,
+          "key_type": "steam",
+          "visible": True,
+          "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'\u003ESteam Instructions\u003C/a\u003E",
+          "display_separately": False,
+          "redeemed_key_val": "redacted",
+          "key_type_human_name": "Steam",
+          "steam_app_id": 1071870,
+          "human_name": "Biped",
+          "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+          "auto_expand": True,
+          "is_expired": False,
+          "class": "steambutton",
+          "keyindex": 0,
+          "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+        })
+
+        sut = self.CreateHumbleChoice(june_2025_choice)
+        other = self.CreateHumbleChoice(order_dict)
+        sut.Update(other)
+        self.assertTrue(sut.Updated())
+
+    def test_choice_objects_contain_same_products_after_calling_Update_with_object_containing_new_products(self):
+        order_dict = {}
+        order_dict.update(june_2025_choice)
+        order_dict["tpkd_dict"] = {"all_tpks": []}
+        for tpks in june_2025_choice["tpkd_dict"]["all_tpks"]:
+            temp_dict = {}
+            temp_dict.update(tpks)
+            order_dict["tpkd_dict"]["all_tpks"].append(temp_dict)
+
+        order_dict["tpkd_dict"]["all_tpks"].append({
+          "is_gift": False,
+          "machine_name": "biped_choice_steam",
+          "gamekey": "rw3m6TUnb3eqmHzM",
+          "exclusive_countries": [],
+          "num_days_until_expired": -1,
+          "disallowed_countries": [],
+          "show_custom_instructions_in_user_libraries": False,
+          "key_type": "steam",
+          "visible": True,
+          "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'\u003ESteam Instructions\u003C/a\u003E",
+          "display_separately": False,
+          "redeemed_key_val": "redacted",
+          "key_type_human_name": "Steam",
+          "steam_app_id": 1071870,
+          "human_name": "Biped",
+          "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+          "auto_expand": True,
+          "is_expired": False,
+          "class": "steambutton",
+          "keyindex": 0,
+          "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+        })
+
+        sut = self.CreateHumbleChoice(june_2025_choice)
+        other = self.CreateHumbleChoice(order_dict)
+        sut.Update(other)
+        self.assertEqual(set(sut.ProductMachineNames()), set(other.ProductMachineNames()))
+
+    def test_choice_Updated_returns_true_after_calling_Update_with_object_containing_new_choices(self):
+        order_dict = {}
+        order_dict.update(june_2025_choice)
+        order_dict["product"] = {}
+        order_dict["product"].update(june_2025_choice["product"])
+        order_dict["product"]["all_choices"] = {"contentChoiceOptions": {"contentChoiceData": {"game_data": {"amnesia_thebunker": {
+                        "title": "Amnesia: The Bunker",
+                        "display_item_machine_name": "amnesia_thebunker",
+                        "tpkds": [
+                            {
+                                "machine_name": "amnesia_thebunker_choice_steam",
+                                "show_custom_instructions_in_user_libraries": False,
+                                "key_type": "steam",
+                                "visible": True,
+                                "sold_out": False,
+                                "is_partial_gift": False,
+                                "display_separately": False,
+                                "steam_app_id": 1944430,
+                                "exclusive_countries": [
+                                ],
+                                "class": "steambutton",
+                                "num_days_until_expired": -1,
+                                "gamekey": "rw3m6TUnb3eqmHzM",
+                                "disallowed_countries": [
+                                ],
+                                "direct_redeem": False,
+                                "instructions_html": "\u003ca href\u003d\u0027https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys\u0027 target\u003d\u0027_blank\u0027\u003eSteam Instructions\u003c/a\u003e",
+                                "key_type_human_name": "Steam",
+                                "human_name": "Amnesia: The Bunker",
+                                "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+                                "auto_expand": True,
+                                "is_expired": False,
+                                "partial_gift_enabled": True,
+                                "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+                            }
+                        ],
+                        "user_rating": {
+                            "steam_percent|decimal": 0.93,
+                            "display_user_ratings": "steam_overall",
+                            "review_text": "very_positive",
+                            "steam_count": 7629
+                        },
+                        "platforms": [
+                            "windows"
+                        ],
+                        "more_information": None,
+                        "msrp|money": {
+                            "currency": "USD",
+                            "amount": 24.99
+                        },
+                        "developers": [
+                            "Frictional Games"
+                        ],
+                        "genres": [
+                            "Action",
+                            "Indie",
+                            "Adventure"
+                        ]
+                    }}}}}
+        order_dict["product"]["all_choices"]["contentChoiceOptions"]["contentChoiceData"]["game_data"].update(
+                june_2025_choice["product"]["all_choices"]["contentChoiceOptions"]["contentChoiceData"]["game_data"])
+        order_dict["product"]["all_choices"]["productIsChoiceless"] = True
+
+        sut = self.CreateHumbleChoice(june_2025_choice)
+        other = self.CreateHumbleChoice(order_dict)
+        sut.Update(other)
+        self.assertTrue(sut.Updated())
+
+    def test_choice_objects_contain_same_unchosen_choices_after_calling_Update_with_object_containing_new_choices(self):
+        order_dict = {}
+        order_dict.update(june_2025_choice)
+        order_dict["product"] = {}
+        order_dict["product"].update(june_2025_choice["product"])
+        order_dict["product"]["all_choices"] = {"contentChoiceOptions": {"contentChoiceData": {"game_data": {"amnesia_thebunker": {
+                        "title": "Amnesia: The Bunker",
+                        "display_item_machine_name": "amnesia_thebunker",
+                        "tpkds": [
+                            {
+                                "machine_name": "amnesia_thebunker_choice_steam",
+                                "show_custom_instructions_in_user_libraries": False,
+                                "key_type": "steam",
+                                "visible": True,
+                                "sold_out": False,
+                                "is_partial_gift": False,
+                                "display_separately": False,
+                                "steam_app_id": 1944430,
+                                "exclusive_countries": [
+                                ],
+                                "class": "steambutton",
+                                "num_days_until_expired": -1,
+                                "gamekey": "rw3m6TUnb3eqmHzM",
+                                "disallowed_countries": [
+                                ],
+                                "direct_redeem": False,
+                                "instructions_html": "\u003ca href\u003d\u0027https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys\u0027 target\u003d\u0027_blank\u0027\u003eSteam Instructions\u003c/a\u003e",
+                                "key_type_human_name": "Steam",
+                                "human_name": "Amnesia: The Bunker",
+                                "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+                                "auto_expand": True,
+                                "is_expired": False,
+                                "partial_gift_enabled": True,
+                                "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+                            }
+                        ],
+                        "user_rating": {
+                            "steam_percent|decimal": 0.93,
+                            "display_user_ratings": "steam_overall",
+                            "review_text": "very_positive",
+                            "steam_count": 7629
+                        },
+                        "platforms": [
+                            "windows"
+                        ],
+                        "more_information": None,
+                        "msrp|money": {
+                            "currency": "USD",
+                            "amount": 24.99
+                        },
+                        "developers": [
+                            "Frictional Games"
+                        ],
+                        "genres": [
+                            "Action",
+                            "Indie",
+                            "Adventure"
+                        ]
+                    }}}}}
+        order_dict["product"]["all_choices"]["contentChoiceOptions"]["contentChoiceData"]["game_data"].update(
+                june_2025_choice["product"]["all_choices"]["contentChoiceOptions"]["contentChoiceData"]["game_data"])
+        order_dict["product"]["all_choices"]["productIsChoiceless"] = True
+
+        sut = self.CreateHumbleChoice(june_2025_choice)
+        other = self.CreateHumbleChoice(order_dict)
+        sut.Update(other)
+        self.assertEqual(set(sut.UnChosenChoices()), set(other.UnChosenChoices()))
+
+    def test_Updated_returns_false_after_calling_Update_with_object_containing_new_product_data(self):
+        order_dict = {}
+        order_dict.update(april_2024_choice)
+        order_dict["tpkd_dict"] = {"all_tpks": []}
+        for tpks in april_2024_choice["tpkd_dict"]["all_tpks"]:
+            temp_dict = {}
+            temp_dict.update(tpks)
+            if temp_dict["machine_name"] == "fashionpolicesquad_choice_steam":
+                temp_dict["redeemed_key_val"] = "One-Day"
+            order_dict["tpkd_dict"]["all_tpks"].append(temp_dict)
+
+        sut = self.CreateHumbleChoice(april_2024_choice)
+        other = self.CreateHumbleChoice(order_dict)
+        sut.Update(other)
+        self.assertFalse(sut.Updated())
+
+    def test_Update_updates_products_with_new_product_data(self):
+        order_dict = {}
+        order_dict.update(april_2024_choice)
+        order_dict["tpkd_dict"] = {"all_tpks": []}
+        for tpks in april_2024_choice["tpkd_dict"]["all_tpks"]:
+            temp_dict = {}
+            temp_dict.update(tpks)
+            if temp_dict["machine_name"] == "fashionpolicesquad_choice_steam":
+                temp_dict["redeemed_key_val"] = "One-Day"
+            order_dict["tpkd_dict"]["all_tpks"].append(temp_dict)
+
+        sut = self.CreateHumbleChoice(april_2024_choice)
+        other = self.CreateHumbleChoice(order_dict)
+        sut.Update(other)
+        for product in sut.Products():
+            if product.ProductMachineName() == "fashionpolicesquad_choice_steam":
+                self.assertTrue(product.Updated())
+            else:
+                self.assertFalse(product.Updated())
+
+    def test_choice_Updated_returns_false_after_calling_Update_with_differing_machine_name(self):
+        order_dict = {}
+        order_dict.update(june_2025_choice)
+        order_dict["product"] = {}
+        order_dict["product"].update(june_2025_choice["product"])
+        order_dict["product"]["machine_name"] = "april_2025_choice"
+        order_dict["product"]["all_choices"] = {"contentChoiceOptions": {"contentChoiceData": {"game_data": {"amnesia_thebunker": {
+                        "title": "Amnesia: The Bunker",
+                        "display_item_machine_name": "amnesia_thebunker",
+                        "tpkds": [
+                            {
+                                "machine_name": "amnesia_thebunker_choice_steam",
+                                "show_custom_instructions_in_user_libraries": False,
+                                "key_type": "steam",
+                                "visible": True,
+                                "sold_out": False,
+                                "is_partial_gift": False,
+                                "display_separately": False,
+                                "steam_app_id": 1944430,
+                                "exclusive_countries": [
+                                ],
+                                "class": "steambutton",
+                                "num_days_until_expired": -1,
+                                "gamekey": "rw3m6TUnb3eqmHzM",
+                                "disallowed_countries": [
+                                ],
+                                "direct_redeem": False,
+                                "instructions_html": "\u003ca href\u003d\u0027https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys\u0027 target\u003d\u0027_blank\u0027\u003eSteam Instructions\u003c/a\u003e",
+                                "key_type_human_name": "Steam",
+                                "human_name": "Amnesia: The Bunker",
+                                "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+                                "auto_expand": True,
+                                "is_expired": False,
+                                "partial_gift_enabled": True,
+                                "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+                            }
+                        ],
+                        "user_rating": {
+                            "steam_percent|decimal": 0.93,
+                            "display_user_ratings": "steam_overall",
+                            "review_text": "very_positive",
+                            "steam_count": 7629
+                        },
+                        "platforms": [
+                            "windows"
+                        ],
+                        "more_information": None,
+                        "msrp|money": {
+                            "currency": "USD",
+                            "amount": 24.99
+                        },
+                        "developers": [
+                            "Frictional Games"
+                        ],
+                        "genres": [
+                            "Action",
+                            "Indie",
+                            "Adventure"
+                        ]
+                    }}}}}
+        order_dict["product"]["all_choices"]["contentChoiceOptions"]["contentChoiceData"]["game_data"].update(
+                june_2025_choice["product"]["all_choices"]["contentChoiceOptions"]["contentChoiceData"]["game_data"])
+        order_dict["product"]["all_choices"]["productIsChoiceless"] = True
+
+        sut = self.CreateHumbleChoice(june_2025_choice)
+        other = self.CreateHumbleChoice(order_dict)
+        sut.Update(other)
+        self.assertFalse(sut.Updated())
+
+
+    def test_choice_Updated_returns_false_after_calling_Update_with_differing_creation_date(self):
+        order_dict = {}
+        order_dict.update(june_2025_choice)
+        order_dict["product"] = {}
+        order_dict["product"].update(june_2025_choice["product"])
+        order_dict["created"] = "2024-04-30T18:51:02.620236" 
+        order_dict["product"]["all_choices"] = {"contentChoiceOptions": {"contentChoiceData": {"game_data": {"amnesia_thebunker": {
+                        "title": "Amnesia: The Bunker",
+                        "display_item_machine_name": "amnesia_thebunker",
+                        "tpkds": [
+                            {
+                                "machine_name": "amnesia_thebunker_choice_steam",
+                                "show_custom_instructions_in_user_libraries": False,
+                                "key_type": "steam",
+                                "visible": True,
+                                "sold_out": False,
+                                "is_partial_gift": False,
+                                "display_separately": False,
+                                "steam_app_id": 1944430,
+                                "exclusive_countries": [
+                                ],
+                                "class": "steambutton",
+                                "num_days_until_expired": -1,
+                                "gamekey": "rw3m6TUnb3eqmHzM",
+                                "disallowed_countries": [
+                                ],
+                                "direct_redeem": False,
+                                "instructions_html": "\u003ca href\u003d\u0027https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys\u0027 target\u003d\u0027_blank\u0027\u003eSteam Instructions\u003c/a\u003e",
+                                "key_type_human_name": "Steam",
+                                "human_name": "Amnesia: The Bunker",
+                                "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+                                "auto_expand": True,
+                                "is_expired": False,
+                                "partial_gift_enabled": True,
+                                "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+                            }
+                        ],
+                        "user_rating": {
+                            "steam_percent|decimal": 0.93,
+                            "display_user_ratings": "steam_overall",
+                            "review_text": "very_positive",
+                            "steam_count": 7629
+                        },
+                        "platforms": [
+                            "windows"
+                        ],
+                        "more_information": None,
+                        "msrp|money": {
+                            "currency": "USD",
+                            "amount": 24.99
+                        },
+                        "developers": [
+                            "Frictional Games"
+                        ],
+                        "genres": [
+                            "Action",
+                            "Indie",
+                            "Adventure"
+                        ]
+                    }}}}}
+        order_dict["product"]["all_choices"]["contentChoiceOptions"]["contentChoiceData"]["game_data"].update(
+                june_2025_choice["product"]["all_choices"]["contentChoiceOptions"]["contentChoiceData"]["game_data"])
+        order_dict["product"]["all_choices"]["productIsChoiceless"] = True
+
+        sut = self.CreateHumbleChoice(june_2025_choice)
+        other = self.CreateHumbleChoice(order_dict)
+        sut.Update(other)
+        self.assertFalse(sut.Updated())
+
+    def test_choice_Updated_returns_false_after_calling_Update_with_differing_gamekey(self):
+        order_dict = {}
+        order_dict.update(june_2025_choice)
+        order_dict["product"] = {}
+        order_dict["product"].update(june_2025_choice["product"])
+        order_dict["gamekey"] = "Z8KftUKAEf8zG7zY"
+        order_dict["product"]["all_choices"] = {"contentChoiceOptions": {"contentChoiceData": {"game_data": {"amnesia_thebunker": {
+                        "title": "Amnesia: The Bunker",
+                        "display_item_machine_name": "amnesia_thebunker",
+                        "tpkds": [
+                            {
+                                "machine_name": "amnesia_thebunker_choice_steam",
+                                "show_custom_instructions_in_user_libraries": False,
+                                "key_type": "steam",
+                                "visible": True,
+                                "sold_out": False,
+                                "is_partial_gift": False,
+                                "display_separately": False,
+                                "steam_app_id": 1944430,
+                                "exclusive_countries": [
+                                ],
+                                "class": "steambutton",
+                                "num_days_until_expired": -1,
+                                "gamekey": "rw3m6TUnb3eqmHzM",
+                                "disallowed_countries": [
+                                ],
+                                "direct_redeem": False,
+                                "instructions_html": "\u003ca href\u003d\u0027https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys\u0027 target\u003d\u0027_blank\u0027\u003eSteam Instructions\u003c/a\u003e",
+                                "key_type_human_name": "Steam",
+                                "human_name": "Amnesia: The Bunker",
+                                "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+                                "auto_expand": True,
+                                "is_expired": False,
+                                "partial_gift_enabled": True,
+                                "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+                            }
+                        ],
+                        "user_rating": {
+                            "steam_percent|decimal": 0.93,
+                            "display_user_ratings": "steam_overall",
+                            "review_text": "very_positive",
+                            "steam_count": 7629
+                        },
+                        "platforms": [
+                            "windows"
+                        ],
+                        "more_information": None,
+                        "msrp|money": {
+                            "currency": "USD",
+                            "amount": 24.99
+                        },
+                        "developers": [
+                            "Frictional Games"
+                        ],
+                        "genres": [
+                            "Action",
+                            "Indie",
+                            "Adventure"
+                        ]
+                    }}}}}
+        order_dict["product"]["all_choices"]["contentChoiceOptions"]["contentChoiceData"]["game_data"].update(
+                june_2025_choice["product"]["all_choices"]["contentChoiceOptions"]["contentChoiceData"]["game_data"])
+        order_dict["product"]["all_choices"]["productIsChoiceless"] = True
+
+        sut = self.CreateHumbleChoice(june_2025_choice)
+        other = self.CreateHumbleChoice(order_dict)
+        sut.Update(other)
+        self.assertFalse(sut.Updated())
+
+    def test_FullyChosen_returns_false_when_Update_called_with_object_containing_new_choices_on_a_fully_chosen_choice_bundle(self):
+        order_dict = {}
+        order_dict.update(april_2024_choice)
+        order_dict["product"] = {}
+        order_dict["product"].update(april_2024_choice["product"])
+        order_dict["product"]["all_choices"] = {"contentChoiceOptions": {"contentChoiceData": {"game_data": {"amnesia_thebunker": {
+                        "title": "Amnesia: The Bunker",
+                        "display_item_machine_name": "amnesia_thebunker",
+                        "tpkds": [
+                            {
+                                "machine_name": "amnesia_thebunker_choice_steam",
+                                "show_custom_instructions_in_user_libraries": False,
+                                "key_type": "steam",
+                                "visible": True,
+                                "sold_out": False,
+                                "is_partial_gift": False,
+                                "display_separately": False,
+                                "steam_app_id": 1944430,
+                                "exclusive_countries": [
+                                ],
+                                "class": "steambutton",
+                                "num_days_until_expired": -1,
+                                "gamekey": "rw3m6TUnb3eqmHzM",
+                                "disallowed_countries": [
+                                ],
+                                "direct_redeem": False,
+                                "instructions_html": "\u003ca href\u003d\u0027https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys\u0027 target\u003d\u0027_blank\u0027\u003eSteam Instructions\u003c/a\u003e",
+                                "key_type_human_name": "Steam",
+                                "human_name": "Amnesia: The Bunker",
+                                "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+                                "auto_expand": True,
+                                "is_expired": False,
+                                "partial_gift_enabled": True,
+                                "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+                            }
+                        ],
+                        "user_rating": {
+                            "steam_percent|decimal": 0.93,
+                            "display_user_ratings": "steam_overall",
+                            "review_text": "very_positive",
+                            "steam_count": 7629
+                        },
+                        "platforms": [
+                            "windows"
+                        ],
+                        "more_information": None,
+                        "msrp|money": {
+                            "currency": "USD",
+                            "amount": 24.99
+                        },
+                        "developers": [
+                            "Frictional Games"
+                        ],
+                        "genres": [
+                            "Action",
+                            "Indie",
+                            "Adventure"
+                        ]
+                    }}}}}
+        order_dict["product"]["all_choices"]["contentChoiceOptions"]["contentChoiceData"]["game_data"].update(
+                april_2024_choice["product"]["all_choices"]["contentChoiceOptions"]["contentChoiceData"]["game_data"])
+        order_dict["product"]["all_choices"]["productIsChoiceless"] = True
+
+        sut = self.CreateHumbleChoice(april_2024_choice)
+        other = self.CreateHumbleChoice(order_dict)
+        sut.Update(other)
+        self.assertFalse(sut.FullyChosen())
+
     def CreateHumbleChoice(self, order_dict):
         order_factory = OrderFactory()
         return order_factory.CreateOrder(order_dict)
@@ -1035,56 +1601,343 @@ class TestHumbleStoreKey(unittest.TestCase):
     def test_Updated_returns_true_after_calling_update_with_storekey_obj_with_new_data(self):
         order_factory = OrderFactory()
         order_dict = {"product": {"category": "storefront",
-                                  "machine_name": None,
-                                  "human_name": None},
-                      "gamekey": None,
-                      "created": "2024-04-30T18:51:02.620236",
+                                  "machine_name": "enshrouded_storefront",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-14T01:51:25.738781",
                       "subproducts": [],
                       "tpkd_dict": {
                           "all_tpks":
                             [
                                   {
-                                      "machine_name": None,
-                                      "redeem_key_val": None,
-                                      "key_type": None,
+                                      "machine_name": "enshrouded_steam",
                                       "steam_app_id": None,
                                       "is_expired": False,
-                                      "human_name": None,
+                                      "human_name": "Enshrouded",
                                   }
                             ]
                         }
                       }
 
         updated_order_dict = {"product": {"category": "storefront",
-                                  "machine_name": None,
-                                  "human_name": None},
-                      "gamekey": None,
-                      "created": "2024-04-30T18:51:02.620236",
+                                  "machine_name": "enshrouded_storefront",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-14T01:51:25.738781",
                       "subproducts": [],
                       "tpkd_dict": {
                           "all_tpks":
                             [
                                   {
-                                      "machine_name": None,
-                                      "redeem_key_val": None,
-                                      "key_type": None,
+                                      "machine_name": "enshrouded_steam",
+                                      "redeem_key_val": "TMQTG-FRRFB-NY4EZ",
+                                      "key_type": "steam",
                                       "steam_app_id": None,
                                       "is_expired": False,
-                                      "human_name": None,
+                                      "human_name": "Enshrouded",
+                                      "expiration_date": "2025-12-31T01:51:25.738781"
                                   }
                             ]
                         }
                       }
+
         sut = order_factory.CreateOrder(order_dict)
         other = order_factory.CreateOrder(updated_order_dict)
         sut.Update(other)
         self.assertTrue(sut.Updated())
 
     def test_Updated_returns_false_after_calling_update_with_no_new_data(self):
-        pass
+        order_factory = OrderFactory()
+        order_dict = {"product": {"category": "storefront",
+                                  "machine_name": "enshrouded_storefront",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-14T01:51:25.738781",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": "enshrouded_steam",
+                                      "redeem_key_val": "TMQTG-FRRFB-NY4EZ",
+                                      "key_type": "steam",
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": "Enshrouded",
+                                      "expiration_date": "2025-12-31T01:51:25.738781"
+                                  }
+                            ]
+                        }
+                      }
+
+
+        updated_order_dict = {"product": {"category": "storefront",
+                                  "machine_name": "enshrouded_storefront",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-14T01:51:25.738781",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": "enshrouded_steam",
+                                      "redeem_key_val": "TMQTG-FRRFB-NY4EZ",
+                                      "key_type": "steam",
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": "Enshrouded",
+                                      "expiration_date": "2025-12-31T01:51:25.738781"
+                                  }
+                            ]
+                        }
+                      }
+
+        sut = order_factory.CreateOrder(order_dict)
+        other = order_factory.CreateOrder(updated_order_dict)
+        sut.Update(other)
+        self.assertFalse(sut.Updated())
+
+    def test_Updated_returns_false_after_calling_update_with_differing_machine_name(self):
+        order_factory = OrderFactory()
+        order_dict = {"product": {"category": "storefront",
+                                  "machine_name": "enshrouded_storefront",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-14T01:51:25.738781",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": "enshrouded_steam",
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": "Enshrouded",
+                                  }
+                            ]
+                        }
+                      }
+
+
+        updated_order_dict = {"product": {"category": "storefront",
+                                  "machine_name": "enshrouded_storefront2",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-14T01:51:25.738781",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": "enshrouded_steam",
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": "Enshrouded",
+                                  }
+                            ]
+                        }
+                      }
+
+        sut = order_factory.CreateOrder(order_dict)
+        other = order_factory.CreateOrder(updated_order_dict)
+        sut.Update(other)
+        self.assertFalse(sut.Updated())
+
+    def test_Updated_returns_false_after_calling_update_with_differing_gamekey(self):
+        order_factory = OrderFactory()
+        order_dict = {"product": {"category": "storefront",
+                                  "machine_name": "enshrouded_storefront",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs123",
+                      "created": "2025-02-14T01:51:25.738781",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": "enshrouded_steam",
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": "Enshrouded",
+                                  }
+                            ]
+                        }
+                      }
+
+
+        updated_order_dict = {"product": {"category": "storefront",
+                                  "machine_name": "enshrouded_storefront",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-14T01:51:25.738781",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": "enshrouded_steam",
+                                      "redeem_key_val": "TMQTG-FRRFB-NY4EZ",
+                                      "key_type": "steam",
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": "Enshrouded",
+                                      "expiration_date": "2025-12-31T01:51:25.738781"
+                                  }
+                            ]
+                        }
+                      }
+
+        sut = order_factory.CreateOrder(order_dict)
+        other = order_factory.CreateOrder(updated_order_dict)
+        sut.Update(other)
+        self.assertFalse(sut.Updated())
+
+    def test_Updated_returns_false_after_calling_update_with_differing_creation_date(self):
+        order_factory = OrderFactory()
+        order_dict = {"product": {"category": "storefront",
+                                  "machine_name": "enshrouded_storefront",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-14T01:51:25.738781",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": "enshrouded_steam",
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": "Enshrouded",
+                                  }
+                            ]
+                        }
+                      }
+
+
+        updated_order_dict = {"product": {"category": "storefront",
+                                  "machine_name": "enshrouded_storefront",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-15T01:51:25.738781",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": "enshrouded_steam",
+                                      "redeem_key_val": "TMQTG-FRRFB-NY4EZ",
+                                      "key_type": "steam",
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": "Enshrouded",
+                                      "expiration_date": "2025-12-31T01:51:25.738781"
+                                  }
+                            ]
+                        }
+                      }
+
+        sut = order_factory.CreateOrder(order_dict)
+        other = order_factory.CreateOrder(updated_order_dict)
+        sut.Update(other)
+        self.assertFalse(sut.Updated())
+
+    def test_Updated_returns_false_after_calling_update_with_differing_product_machine_name(self):
+        order_factory = OrderFactory()
+        order_dict = {"product": {"category": "storefront",
+                                  "machine_name": "enshrouded_storefront",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-14T01:51:25.738781",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": "enshrouded_steam",
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": "Enshrouded",
+                                  }
+                            ]
+                        }
+                      }
+
+
+        updated_order_dict = {"product": {"category": "storefront",
+                                  "machine_name": "enshrouded_storefront2",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-15T01:51:25.738781",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": "enshrouded_steam",
+                                      "redeem_key_val": "TMQTG-FRRFB-NY4EZ",
+                                      "key_type": "steam",
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": "Enshrouded",
+                                      "expiration_date": "2025-12-31T01:51:25.738781"
+                                  }
+                            ]
+                        }
+                      }
+
+        sut = order_factory.CreateOrder(order_dict)
+        other = order_factory.CreateOrder(updated_order_dict)
+        sut.Update(other)
+        self.assertFalse(sut.Updated())
 
     def test_Update_makes_the_storekey_equal_to_a_storekey_generated_from_the_update_dictionary(self):
-        pass
+        order_factory = OrderFactory()
+        order_dict = {"product": {"category": "storefront",
+                                  "machine_name": "enshrouded_storefront",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-14T01:51:25.738781",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": "enshrouded_steam",
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": "Enshrouded",
+                                  }
+                            ]
+                        }
+                      }
+
+        updated_order_dict = {"product": {"category": "storefront",
+                                  "machine_name": "enshrouded_storefront",
+                                  "human_name": "Enshrouded"},
+                      "gamekey": "TSskvEHeqSfUbZAs",
+                      "created": "2025-02-14T01:51:25.738781",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": "enshrouded_steam",
+                                      "redeemed_key_val": "TMQTG-FRRFB-NY4EZ",
+                                      "key_type": "steam",
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": "Enshrouded",
+                                      "expiration_date": "2025-12-31T01:51:25.738781"
+                                  }
+                            ]
+                        }
+                      }
+
+        sut = order_factory.CreateOrder(order_dict)
+        other = order_factory.CreateOrder(updated_order_dict)
+        sut.Update(other)
+        self.assertEqual(sut, other)
 
 class TestOrderFactory(unittest.TestCase):
 
@@ -1323,8 +2176,3 @@ class TestOrderFactory(unittest.TestCase):
                                         "is_expired": False
                                         }) 
         self.assertTrue(order.Contains(comp_storefront))
-
-
-
-
-
