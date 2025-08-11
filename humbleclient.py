@@ -113,7 +113,8 @@ class HumbleClient(GameKeyClient):
                     #    product_details["steam_app_id"] = game_info["tpkds"][0]["steam_app_id"]
                     #all_products_details[game_info["display_item_machine_name"]] = product_details
                 #print(all_products_details)
-                order_info["product"]["all_choices"] = choice_details#all_products_details
+                order_info["product"]["all_choices"] = {"productIsChoiceless": choice_details["productIsChoiceless"],
+                                                        "contentChoiceOptions": choice_details["contentChoiceOptions"]}#all_products_details
         #print(order_details)
         return order_details
 

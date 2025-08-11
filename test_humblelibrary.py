@@ -1032,6 +1032,60 @@ class TestHumbleStoreKey(unittest.TestCase):
         sut = order_factory.CreateOrder(order_dict)
         self.assertTrue(sut.Expired())
 
+    def test_Updated_returns_true_after_calling_update_with_storekey_obj_with_new_data(self):
+        order_factory = OrderFactory()
+        order_dict = {"product": {"category": "storefront",
+                                  "machine_name": None,
+                                  "human_name": None},
+                      "gamekey": None,
+                      "created": "2024-04-30T18:51:02.620236",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": None,
+                                      "redeem_key_val": None,
+                                      "key_type": None,
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": None,
+                                  }
+                            ]
+                        }
+                      }
+
+        updated_order_dict = {"product": {"category": "storefront",
+                                  "machine_name": None,
+                                  "human_name": None},
+                      "gamekey": None,
+                      "created": "2024-04-30T18:51:02.620236",
+                      "subproducts": [],
+                      "tpkd_dict": {
+                          "all_tpks":
+                            [
+                                  {
+                                      "machine_name": None,
+                                      "redeem_key_val": None,
+                                      "key_type": None,
+                                      "steam_app_id": None,
+                                      "is_expired": False,
+                                      "human_name": None,
+                                  }
+                            ]
+                        }
+                      }
+        sut = order_factory.CreateOrder(order_dict)
+        other = order_factory.CreateOrder(updated_order_dict)
+        sut.Update(other)
+        self.assertTrue(sut.Updated())
+
+    def test_Updated_returns_false_after_calling_update_with_no_new_data(self):
+        pass
+
+    def test_Update_makes_the_storekey_equal_to_a_storekey_generated_from_the_update_dictionary(self):
+        pass
+
 class TestOrderFactory(unittest.TestCase):
 
     def test_unknown_category_raises_error(self):

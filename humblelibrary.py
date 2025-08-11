@@ -158,6 +158,9 @@ class HumbleLibrary():
     def AllKeys(self):
         return self.KeysContent()
 
+    def UpdateOrder(self, order_dict):
+        pass
+
 class Order():
     def __init__(self, init_dict):
         self._order_machine_name = init_dict["order_machine_name"]
@@ -165,6 +168,7 @@ class Order():
         self._created = datetime.fromisoformat(init_dict["created"])
         self._name = init_dict["name"]
         self._subproducts = init_dict["subproducts"]
+        self._updated = False
 
     def MachineName(self):
         return self._order_machine_name
@@ -177,6 +181,9 @@ class Order():
 
     def Name(self):
         return self._name
+
+    def Updated(self):
+        return self._updated
 
 class HumbleBundle(Order):
 
@@ -211,12 +218,16 @@ class HumbleBundle(Order):
     def _getProductsByPlatform(self, platforms):
         return [product for product in self._products if not platforms or product.KeyType() in platforms]
 
+    def Update(self, raw_order_dict):
+        pass
+
 class HumbleChoice(HumbleBundle):
 
     def __init__(self, init_dict, products):
         super().__init__(init_dict, products)
         self.__chosen = True
         self.__choices_remaining = init_dict["choices_remaining"]
+        self.__all_choices = init_dict["all_choices"] 
 
         if init_dict["all_choices"] is None:
             self.__chosen = self.__choices_remaining == 0 and len(self._products) > 0
@@ -295,6 +306,9 @@ class HumbleChoice(HumbleBundle):
     def RedeemableProducts(self):
         return [product.ProductMachineName() for product in self._products if product.RedeemKey() == None and not product.Expired()]
 
+    def Update(self, raw_order_dict):
+        pass
+
 class ChoiceContent():
 
     def __init__(self, machine_name, tpkds):
@@ -359,6 +373,7 @@ class HumbleStoreKey(Order):
         self.__key_index = init_dict["keyindex"]
         self.__platform_id = init_dict["platform_id"]
         self.__expiration_date = datetime.fromisoformat(init_dict["expiration_date"]) if init_dict.get("expiration_date", None) else None  
+        self.__registered = False
 
         if self.__key_type and self.__key_type not in PLATFORMS:
             for platform in PLATFORMS:
@@ -383,9 +398,29 @@ class HumbleStoreKey(Order):
         if self.__expiration_date is None:
             return False
         return self.__expiration_date < datetime.now()
+
+    def Registered(self):
+        return self.__registered
     
     def KeyIndex(self):
         return self.__key_index
+
+    def Update(self, other):
+        if not isinstance(other, HumbleStoreKey):
+            return
+        if self._humblekey != other._humblekey or self._order_machine_name != other._order_machine_name \
+            or self._created != other._created:
+            return
+
+    def __UpdateFromStoreKey(self, store_key):
+        pass
+
+    def __UpdateFromInitDict(self, init_dict):
+        created = datetime.fromisoformat(init_dict["created"])
+        if self._humblekey != init_dict["humble_key"] or self._order_machine_name != init_dict["order_machine_name"] \
+            or self._created != created:
+                    return
+
 
     def __eq__(self, other):
         return (self._order_machine_name == other._order_machine_name and self._name == other._name
