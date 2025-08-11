@@ -112,7 +112,8 @@ class HumbleLibrary():
                                  "platform_id": product.PlatformId(),
                                  "name": product.Name(),
                                  "created": product.Created(),
-                                 "expired": product.Expired()
+                                 "expired": product.Expired(),
+                                 "registered": product.Registered()
                                 }
                                for product in content
                                ])
@@ -131,7 +132,8 @@ class HumbleLibrary():
                                  "platform_id": product.PlatformId(),
                                  "name": product.Name(),
                                  "created": product.Created(),
-                                 "expired": product.Expired()
+                                 "expired": product.Expired(),
+                                 "registered": product.Registered()
                                 }
                                for product in content
                                ])
@@ -139,11 +141,12 @@ class HumbleLibrary():
         for product in self.__store_keys.values():
             if not platforms or product.KeyType() in platforms: 
                 key_content.append({"key": product.RedeemKey(),
-                                     "key_type": product.KeyType(),
-                                     "platform_id": product.PlatformId(),
-                                     "name": product.Name(),
-                                     "created": product.Created(),
-                                     "expired": product.Expired()
+                                    "key_type": product.KeyType(),
+                                    "platform_id": product.PlatformId(),
+                                    "name": product.Name(),
+                                    "created": product.Created(),
+                                    "expired": product.Expired(),
+                                    "registered": product.Registered()
                                     })
 
         return key_content

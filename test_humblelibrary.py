@@ -160,56 +160,64 @@ class TestHumbleLibrary(unittest.TestCase):
                          "platform_id": 445980,
                          "name": "Wizard of Legend",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key":"M0968-5PKWM-2LFAH",
                          "key_type": "steam",
                          "platform_id": 225540,
                          "name": "Just Cause 3 XXL Edition",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "LCGM6-DYY4V-RAQYH",
                          "key_type": "steam",
                          "platform_id": 378860,
                          "name": "Project CARS 2",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "K6RJG-75NKD-68ANV",
                          "key_type": "steam",
                          "platform_id": 359100,
                          "name": "Q.U.B.E. 2",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "L0K0D-F4MXW-EXC94",
                          "key_type": "steam",
                          "platform_id": 514900,
                          "name": "\u003Eobserver_",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "K7WEC-FTCJ4-7LHI6",
                          "key_type": "steam",
                          "platform_id": 535480,
                          "name": "Sundered",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "K7YP7-PXXFK-M7PN5",
                          "key_type": "steam",
                          "platform_id": 680360,
                          "name": "Regions of Ruin",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "K4NIP-5CAKI-HA5BG",
                          "key_type": "steam",
                          "platform_id": 368390,
                          "name": "Darkside Detective",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         #{"key": "GRAC5-P2ATX-T88AV",
                         # "key_type": "steam",
@@ -347,133 +355,152 @@ class TestHumbleLibrary(unittest.TestCase):
                          "platform_id": 445980,
                          "name": "Wizard of Legend",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key":"M0968-5PKWM-2LFAH",
                          "key_type": "steam",
                          "platform_id": 225540,
                          "name": "Just Cause 3 XXL Edition",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "LCGM6-DYY4V-RAQYH",
                          "key_type": "steam",
                          "platform_id": 378860,
                          "name": "Project CARS 2",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "K6RJG-75NKD-68ANV",
                          "key_type": "steam",
                          "platform_id": 359100,
                          "name": "Q.U.B.E. 2",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "L0K0D-F4MXW-EXC94",
                          "key_type": "steam",
                          "platform_id": 514900,
                          "name": "\u003Eobserver_",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "K7WEC-FTCJ4-7LHI6",
                          "key_type": "steam",
                          "platform_id": 535480,
                          "name": "Sundered",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "K7YP7-PXXFK-M7PN5",
                          "key_type": "steam",
                          "platform_id": 680360,
                          "name": "Regions of Ruin",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "K4NIP-5CAKI-HA5BG",
                          "key_type": "steam",
                          "platform_id": 368390,
                          "name": "Darkside Detective",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "GRAC5-P2ATX-T88AV",
                          "key_type": "steam",
                          "platform_id": None,
                          "name": "Dragon's Dogma 2 - Deluxe Edition (Pre-order)",
                          "created": datetime.fromisoformat("2024-03-19T20:08:02.142843"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "AP3C-XN4R-8V4E-CLPM",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® Chronicles India",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "UXV7-3L7M-TW67-WAET",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® Chronicles China",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "VKJY-7AVN-TKG7-MVUH",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® Chronicles Russia",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "UP3-4DED-A2FA-8086-E322",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed®",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "W9QG-KVGB-YX6M-6W8W",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® Liberation HD",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "UVNL-LHY7-GKR6-GE6A",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® III",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "WBMB-GP83-9MWX-86NF",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® III - Tyranny of King Washington: The Infamy (DLC)",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "WCGF-AEJX-GACU-XUBX",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® II Deluxe Edition",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "X8C7-GR6M-D87X-DM6E",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® Unity",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "WPAT-4YKP-AAMM-X4RG",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® Brotherhood",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          }
                         ]
         self.assertTrue(EqualInContent(sut.KeysContent(), product_info))
@@ -542,70 +569,80 @@ class TestHumbleLibrary(unittest.TestCase):
                          "platform_id": None,
                          "name": "Assassin's Creed® Chronicles India",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "UXV7-3L7M-TW67-WAET",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® Chronicles China",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "VKJY-7AVN-TKG7-MVUH",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® Chronicles Russia",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "UP3-4DED-A2FA-8086-E322",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed®",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "W9QG-KVGB-YX6M-6W8W",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® Liberation HD",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "UVNL-LHY7-GKR6-GE6A",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® III",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "WBMB-GP83-9MWX-86NF",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® III - Tyranny of King Washington: The Infamy (DLC)",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "WCGF-AEJX-GACU-XUBX",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® II Deluxe Edition",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "X8C7-GR6M-D87X-DM6E",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® Unity",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          },
                         {"key": "WPAT-4YKP-AAMM-X4RG",
                          "key_type": "uplay",
                          "platform_id": None,
                          "name": "Assassin's Creed® Brotherhood",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
-                         "expired": False
+                         "expired": False,
+                         "registered": False
                          }
                         ]
         self.assertTrue(EqualInContent(sut.KeysContent(platforms=["uplay"]), product_info))
