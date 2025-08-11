@@ -183,6 +183,14 @@ class HumbleLibrary():
 
         order.Update(updated_order)
 
+    def SetProductRegistered(self, humblekey, product_machine_name):
+        order = self.GetOrder(humblekey)
+
+        if order is None:
+            return
+
+        order.SetRegistered(product_machine_name)
+
     def __insertOrder(self, key, new_order):
         if isinstance(new_order, HumbleStoreKey):
             self.__store_keys[key] = new_order
@@ -235,6 +243,11 @@ class HumbleBundle(Order):
 
     def Products(self, platforms = []):
         return self._getProductsByPlatform(platforms)
+
+    def SetRegistered(self, product_machine_name):
+        for product in self.Products():
+            if product.ProductMachineName() == product_machine_name:
+                product.SetRegistered(product_machine_name)
 
     def _getProductsByPlatform(self, platforms):
         return [product for product in self._products if not platforms or product.KeyType() in platforms]
@@ -454,6 +467,10 @@ class HumbleStoreKey(Order):
 
     def Registered(self):
         return self.__registered
+
+    def SetRegistered(self, product_machine_name):
+        if self.__product_machine_name == product_machine_name:
+            self.__registered = True
     
     def KeyIndex(self):
         return self.__key_index

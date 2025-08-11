@@ -22,6 +22,17 @@ class TestHumbleLibrary(unittest.TestCase):
                   "Yv8pEek2ehcSppPk": assassinscreed_bundle                      
             }
 
+    def test_SetProductRegistered_sets_registered_flag_on_product(self):
+        sut = HumbleLibrary(TestHumbleLibrary.orders_dict)
+        sut.SetProductRegistered("Z8KftUKAEf8zG7zY", "thecallistoprotocol_choice_steam")
+        choice_products = sut.GetOrder("Z8KftUKAEf8zG7zY").Products()
+        
+        for product in choice_products:
+            if product.ProductMachineName() == "thecallistoprotocol_choice_steam":
+                self.assertTrue(product.Registered())
+            else:
+                self.assertFalse(product.Registered())
+
     def test_UpdateOrder_updates_order_with_new_data(self):
         sut = HumbleLibrary(TestHumbleLibrary.orders_dict)
         order_dict = {}
