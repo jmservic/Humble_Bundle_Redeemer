@@ -105,3 +105,169 @@ mixed_key_bundle = {
                 ]
             }
         }
+
+enshrouded = {
+    "amount_spent": 26.99,
+    "product": {
+      "category": "storefront",
+      "machine_name": "enshrouded_storefront",
+      "empty_tpkds": {
+
+      },
+      "post_purchase_text": "",
+      "human_name": "Enshrouded",
+      "partial_gift_enabled": True
+    },
+    "gamekey": "TSskvEHeqSfUbZAs",
+    "uid": "X9ZX7MZ0141FX",
+    "created": "2025-02-14T01:51:25.738781",
+    "missed_credit": None,
+    "subproducts": [],
+    "total_choices": 0,
+    "tpkd_dict": {
+      "all_tpks": [
+        {
+          "is_gift": False,
+          "machine_name": "enshrouded_steam",
+          "gamekey": "TSskvEHeqSfUbZAs",
+          "exclusive_countries": [],
+          "num_days_until_expired": -1,
+          "disallowed_countries": [],
+          "show_custom_instructions_in_user_libraries": False,
+          "key_type": "steam",
+          "visible": True,
+          "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'\u003ESteam Instructions\u003C/a\u003E",
+          "display_separately": False,
+          "redeemed_key_val": "TMQTG-FRRFB-NY4EZ",
+          "key_type_human_name": "Steam",
+          "steam_app_id": None,
+          "human_name": "Enshrouded",
+          "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+          "auto_expand": False,
+          "is_expired": False,
+          "class": "steambutton",
+          "keyindex": 0,
+          "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+        }
+      ]
+    },
+    "choices_remaining": 0,
+    "currency": "USD",
+    "is_giftee": False,
+    "claimed": True,
+    "total": 29.99,
+    "path_ids": [
+      "5044586128277504",
+      "6726378484858880"
+    ]
+  }
+
+wizardwithagun = {
+    "amount_spent": 22.49,
+    "product": {
+      "category": "storefront",
+      "machine_name": "wizardwithagun_storefront",
+      "empty_tpkds": {
+
+      },
+      "post_purchase_text": "",
+      "human_name": "Wizard with a Gun",
+      "partial_gift_enabled": True
+    },
+    "gamekey": "mNUwXmdxFqwZpNPZ",
+    "uid": "XM43F1TG1UWRE",
+    "created": "2023-11-01T00:55:38.697741",
+    "missed_credit": None,
+    "subproducts": [],
+    "total_choices": 0,
+    "tpkd_dict": {
+      "all_tpks": [
+        {
+          "is_gift": False,
+          "expiration_date": "2026-01-05T18:00:00",
+          "machine_name": "wizardwithagun_storefront_steam_rlq7w",
+          "gamekey": "mNUwXmdxFqwZpNPZ",
+          "exclusive_countries": [],
+          "num_days_until_expired": -1,
+          "disallowed_countries": [],
+          "show_custom_instructions_in_user_libraries": False,
+          "key_type": "steam",
+          "visible": True,
+          "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'\u003ESteam Instructions\u003C/a\u003E",
+          "display_separately": False,
+          "redeemed_key_val": "BL603-ZYX0H-LG8A4",
+          "key_type_human_name": "Steam",
+          "steam_app_id": 1150530,
+          "human_name": "Wizard with a Gun (Steam)",
+          "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+          "auto_expand": True,
+          "is_expired": False,
+          "class": "steambutton",
+          "keyindex": 0,
+          "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+        }
+      ]
+    },
+    "choices_remaining": 0,
+    "currency": "USD",
+    "is_giftee": False,
+    "claimed": True,
+    "total": 24.99,
+    "path_ids": [
+      "5833743336144896",
+      "6664781859848192"
+    ]
+  }
+
+wizardwithagun_missing_info = {
+    "amount_spent": 22.49,
+    "product": {
+      "category": "storefront",
+      "machine_name": "wizardwithagun_storefront",
+      "empty_tpkds": {
+
+      },
+      "post_purchase_text": "",
+      "human_name": "Wizard with a Gun",
+      "partial_gift_enabled": True
+    },
+    "gamekey": "mNUwXmdxFqwZpNPZ",
+    "uid": "XM43F1TG1UWRE",
+    "created": "2023-11-01T00:55:38.697741",
+    "missed_credit": None,
+    "subproducts": [],
+    "total_choices": 0,
+    "tpkd_dict": {
+      "all_tpks": [
+        {
+          "is_gift": False,
+          "machine_name": "wizardwithagun_storefront_steam_rlq7w",
+          "gamekey": "mNUwXmdxFqwZpNPZ",
+          "exclusive_countries": [],
+          "num_days_until_expired": -1,
+          "disallowed_countries": [],
+          "show_custom_instructions_in_user_libraries": False,
+          "visible": True,
+          "instructions_html": "\u003Ca href='https://support.humblebundle.com/hc/articles/204008710-How-To-Redeem-Steam-Keys' target='_blank'\u003ESteam Instructions\u003C/a\u003E",
+          "display_separately": False,
+          "key_type_human_name": "Steam",
+          "human_name": "Wizard with a Gun (Steam)",
+          "preinstruction_text": "Copy this key into the Steam client, or click Redeem to redeem in-browser.",
+          "auto_expand": True,
+          "is_expired": False,
+          "class": "steambutton",
+          "keyindex": 0,
+          "disclaimer": "Steam will not provide extra giftable copies of games you already own."
+        }
+      ]
+    },
+    "choices_remaining": 0,
+    "currency": "USD",
+    "is_giftee": False,
+    "claimed": True,
+    "total": 24.99,
+    "path_ids": [
+      "5833743336144896",
+      "6664781859848192"
+    ]
+  } 

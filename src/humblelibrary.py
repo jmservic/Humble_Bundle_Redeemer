@@ -1,6 +1,6 @@
 from datetime import datetime
 
-PLATFORMS = ["steam", "epic", "uplay", "origin"]
+PLATFORMS = ["steam", "epic", "uplay", "origin", "generic"]
 
 class OrderFactory():
     
@@ -170,10 +170,10 @@ class HumbleLibrary():
         return {key: value for key, value in self.__store_keys.items()}
 
     def GetHumbleBundles(self):
-        {key: value for key, value in self.__bundles.items()}
+        return {key: value for key, value in self.__bundles.items()}
 
     def GetChoiceBundles(self):
-        {key: value for key, value in self.__choice_bundles.items()}
+        return {key: value for key, value in self.__choice_bundles.items()}
 
     def UpdateOrder(self, order_dict):
         order_factory = OrderFactory()
@@ -215,6 +215,9 @@ class Order():
 
     def MachineName(self):
         return self._order_machine_name
+
+    def Subproducts(self):
+        return self._subproducts
 
     def Key(self):
         return self._humblekey
@@ -287,6 +290,12 @@ class HumbleChoice(HumbleBundle):
         self.__all_choices = self.__getAllChoices(self.__all_choices_dict)
         
         self.__setChosenFlag()
+
+    def ChoicesRemaining(self):
+        return self.__choices_remaining
+
+    def AllChoices(self):
+        return self.__all_choices_dict
             
     def __getAllChoices(self, all_choices):
         choice_info = self.__getGameData(all_choices["contentChoiceOptions"]["contentChoiceData"])
@@ -463,6 +472,9 @@ class HumbleStoreKey(Order):
     def PlatformId(self):
         return self.__platform_id
 
+    def ExpirationDate(self):
+        return self.__expiration_date
+
     def Expired(self):
         if self.__expiration_date is None:
             return False
@@ -474,6 +486,7 @@ class HumbleStoreKey(Order):
     def SetRegistered(self, product_machine_name):
         if self.__product_machine_name == product_machine_name:
             self.__registered = True
+            self._updated = True
     
     def KeyIndex(self):
         return self.__key_index
@@ -487,6 +500,7 @@ class HumbleStoreKey(Order):
         if self.__redeem_key is None and other.__redeem_key is not None:
             self.__redeem_key = other.__redeem_key
             self.__key_type = other.__key_type
+            self.__key_index = other.__key_index
             self._updated = True
 
         if self.__platform_id != other.__platform_id:
