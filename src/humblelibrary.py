@@ -367,7 +367,7 @@ class HumbleChoice(HumbleBundle):
         #Update products through HumbleBundle's update method
         super().Update(other)
                     
-        if self.__all_choices_dict != other.__all_choices_dict:
+        if other.__all_choices_dict and self.__all_choices_dict != other.__all_choices_dict:
             self.__all_choices_dict = other.__all_choices_dict
             self.__all_choices = self.__getAllChoices(self.__all_choices_dict)
             self._updated = True
