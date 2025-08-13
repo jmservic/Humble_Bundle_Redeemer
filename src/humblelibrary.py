@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 
 PLATFORMS = ["steam", "epic", "uplay", "origin", "generic"]
 
@@ -31,6 +32,52 @@ class OrderFactory():
             case _:
                 raise ValueError(f"HumbleBundle order category '{category}' is an unknown category type.")
         return order
+    
+    def CreateOrderFromRecords(self, records_dict):
+        product_dicts = []
+        storekey_order_dict = None
+        for storekey_row in records_dict["StoreKeys"]:
+            storekey_order_dict = {"gamekey": storekey_row[0],
+                                  "machine_name": storekey_row[2],
+                                  "created": storekey_row[3],
+                                  "subproducts": storekey_row[5]
+                                   }
+            storekey_product_dict = {"human_name": storekey_row[1],
+                                     "machine_name": storekey_row[4],
+                                     "redeemed_key_val": storekey_row[6],
+                                     "key_type": storekey_row[7],
+                                     "key_index": storekey_row[8],
+                                     "steam_app_id": storekey_row[9],
+                                     "expiration_date": storekey_row[10],
+                                     "registered": bool(storekey_row[11])
+                                     }
+            product_dicts.append(storekey_product_dict)
+        
+        if records_dict["HumbleChoice"]:
+            choice_row = records_dict["HumbleChoice"]
+            choice_order_dict = {"gamekey": choice_row[0],
+                                 "human_name": choice_row[1],
+                                 "machine_name": choice_row[2],
+                                 "created": choice_row[3],
+                                 "subproducts": json.loads(choice_row[4]),
+                                 "choices_remaining": choice_row[5],
+                                 "all_choices": json.loads(choice_row[6]),
+                                 "total_choices": 0
+                                 }
+            return self.CreateChoiceOrder(choice_order_dict, product_dicts)
+
+        if records_dict["HumbleBundle"]:
+            bundle_row = records_dict["HumbleBundle"]
+            bundle_order_dict = {"gamekey": bundle_row[0],
+                                 "human_name": bundle_row[1],
+                                 "machine_name": bundle_row[2],
+                                 "created": bundle_row[3],
+                                 "subproducts": json.loads(bundle_row[4])
+                                 }
+            return self.CreateBundleOrder(bundle_order_dict, product_dicts)
+
+
+        return self.CreateStoreKeyOrder(storekey_order_dict, product_dicts[0])
 
     def CreateStoreKeyOrder(self, order_dict, product_dict):
         init_dict = {"order_machine_name": order_dict["machine_name"],
@@ -43,7 +90,8 @@ class OrderFactory():
                      "key_type": product_dict.get("key_type", None),
                      "platform_id": product_dict.get("steam_app_id", None),
                      "keyindex": product_dict.get("keyindex", None),
-                     "expiration_date": product_dict.get("expiration_date", None)
+                     "expiration_date": product_dict.get("expiration_date", None),
+                     "registered": product_dict.get("registered", False)
                      }
         return HumbleStoreKey(init_dict)
 
@@ -57,7 +105,10 @@ class OrderFactory():
                      "subproducts": order_dict["subproducts"],
                      "all_choices": order_dict.get("all_choices", None)
                      }
-        products = [self.CreateStoreKeyOrder(order_dict, product_dict) for product_dict in product_dicts]
+        product_order_dict = {}
+        product_order_dict.update(order_dict)
+        product_order_dict["subproducts"] = []
+        products = [self.CreateStoreKeyOrder(product_order_dict, product_dict) for product_dict in product_dicts]
         return HumbleChoice(init_dict, products)
 
     def CreateBundleOrder(self, order_dict, product_dicts):
@@ -67,7 +118,10 @@ class OrderFactory():
                      "created": order_dict["created"],
                      "subproducts": order_dict["subproducts"]
                     }
-        products = [self.CreateStoreKeyOrder(order_dict, product_dict) for product_dict in product_dicts]
+        product_order_dict = {}
+        product_order_dict.update(order_dict)
+        product_order_dict["subproducts"] = []
+        products = [self.CreateStoreKeyOrder(product_order_dict, product_dict) for product_dict in product_dicts]
         return HumbleBundle(init_dict, products)
 
 class HumbleLibrary():
@@ -82,6 +136,15 @@ class HumbleLibrary():
         for (key, order_dict) in orders_dict.items():
             order = order_factory.CreateOrder(order_dict)
             self.__insertOrder(key, order)
+
+    @classmethod
+    def FromOrderRecords(cls, order_records):
+        library = HumbleLibrary({})
+        order_factory = OrderFactory()
+        for key, records_dict in order_records.items():
+            library.__insertOrder(key, order_factory.CreateOrderFromRecords(records_dict))
+
+        return library
 
     def ChoiceChooseContent(self):
         unchosen_content_dict = {}
@@ -113,7 +176,8 @@ class HumbleLibrary():
                                  "name": product.Name(),
                                  "created": product.Created(),
                                  "expired": product.Expired(),
-                                 "registered": product.Registered()
+                                 "registered": product.Registered(),
+                                 "humble_key": product.Key()
                                 }
                                for product in content
                                ])
@@ -133,7 +197,8 @@ class HumbleLibrary():
                                  "name": product.Name(),
                                  "created": product.Created(),
                                  "expired": product.Expired(),
-                                 "registered": product.Registered()
+                                 "registered": product.Registered(),
+                                 "humble_key": product.Key()
                                 }
                                for product in content
                                ])
@@ -146,7 +211,8 @@ class HumbleLibrary():
                                     "name": product.Name(),
                                     "created": product.Created(),
                                     "expired": product.Expired(),
-                                    "registered": product.Registered()
+                                    "registered": product.Registered(),
+                                    "humble_key": product.Key()
                                     })
 
         return key_content

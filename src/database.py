@@ -80,6 +80,48 @@ class Database():
         self._con.execute("INSERT INTO Log VALUES(?, ?, ?, ?, ?, ?)", row)
         self._con.commit()
 
+    def GetOrders(self):
+        orders_dict = {}
+
+        res = self._con.execute("""SELECT HumbleKey, Name, OrderMachineName, Created, Subproducts, ChoicesRemaining,
+                                AllChoices FROM HumbleChoice""")
+        humble_choices = res.fetchall()
+
+        for choice_row in humble_choices:
+            if choice_row[0] not in orders_dict:
+                orders_dict[choice_row[0]] = {"HumbleBundle": None,
+                                              "HumbleChoice": choice_row,
+                                              "StoreKeys": []}
+
+        res = self._con.execute("SELECT HumbleKey, Name, OrderMachineName, Created, Subproducts FROM HumbleBundle")
+
+        humble_bundles = res.fetchall()
+
+        for bundle_row in humble_bundles:
+            if bundle_row[0] not in orders_dict:
+                orders_dict[bundle_row[0]] = {"HumbleBundle": bundle_row,
+                                              "HumbleChoice": None,
+                                              "StoreKeys": []}
+
+        res = self._con.execute("""SELECT HumbleKey, Name, OrderMachineName, Created,
+        ProductMachineName, Subproducts, RedeemKey, KeyType, KeyIndex,
+        PlatformId, ExpirationDate, Registered FROM HumbleStoreKey""")
+
+        storekeys = res.fetchall()
+
+        for storekey_row in storekeys:
+            if storekey_row[0] not in orders_dict:
+                orders_dict[storekey_row[0]] = {"HumbleBundle": None,
+                                                "HumbleChoice": None,
+                                                "StoreKeys": [storekey_row]}
+            else:
+                orders_dict[storekey_row[0]]["StoreKeys"].append(storekey_row)
+
+        return orders_dict
+
+
+        
+
     def __SaveStoreKeys(self, store_keys):
         data_inserts = []
         data_updates = []

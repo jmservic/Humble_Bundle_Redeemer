@@ -7,21 +7,31 @@ import os
 import json
 from datetime import datetime
 
+temp_db_path = "temp.db"
+
+def tearDownModule():
+    if not os.path.exists(temp_db_path):
+        return
+
+    os.remove(temp_db_path)
+
 class TestDBCreateDB(unittest.TestCase):
-    temp_db_path = "temp.db"
 
     @classmethod
     def setUpClass(cls):
-        cls._database = Database(cls.temp_db_path)
-        cls._con = sqlite3.connect(cls.temp_db_path) 
+        cls._database = Database(temp_db_path)
+        cls._con = sqlite3.connect(temp_db_path) 
 
     @classmethod
     def tearDownClass(cls):
+        cur = cls._con.cursor()
+        cur.execute("DROP TABLE Giftable")
+        cur.execute("DROP TABLE Log")
+        cur.execute("DROP TABLE Redeemable")
+        cur.execute("DROP TABLE HumbleChoice")
+        cur.execute("DROP TABLE HumbleBundle")
+        cur.execute("DROP TABLE HumbleStoreKey")
         cls._con.close()
-        if not os.path.exists(cls.temp_db_path):
-            return
-
-        os.remove(cls.temp_db_path)
 
     def test_Initialize_creates_correct_tables(self):
         sut = TestDBCreateDB._database
@@ -35,21 +45,16 @@ class TestDBCreateDB(unittest.TestCase):
         self.assertEqual(table_names, expected_names)
 
 class TestDBCreate(unittest.TestCase):
-    temp_db_path = "temp.db"
 
     @classmethod
     def setUpClass(cls):
-        cls._database = Database(cls.temp_db_path)
+        cls._database = Database(temp_db_path)
         cls._database.Initialize()
-        cls._con = sqlite3.connect(cls.temp_db_path) 
+        cls._con = sqlite3.connect(temp_db_path) 
 
     @classmethod
     def tearDownClass(cls):
         cls._con.close()
-        if not os.path.exists(cls.temp_db_path):
-            return
-
-        os.remove(cls.temp_db_path)
 
     def test_SaveHumbleLibrary_persists_library_HumbleStoreKeys_in_HumbleStoreKey_table(self):
         sut = TestDBCreate._database
@@ -144,21 +149,23 @@ class TestDBCreate(unittest.TestCase):
         self.assertEqual(res.fetchone(), gift_record)
 
 class TestDBUpdate(unittest.TestCase):
-    temp_db_path = "temp.db"
 
     @classmethod
     def setUpClass(cls):
-        cls._database = Database(cls.temp_db_path)
+        cls._database = Database(temp_db_path)
         cls._database.Initialize()
-        cls._con = sqlite3.connect(cls.temp_db_path) 
+        cls._con = sqlite3.connect(temp_db_path) 
 
     @classmethod
     def tearDownClass(cls):
+        cur = cls._con.cursor()
+        cur.execute("DROP TABLE Giftable")
+        cur.execute("DROP TABLE Log")
+        cur.execute("DROP TABLE Redeemable")
+        cur.execute("DROP TABLE HumbleChoice")
+        cur.execute("DROP TABLE HumbleBundle")
+        cur.execute("DROP TABLE HumbleStoreKey")
         cls._con.close()
-        if not os.path.exists(cls.temp_db_path):
-            return
-
-        os.remove(cls.temp_db_path)
 
     def test_SaveHumbleLibrary_updates_updated_HumbleStoreKeys(self):
         sut = TestDBUpdate._database
@@ -275,6 +282,123 @@ class TestDBUpdate(unittest.TestCase):
                           Attempts, Redeemed FROM Redeemable 
                           WHERE HumbleKey = 'Z8KftUKAEf8zG7zY' and ProductMachineName = 'fashionpolicesquad_choice_steam'""")
         self.assertEqual(res.fetchone(), redeem_row)
+
+
+class TestDBRead(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._database = Database(temp_db_path)
+        cls._database.Initialize()
+        cls._con = sqlite3.connect(temp_db_path) 
+
+    @classmethod
+    def tearDownClass(cls):
+        cur = cls._con.cursor()
+        cur.execute("DROP TABLE Giftable")
+        cur.execute("DROP TABLE Log")
+        cur.execute("DROP TABLE Redeemable")
+        cur.execute("DROP TABLE HumbleChoice")
+        cur.execute("DROP TABLE HumbleBundle")
+        cur.execute("DROP TABLE HumbleStoreKey")
+        cls._con.close()
+
+    def test_GetOrders_returns_dict_containing_all_orders(self):
+        self.maxDiff = None
+        sut = TestDBRead._database
+        humble_library = HumbleLibrary({
+            "Z8KftUKAEf8zG7zY": april_2024_choice,
+            "Yv8pEek2ehcSppPk": assassinscreed_bundle,
+            "TSskvEHeqSfUbZAs": enshrouded,
+            "mNUwXmdxFqwZpNPZ": wizardwithagun
+            })
+        order_dict = {
+                "Z8KftUKAEf8zG7zY": {
+                    "HumbleBundle": None,
+                    "HumbleChoice": ("Z8KftUKAEf8zG7zY", "April 2024 Humble Choice", "april_2024_choice", "2024-04-30T18:51:02.620236",
+                                     json.dumps(april_2024_choice["subproducts"]), 0, 
+                                     json.dumps(april_2024_choice["product"]["all_choices"])),
+                    "StoreKeys": [("Z8KftUKAEf8zG7zY", "Victoria 3","april_2024_choice", "2024-04-30T18:51:02.620236",
+                                   "victoria3_choice_steam", "[]","Z7AQM-3XTNN-PAATK" ,"steam", 0, 529340, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "The Callisto Protocol","april_2024_choice",
+                                   "2024-04-30T18:51:02.620236", "thecallistoprotocol_choice_steam",
+                                   "[]", "996KZ-JYH6X-T62DJ",
+                                   "steam", 0, 1544020, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Humankind Definitive Edition", "april_2024_choice",
+                                   "2024-04-30T18:51:02.620236", "humankind_definitiveedition_choice_steam", 
+                                   "[]", "KBEKN-R22I4-BH9M5",
+                                   "steam", 0, 1124300, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Fashion Police Squad", "april_2024_choice", 
+                                   "2024-04-30T18:51:02.620236", "fashionpolicesquad_choice_steam",
+                                   "[]", None, "steam", 0, 1319460, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Terraformers","april_2024_choice", "2024-04-30T18:51:02.620236",
+                                   "terraformers_row_choice_steam", "[]", "T5JBA-F3Z39-QG3FX",
+                                   "steam", 0, 1244800, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Symphony of War: The Nephilim Saga","april_2024_choice",
+                                   "2024-04-30T18:51:02.620236", "symphonyofwar_thenephilimsaga_choice_steam",
+                                   "[]", "ZA0J0-59TLG-MVPYA",
+                                   "steam", 0, 1488200, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Coromon","april_2024_choice", "2024-04-30T18:51:02.620236",
+                                   "coromon_choice_steam", "[]", "YN2CB-VAH8C-NFYBF",
+                                   "steam", 0, 1218210, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "The Excavation of Hob's Barrow","april_2024_choice",
+                                   "2024-04-30T18:51:02.620236", "theexcavationofhobsbarrow_choice_steam",
+                                   "[]", "X7TX6-A9TYH-ZTR0Y",
+                                   "steam", 0, 1182310, None, False)
+                                  ]
+                    },
+                "Yv8pEek2ehcSppPk": {
+                    "HumbleBundle": ("Yv8pEek2ehcSppPk", "Humble Assassin's Creed Bundle", "assassinscreed_bundle", 
+                                     "2017-01-16T15:38:08.924170", "[]"),
+                    "HumbleChoice": None,
+                    "StoreKeys": [("Yv8pEek2ehcSppPk", "Assassin's Creed® Chronicles India", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_chronicles_india_bundle_na_uplay",
+                                   "[]", "AP3C-XN4R-8V4E-CLPM", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Chronicles China", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_chronicles_china_bundle_na_uplay",
+                                   "[]", "UXV7-3L7M-TW67-WAET", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Chronicles Russia", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_chronicles_russia_bundle_na_uplay",
+                                   "[]", "VKJY-7AVN-TKG7-MVUH", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed®", "assassinscreed_bundle", "2017-01-16T15:38:08.924170",
+                                   "assassinscreed_bundle_uplay", "[]", "UP3-4DED-A2FA-8086-E322",
+                                   "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Liberation HD", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_liberationhd_bundle_uplay",
+                                   "[]", "W9QG-KVGB-YX6M-6W8W", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® III", "assassinscreed_bundle", "2017-01-16T15:38:08.924170",
+                                   "assassinscreed3_bundle_uplay", "[]", "UVNL-LHY7-GKR6-GE6A",
+                                   "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® III - Tyranny of King Washington: The Infamy (DLC)",
+                                   "assassinscreed_bundle", "2017-01-16T15:38:08.924170", "assassinscreed3_washingtondlc_bundle_uplay",
+                                   "[]", "WBMB-GP83-9MWX-86NF", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® II Deluxe Edition", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed2_deluxe_bundle_uplay",
+                                   "[]", "WCGF-AEJX-GACU-XUBX", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Unity", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_unity_bundle_na_uplay",
+                                   "[]", "X8C7-GR6M-D87X-DM6E", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Brotherhood", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_brotherhood_bundle_uplay",
+                                   "[]", "WPAT-4YKP-AAMM-X4RG", "uplay", 0, None, None, False)
+                                  ]
+                    },
+                "TSskvEHeqSfUbZAs": {
+                    "HumbleBundle": None,
+                    "HumbleChoice": None,
+                    "StoreKeys": [("TSskvEHeqSfUbZAs", "Enshrouded", "enshrouded_storefront", "2025-02-14T01:51:25.738781",
+                         "enshrouded_steam", "[]", "TMQTG-FRRFB-NY4EZ", "steam", 0, None, None, False)
+                                  ]
+                    },
+                "mNUwXmdxFqwZpNPZ": {
+                        "HumbleBundle": None,
+                        "HumbleChoice": None,
+                        "StoreKeys": [("mNUwXmdxFqwZpNPZ", "Wizard with a Gun (Steam)", "wizardwithagun_storefront",
+                                   "2023-11-01T00:55:38.697741", "wizardwithagun_storefront_steam_rlq7w",
+                                   "[]", "BL603-ZYX0H-LG8A4", "steam", 0, 1150530, "2026-01-05T18:00:00.000000", False)]
+                        }
+                      }
+        sut.SaveHumbleLibrary(humble_library)
+        self.assertEqual(sut.GetOrders(), order_dict)
 
                       
 

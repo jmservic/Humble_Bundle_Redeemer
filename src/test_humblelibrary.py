@@ -2,6 +2,7 @@ import unittest
 from datetime import datetime, timedelta
 from humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey, ChoiceContent
 from humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice, assassinscreed_bundle, mixed_key_bundle
+import json
 
 def EqualInContent(collection_1, collection_2):
     if not collection_1 or not collection_2 or len(collection_1) != len(collection_2):
@@ -21,6 +22,102 @@ class TestHumbleLibrary(unittest.TestCase):
                   "rw3m6TUnb3eqmHzM": june_2025_choice,
                   "Yv8pEek2ehcSppPk": assassinscreed_bundle                      
             }
+
+    def test_FromOrderRecords_returns_HumbleLibrary_containing_all_orders(self):
+        order_dict = {
+                "Z8KftUKAEf8zG7zY": {
+                    "HumbleBundle": None,
+                    "HumbleChoice": ("Z8KftUKAEf8zG7zY", "April 2024 Humble Choice", "april_2024_choice", "2024-04-30T18:51:02.620236",
+                                     json.dumps(april_2024_choice["subproducts"]), 0, 
+                                     json.dumps(april_2024_choice["product"]["all_choices"])),
+                    "StoreKeys": [("Z8KftUKAEf8zG7zY", "Victoria 3","april_2024_choice", "2024-04-30T18:51:02.620236",
+                                   "victoria3_choice_steam", "[]","Z7AQM-3XTNN-PAATK" ,"steam", 0, 529340, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "The Callisto Protocol","april_2024_choice",
+                                   "2024-04-30T18:51:02.620236", "thecallistoprotocol_choice_steam",
+                                   "[]", "996KZ-JYH6X-T62DJ",
+                                   "steam", 0, 1544020, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Humankind Definitive Edition", "april_2024_choice",
+                                   "2024-04-30T18:51:02.620236", "humankind_definitiveedition_choice_steam", 
+                                   "[]", "KBEKN-R22I4-BH9M5",
+                                   "steam", 0, 1124300, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Fashion Police Squad", "april_2024_choice", 
+                                   "2024-04-30T18:51:02.620236", "fashionpolicesquad_choice_steam",
+                                   "[]", None, "steam", 0, 1319460, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Terraformers","april_2024_choice", "2024-04-30T18:51:02.620236",
+                                   "terraformers_row_choice_steam", "[]", "T5JBA-F3Z39-QG3FX",
+                                   "steam", 0, 1244800, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Symphony of War: The Nephilim Saga","april_2024_choice",
+                                   "2024-04-30T18:51:02.620236", "symphonyofwar_thenephilimsaga_choice_steam",
+                                   "[]", "ZA0J0-59TLG-MVPYA",
+                                   "steam", 0, 1488200, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Coromon","april_2024_choice", "2024-04-30T18:51:02.620236",
+                                   "coromon_choice_steam", "[]", "YN2CB-VAH8C-NFYBF",
+                                   "steam", 0, 1218210, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "The Excavation of Hob's Barrow","april_2024_choice",
+                                   "2024-04-30T18:51:02.620236", "theexcavationofhobsbarrow_choice_steam",
+                                   "[]", "X7TX6-A9TYH-ZTR0Y",
+                                   "steam", 0, 1182310, None, False)
+                                  ]
+                    },
+                "Yv8pEek2ehcSppPk": {
+                    "HumbleBundle": ("Yv8pEek2ehcSppPk", "Humble Assassin's Creed Bundle", "assassinscreed_bundle", 
+                                     "2017-01-16T15:38:08.924170", "[]"),
+                    "HumbleChoice": None,
+                    "StoreKeys": [("Yv8pEek2ehcSppPk", "Assassin's Creed® Chronicles India", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_chronicles_india_bundle_na_uplay",
+                                   "[]", "AP3C-XN4R-8V4E-CLPM", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Chronicles China", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_chronicles_china_bundle_na_uplay",
+                                   "[]", "UXV7-3L7M-TW67-WAET", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Chronicles Russia", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_chronicles_russia_bundle_na_uplay",
+                                   "[]", "VKJY-7AVN-TKG7-MVUH", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed®", "assassinscreed_bundle", "2017-01-16T15:38:08.924170",
+                                   "assassinscreed_bundle_uplay", "[]", "UP3-4DED-A2FA-8086-E322",
+                                   "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Liberation HD", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_liberationhd_bundle_uplay",
+                                   "[]", "W9QG-KVGB-YX6M-6W8W", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® III", "assassinscreed_bundle", "2017-01-16T15:38:08.924170",
+                                   "assassinscreed3_bundle_uplay", "[]", "UVNL-LHY7-GKR6-GE6A",
+                                   "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® III - Tyranny of King Washington: The Infamy (DLC)",
+                                   "assassinscreed_bundle", "2017-01-16T15:38:08.924170", "assassinscreed3_washingtondlc_bundle_uplay",
+                                   "[]", "WBMB-GP83-9MWX-86NF", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® II Deluxe Edition", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed2_deluxe_bundle_uplay",
+                                   "[]", "WCGF-AEJX-GACU-XUBX", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Unity", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_unity_bundle_na_uplay",
+                                   "[]", "X8C7-GR6M-D87X-DM6E", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Brotherhood", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_brotherhood_bundle_uplay",
+                                   "[]", "WPAT-4YKP-AAMM-X4RG", "uplay", 0, None, None, False)
+                                  ]
+                    },
+                "TSskvEHeqSfUbZAs": {
+                    "HumbleBundle": None,
+                    "HumbleChoice": None,
+                    "StoreKeys": [("TSskvEHeqSfUbZAs", "Enshrouded", "enshrouded_storefront", "2025-02-14T01:51:25.738781",
+                         "enshrouded_steam", "[]", "TMQTG-FRRFB-NY4EZ", "steam", 0, None, None, False)
+                                  ]
+                    },
+                "mNUwXmdxFqwZpNPZ": {
+                        "HumbleBundle": None,
+                        "HumbleChoice": None,
+                        "StoreKeys": [("mNUwXmdxFqwZpNPZ", "Wizard with a Gun (Steam)", "wizardwithagun_storefront",
+                                   "2023-11-01T00:55:38.697741", "wizardwithagun_storefront_steam_rlq7w",
+                                   "[]", "BL603-ZYX0H-LG8A4", "steam", 0, 1150530, "2026-01-05T18:00:00.000000", False)]
+                        }
+                      }
+        order_keys = ["Z8KftUKAEf8zG7zY","Yv8pEek2ehcSppPk", "TSskvEHeqSfUbZAs", "mNUwXmdxFqwZpNPZ"] 
+        sut = HumbleLibrary.FromOrderRecords(order_dict)
+        keys = []
+        keys.extend(sut.GetStoreKeys().keys())
+        keys.extend(sut.GetHumbleBundles().keys())
+        keys.extend(sut.GetChoiceBundles().keys())
+        self.assertEqual(set(keys), set(order_keys))
+
 
     def test_SetProductRegistered_sets_registered_flag_on_product(self):
         sut = HumbleLibrary(TestHumbleLibrary.orders_dict)
@@ -161,7 +258,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Wizard of Legend",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key":"M0968-5PKWM-2LFAH",
                          "key_type": "steam",
@@ -169,7 +267,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Just Cause 3 XXL Edition",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "LCGM6-DYY4V-RAQYH",
                          "key_type": "steam",
@@ -177,7 +276,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Project CARS 2",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "K6RJG-75NKD-68ANV",
                          "key_type": "steam",
@@ -185,7 +285,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Q.U.B.E. 2",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "L0K0D-F4MXW-EXC94",
                          "key_type": "steam",
@@ -193,7 +294,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "\u003Eobserver_",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "K7WEC-FTCJ4-7LHI6",
                          "key_type": "steam",
@@ -201,7 +303,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Sundered",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "K7YP7-PXXFK-M7PN5",
                          "key_type": "steam",
@@ -209,7 +312,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Regions of Ruin",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "K4NIP-5CAKI-HA5BG",
                          "key_type": "steam",
@@ -217,7 +321,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Darkside Detective",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         #{"key": "GRAC5-P2ATX-T88AV",
                         # "key_type": "steam",
@@ -356,7 +461,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Wizard of Legend",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key":"M0968-5PKWM-2LFAH",
                          "key_type": "steam",
@@ -364,7 +470,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Just Cause 3 XXL Edition",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "LCGM6-DYY4V-RAQYH",
                          "key_type": "steam",
@@ -372,7 +479,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Project CARS 2",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "K6RJG-75NKD-68ANV",
                          "key_type": "steam",
@@ -380,7 +488,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Q.U.B.E. 2",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "L0K0D-F4MXW-EXC94",
                          "key_type": "steam",
@@ -388,7 +497,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "\u003Eobserver_",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "K7WEC-FTCJ4-7LHI6",
                          "key_type": "steam",
@@ -396,7 +506,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Sundered",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "K7YP7-PXXFK-M7PN5",
                          "key_type": "steam",
@@ -404,7 +515,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Regions of Ruin",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "K4NIP-5CAKI-HA5BG",
                          "key_type": "steam",
@@ -412,7 +524,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Darkside Detective",
                          "created": datetime.fromisoformat("2018-12-28T13:14:02.201818"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "NUDtNZdxFP7seeap"
                          },
                         {"key": "GRAC5-P2ATX-T88AV",
                          "key_type": "steam",
@@ -420,7 +533,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Dragon's Dogma 2 - Deluxe Edition (Pre-order)",
                          "created": datetime.fromisoformat("2024-03-19T20:08:02.142843"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "mvHZvHGE7dzzcGTC"
                          },
                         {"key": "AP3C-XN4R-8V4E-CLPM",
                          "key_type": "uplay",
@@ -428,7 +542,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® Chronicles India",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "UXV7-3L7M-TW67-WAET",
                          "key_type": "uplay",
@@ -436,7 +551,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® Chronicles China",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "VKJY-7AVN-TKG7-MVUH",
                          "key_type": "uplay",
@@ -444,7 +560,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® Chronicles Russia",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "UP3-4DED-A2FA-8086-E322",
                          "key_type": "uplay",
@@ -452,7 +569,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed®",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "W9QG-KVGB-YX6M-6W8W",
                          "key_type": "uplay",
@@ -460,7 +578,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® Liberation HD",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "UVNL-LHY7-GKR6-GE6A",
                          "key_type": "uplay",
@@ -468,7 +587,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® III",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "WBMB-GP83-9MWX-86NF",
                          "key_type": "uplay",
@@ -476,7 +596,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® III - Tyranny of King Washington: The Infamy (DLC)",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "WCGF-AEJX-GACU-XUBX",
                          "key_type": "uplay",
@@ -484,7 +605,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® II Deluxe Edition",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "X8C7-GR6M-D87X-DM6E",
                          "key_type": "uplay",
@@ -492,7 +614,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® Unity",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "WPAT-4YKP-AAMM-X4RG",
                          "key_type": "uplay",
@@ -500,7 +623,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® Brotherhood",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          }
                         ]
         self.assertTrue(EqualInContent(sut.KeysContent(), product_info))
@@ -570,7 +694,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® Chronicles India",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "UXV7-3L7M-TW67-WAET",
                          "key_type": "uplay",
@@ -578,7 +703,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® Chronicles China",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "VKJY-7AVN-TKG7-MVUH",
                          "key_type": "uplay",
@@ -586,7 +712,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® Chronicles Russia",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "UP3-4DED-A2FA-8086-E322",
                          "key_type": "uplay",
@@ -594,7 +721,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed®",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "W9QG-KVGB-YX6M-6W8W",
                          "key_type": "uplay",
@@ -602,7 +730,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® Liberation HD",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "UVNL-LHY7-GKR6-GE6A",
                          "key_type": "uplay",
@@ -610,7 +739,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® III",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "WBMB-GP83-9MWX-86NF",
                          "key_type": "uplay",
@@ -618,7 +748,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® III - Tyranny of King Washington: The Infamy (DLC)",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "WCGF-AEJX-GACU-XUBX",
                          "key_type": "uplay",
@@ -626,7 +757,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® II Deluxe Edition",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "X8C7-GR6M-D87X-DM6E",
                          "key_type": "uplay",
@@ -634,7 +766,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® Unity",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          },
                         {"key": "WPAT-4YKP-AAMM-X4RG",
                          "key_type": "uplay",
@@ -642,7 +775,8 @@ class TestHumbleLibrary(unittest.TestCase):
                          "name": "Assassin's Creed® Brotherhood",
                          "created": datetime.fromisoformat("2017-01-16T15:38:08.924170"),
                          "expired": False,
-                         "registered": False
+                         "registered": False,
+                         "humble_key": "Yv8pEek2ehcSppPk"
                          }
                         ]
         self.assertTrue(EqualInContent(sut.KeysContent(platforms=["uplay"]), product_info))
@@ -2149,6 +2283,113 @@ class TestOrderFactory(unittest.TestCase):
                                                 "platform_id": None,
                                                 "is_expired": False
                                                 })) 
+    
+    def test_CreateOrderFromRecords_creates_HumbleStoreKey_object(self):
+        sut = OrderFactory()
+        order = sut.CreateOrderFromRecords({
+                    "HumbleBundle": None,
+                    "HumbleChoice": None,
+                    "StoreKeys": [("TSskvEHeqSfUbZAs", "Enshrouded", "enshrouded_storefront", "2025-02-14T01:51:25.738781",
+                         "enshrouded_steam", "[]", "TMQTG-FRRFB-NY4EZ", "steam", 0, None, None, False)
+                                  ]
+                    })
+        self.assertEqual(order, HumbleStoreKey({"order_machine_name": "enshrouded_storefront",
+                                                "name": "Enshrouded",
+                                                "humblekey": "TSskvEHeqSfUbZAs",
+                                                "product_machine_name": "enshrouded_steam",
+                                                "created": "2025-02-14T01:51:25.738781",
+                                                "subproducts": [],
+                                                "redeem_key": "TMQTG-FRRFB-NY4EZ",
+                                                "key_type": "steam",
+                                                "keyindex": 0,
+                                                "platform_id": None,
+                                                "is_expired": False
+                                                })) 
+
+    def test_CreateOrderFromRecords_creates_HumbleChoice_object(self):
+        sut = OrderFactory()
+        order = sut.CreateOrderFromRecords({
+                    "HumbleBundle": None,
+                    "HumbleChoice": ("Z8KftUKAEf8zG7zY", "April 2024 Humble Choice", "april_2024_choice", "2024-04-30T18:51:02.620236",
+                                     json.dumps(april_2024_choice["subproducts"]), 0, 
+                                     json.dumps(april_2024_choice["product"]["all_choices"])),
+                    "StoreKeys": [("Z8KftUKAEf8zG7zY", "Victoria 3","april_2024_choice", "2024-04-30T18:51:02.620236",
+                                   "victoria3_choice_steam", "[]","Z7AQM-3XTNN-PAATK" ,"steam", 0, 529340, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "The Callisto Protocol","april_2024_choice",
+                                   "2024-04-30T18:51:02.620236", "thecallistoprotocol_choice_steam",
+                                   "[]", "996KZ-JYH6X-T62DJ",
+                                   "steam", 0, 1544020, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Humankind Definitive Edition", "april_2024_choice",
+                                   "2024-04-30T18:51:02.620236", "humankind_definitiveedition_choice_steam", 
+                                   "[]", "KBEKN-R22I4-BH9M5",
+                                   "steam", 0, 1124300, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Fashion Police Squad", "april_2024_choice", 
+                                   "2024-04-30T18:51:02.620236", "fashionpolicesquad_choice_steam",
+                                   "[]", None, "steam", 0, 1319460, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Terraformers","april_2024_choice", "2024-04-30T18:51:02.620236",
+                                   "terraformers_row_choice_steam", "[]", "T5JBA-F3Z39-QG3FX",
+                                   "steam", 0, 1244800, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Symphony of War: The Nephilim Saga","april_2024_choice",
+                                   "2024-04-30T18:51:02.620236", "symphonyofwar_thenephilimsaga_choice_steam",
+                                   "[]", "ZA0J0-59TLG-MVPYA",
+                                   "steam", 0, 1488200, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "Coromon","april_2024_choice", "2024-04-30T18:51:02.620236",
+                                   "coromon_choice_steam", "[]", "YN2CB-VAH8C-NFYBF",
+                                   "steam", 0, 1218210, None, False),
+                                  ("Z8KftUKAEf8zG7zY", "The Excavation of Hob's Barrow","april_2024_choice",
+                                   "2024-04-30T18:51:02.620236", "theexcavationofhobsbarrow_choice_steam",
+                                   "[]", "X7TX6-A9TYH-ZTR0Y",
+                                   "steam", 0, 1182310, None, False)
+                                  ]
+                    })
+        bundle_info = ("Z8KftUKAEf8zG7zY", "April 2024 Humble Choice", "april_2024_choice", "2024-04-30T18:51:02.620236",
+                                     april_2024_choice["subproducts"], 0, 
+                                     april_2024_choice["product"]["all_choices"], 8)
+        self.assertEqual((order.Key(), order.Name(), order.MachineName(), order.Created().strftime("%Y-%m-%dT%H:%M:%S.%f"),
+                          order.Subproducts(), order.ChoicesRemaining(), order.AllChoices(), len(order.Products())), bundle_info)
+
+    def test_CreateOrderFromRecords_creates_HumbleBundle_object(self):
+        sut = OrderFactory()
+        order = sut.CreateOrderFromRecords({
+                    "HumbleBundle": ("Yv8pEek2ehcSppPk", "Humble Assassin's Creed Bundle", "assassinscreed_bundle", 
+                                     "2017-01-16T15:38:08.924170", "[]"),
+                    "HumbleChoice": None,
+                    "StoreKeys": [("Yv8pEek2ehcSppPk", "Assassin's Creed® Chronicles India", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_chronicles_india_bundle_na_uplay",
+                                   "[]", "AP3C-XN4R-8V4E-CLPM", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Chronicles China", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_chronicles_china_bundle_na_uplay",
+                                   "[]", "UXV7-3L7M-TW67-WAET", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Chronicles Russia", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_chronicles_russia_bundle_na_uplay",
+                                   "[]", "VKJY-7AVN-TKG7-MVUH", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed®", "assassinscreed_bundle", "2017-01-16T15:38:08.924170",
+                                   "assassinscreed_bundle_uplay", "[]", "UP3-4DED-A2FA-8086-E322",
+                                   "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Liberation HD", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_liberationhd_bundle_uplay",
+                                   "[]", "W9QG-KVGB-YX6M-6W8W", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® III", "assassinscreed_bundle", "2017-01-16T15:38:08.924170",
+                                   "assassinscreed3_bundle_uplay", "[]", "UVNL-LHY7-GKR6-GE6A",
+                                   "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® III - Tyranny of King Washington: The Infamy (DLC)",
+                                   "assassinscreed_bundle", "2017-01-16T15:38:08.924170", "assassinscreed3_washingtondlc_bundle_uplay",
+                                   "[]", "WBMB-GP83-9MWX-86NF", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® II Deluxe Edition", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed2_deluxe_bundle_uplay",
+                                   "[]", "WCGF-AEJX-GACU-XUBX", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Unity", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_unity_bundle_na_uplay",
+                                   "[]", "X8C7-GR6M-D87X-DM6E", "uplay", 0, None, None, False),
+                                  ("Yv8pEek2ehcSppPk", "Assassin's Creed® Brotherhood", "assassinscreed_bundle",
+                                   "2017-01-16T15:38:08.924170", "assassinscreed_brotherhood_bundle_uplay",
+                                   "[]", "WPAT-4YKP-AAMM-X4RG", "uplay", 0, None, None, False)
+                                  ]
+                    })
+        bundle_info = ("Yv8pEek2ehcSppPk", "Humble Assassin's Creed Bundle", "assassinscreed_bundle", 
+                                     "2017-01-16T15:38:08.924170", [], 10)
+        self.assertEqual((order.Key(), order.Name(), order.MachineName(), order.Created().strftime("%Y-%m-%dT%H:%M:%S.%f"),
+                          order.Subproducts(), len(order.Products())), bundle_info)
 
     def test_creates_humblechoice_object_with_correct_humblestorefront_object(self):
         sut = OrderFactory()
