@@ -1,8 +1,8 @@
 import unittest
 import sqlite3
 from database import Database
-from humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey
-from humble_ref_data import enshrouded, assassinscreed_bundle, june_2025_choice, wizardwithagun, wizardwithagun_missing_info, april_2024_choice
+from libraries.humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey
+from libraries.humble_ref_data import enshrouded, assassinscreed_bundle, june_2025_choice, wizardwithagun, wizardwithagun_missing_info, april_2024_choice
 import os
 import json
 from datetime import datetime

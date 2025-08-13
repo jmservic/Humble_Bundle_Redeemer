@@ -112,11 +112,7 @@ class TestHumbleLibrary(unittest.TestCase):
                       }
         order_keys = ["Z8KftUKAEf8zG7zY","Yv8pEek2ehcSppPk", "TSskvEHeqSfUbZAs", "mNUwXmdxFqwZpNPZ"] 
         sut = HumbleLibrary.FromOrderRecords(order_dict)
-        keys = []
-        keys.extend(sut.GetStoreKeys().keys())
-        keys.extend(sut.GetHumbleBundles().keys())
-        keys.extend(sut.GetChoiceBundles().keys())
-        self.assertEqual(set(keys), set(order_keys))
+        self.assertEqual(set(sut.GetOrderKeys()), set(order_keys))
 
 
     def test_SetProductRegistered_sets_registered_flag_on_product(self):

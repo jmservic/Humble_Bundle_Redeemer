@@ -232,6 +232,13 @@ class HumbleLibrary():
 
         return None
 
+    def GetOrderKeys(self):
+        keys = []
+        keys.extend([key for key in self.__store_keys])
+        keys.extend([key for key in self.__bundles])
+        keys.extend([key for key in self.__choice_bundles])
+        return keys
+
     def GetStoreKeys(self):
         return {key: value for key, value in self.__store_keys.items()}
 
