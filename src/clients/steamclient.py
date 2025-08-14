@@ -4,12 +4,12 @@ from requests.cookies import cookiejar_from_dict, create_cookie, morsel_to_cooki
 import pickle
 from os.path import exists
 import http.client, urllib.parse
-from http_utils import SetCookieHeaderToMorsels 
+from clients.http_utils import SetCookieHeaderToMorsels 
 from enum import Enum
 import json
 from bs4 import BeautifulSoup
-from steam_utils import EncodeProtoBuff, EncryptPassword
-import Steam_RSA_Public_Key_Request_pb2 
+from clients.steam_utils import EncodeProtoBuff, EncryptPassword
+import clients.Steam_RSA_Public_Key_Request_pb2 
 from time import sleep
 import threading
 from datetime import datetime
@@ -71,7 +71,7 @@ class SteamClient(LibraryClient):
 
     def Login(self, payload=None):
         if self.__loggedIn:
-            print(f"Already logged into steam as {self.__login}")
+            #print(f"Already logged into steam as {self.__login}")
             self.__login_result = LoginResult.SUCCESS
             return
 
@@ -80,7 +80,7 @@ class SteamClient(LibraryClient):
         #print(res.url)
         if "login" not in res.url:
             self.__loggedIn = True
-            print(f"Already logged into steam as {self.__login}")
+            #print(f"Already logged into steam as {self.__login}")
             self.__login_result = LoginResult.SUCCESS
             return
 
@@ -311,9 +311,9 @@ class SteamClient(LibraryClient):
             return
         res = self.__session.post(f"https://{STEAM_DOMAIN}{STEAM_REGISTER_KEY_API}", data={"product_key": gamekey,
                                                                                 "sessionid": self.__session.cookies.get("sessionid", domain=STEAM_DOMAIN)})
-        print(res.status_code)
+        #print(res.status_code)
         rtn_data = res.json()
-        print(rtn_data)
+        #print(rtn_data)
         return rtn_data
 
     def VisitHomePage(self):

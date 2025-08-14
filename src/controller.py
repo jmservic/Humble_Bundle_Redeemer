@@ -1,7 +1,9 @@
-from libraries.humblelibrary import HumbleLibrary
+from libraries.humblelibrary import HumbleLibrary, HumbleStoreKey, HumbleBundle, HumbleChoice
 from libraries.steamlibrary import SteamLibrary
 import clients.humbleclient as hc
 import clients.steamclient as sc
+from datetime import datetime
+from time import sleep
 
 class HumbleController:
 
@@ -13,6 +15,7 @@ class HumbleController:
         self.__dry_run = dry_run
         self.__humble_library = None
         self.__steam_library = None
+        self.__orders_to_update = {}
 
     def ChoseChoiceContent(self): #, skip_owned_games=False):
         if not self.HumbleLogin():
@@ -21,35 +24,122 @@ class HumbleController:
         if self.__humble_library is None: 
             self.__humble_library = self.GetHumbleLibrary()
 
-        unchosen_content = self.__humble_library.ChoiceChoseContent()
-        orders_to_update = []
+        self.__choseChoiceContent()
 
+        self.UpdateOrders(self.__humble_library)
+        self.__db.SaveHumbleLibrary(self.__humble_library)
+
+    def __choseChoiceContent(self):
+        unchosen_content = self.__humble_library.ChoiceChooseContent()
+        #redeem_dict = {}
         for order_key, contents in unchosen_content.items():
-            order = humble_library.GetOrder(order_key)
+            order = self.__humble_library.GetOrder(order_key)
             print(f"Choosing Content for {order.Name()} ({order_key}):")
             choice_made = False
-
-            for content in contents:
-                print(f"Choosing {content}...")
+            #redeem_dict[order_key] = {}
+            for display_name, machine_names in contents.items():
+                print(f"\tChoosing {display_name}...")
 
                 if not self.__dry_run:
-                    res = self.__hb.ChooseContent(order_key, content) 
+                    res = self.__hb.ChooseContent(order_key, display_name) 
 
                     if res["success"]:
-                        print(f"Successfully chosen {content}.")
+                        print(f"\tSuccessfully chosen {display_name}.")
+                        #redeem_dict[order_key].update(machine_names)
                         choice_made = True
                     else:
-                        print(f"Failed to chose {content} Message: {res['error_msg]}.")
-                    self.__db.Log(order_key, order.Name(), content, "choose", res["success"])
+                        print(f"\tFailed to chose {content} Message: {res['error_msg']}.")
 
+                    self.__db.Log(order_key, order.Name(), display_name, "choose", res["success"])
+
+                else:
+                    self.__db.Log(order_key, order.Name(), display_name, "choose_dry_run", True)
+
+            print("")
             if choice_made:
-                orders_to_update.append(order_key)
+                self.__orders_to_update.add(order_key)
 
-        self.UpdateOrders(self.__humble_library, orders_to_update)
-        self.__db.SaveHumbleLibrary(self.__humble_library)
+        #return redeem_dict
 
     def RedeemChoiceContent(self, skip_owned_games=False):
         if not self.HumbleLogin():
+            return
+
+        if skip_owned_games and not self.SteamLogin():
+            return
+
+        if self.__humble_library is None: 
+            self.__humble_library = self.GetHumbleLibrary()
+        
+        if skip_owned_games and self.__steam_library is None:
+            self.__steam_library = self.GetSteamLibrary()
+
+        self.__redeemChoiceContent(skip_owned_games)
+
+        self.UpdateOrders(self.__humble_library)
+        self.__db.SaveHumbleLibrary(self.__humble_library)
+
+    def __redeemChoiceContent(self, skip_owned_games=False):
+        redeemable_content = self.__humble_library.ChoiceRedeemableContent()
+            #content_to_add = self.__humble_library.ChoiceRedeemableContent()
+           #for order_key, contents in content_to_add:
+           #    if order_key not in redeemable_content:
+           #        redeemable_content[order_key] = {}
+           #    redeemable_content[order_key].update(contents)
+        register_content = []
+
+        for order_key, contents in redeemable_content.items():
+            products = self.__humble_library.GetOrder(order_key).Products()
+            redeemed_product = False
+            for product_machine_name in contents:
+                product = next(filter(lambda x: x.ProductMachineName() == product_machine_name , products))
+                print(f"Redeeming {product.Name()} ({product_machine_name})")
+
+                if skip_owned_games and not self.__proceedWithAction(product.Name(), product.KeyType(), product.PlatformId(), "redeeming"):
+                    self.__db.SaveGift(product)
+                    continue
+
+                if self.__dry_run:
+                    self.__db.Log(order_key, product.Name(), product_machine_name, "redeem_dry_run", True)
+                    continue
+                
+                attempts = 1
+                res = self.__hb.RedeemKey(order_key, product_machine_name)
+
+                while not res["success"] and attempts < 4:
+                    res = self.__hb.RedeemKey(order_key, product_machine_name)
+                    attempts += 1
+
+                if not res["success"]:
+                    print(f"Failed to redeem {product.Name()} ({product_machine_name}). Message: {res['error_msg']}")
+                else:              
+                    print(f"Successfully redeemed {product.Name()} ({product_machine_name}).")
+                    redeemed_product = True
+                    register_content.append({"key": res["key"],
+                                 "key_type": product.KeyType(),
+                                 "platform_id": product.PlatformId(),
+                                 "name": product.Name(),
+                                 "created": product.Created(),
+                                 "expired": product.Expired(),
+                                 "registered": product.Registered(),
+                                 "humble_key": product.Key()
+                                             })
+
+                self.__db.Log(order_key, product.Name(), product_machine_name, "redeem", res["success"])
+                self.__db.SaveRedeemAttempt(order_key, product.Name(), product_machine_name, datetime.Now(), res["success"])
+
+            if redeemed_product:
+                self.__orders_to_update.add(order_key)
+
+        return register_content
+
+            
+
+    def RegisterContent(self):
+        if not self.HumbleLogin():
+            return
+
+        if not self.SteamLogin():
             return
 
         if self.__humble_library is None: 
@@ -58,30 +148,155 @@ class HumbleController:
         if self.__steam_library is None:
             self.__steam_library = self.GetSteamLibrary()
 
-        redeemable_content = self.__humble_library.ChoiceRedeemableContent()
-        orders_to_update = []
+        self.__registerContent(self.__humble_library.KeysContent(["steam"]))
 
-    def RegisterContent(self):
-        pass
+        self.__db.SaveHumbleLibrary(self.__humble_library)
+
+    def __registerContent(self, register_content):
+        for product_dict in register_content:
+            if product_dict["expired"] or product_dict["registered"] or not product_dict["key"]:
+                continue
+
+            order = self.__humble_library.GetOrder(product_dict["humble_key"])
+
+            if isinstance(order, HumbleStoreKey):
+                product = order
+            else:
+                products = order.Products() 
+                product = next(filter(lambda x: x.Name() == product_dict["name"] , products))
+
+            if product.PlatformId() != product_dict["platform_id"]:
+                raise Exception("Definitely didn't find the right product when registering!")
+
+            bundle_info = None
+            print(f"Registering {product.Name()} ({product.ProductMachineName()})")
+
+            if "steam" in product_dict["key_type"] and not self.__proceedWithAction(product_dict["name"],
+                                                                                    product_dict["key_type"],
+                                                                                    product_dict["platform_id"],
+                                                                                    "registering",
+                                                                                    bundle_info):
+                if bundle_info:
+                    date = self.__steam_library.BundleRegisterDate(bundle_info)
+                    aq_method = self.__steam_library.BundleAcquisitionMethod(bundle_info)
+                else:
+                    date = self.__steam_library.ProductRegisterDate(title=product_dict["name"], id=product_dict["platform_id"])
+                    aq_method = self.__steam_library.ProductAcquisitionMethod(title=product_dict["name"], id=product_dict["platform_id"])
+
+                if aq_method != "retail" or (date and (product_dict["created"].date() - date).days > 1):
+                    print(f"\tacquisiton method : {aq_method} | { (product_dict['created'].date() - date).days if date else 'unknown'} difference between order creation and steam activation dates.")
+                    print(f"\tSaving {product_dict['name']} as a gift.")
+                    if not self.__dry_run:
+                        self.__db.SaveGift(product)
+                    print("")
+                    continue
+
+                if not date:
+                    print(f"\tCouldn't find an exact date for the product, assuming it has been registered.")
+
+                print(f"\tSetting {product.Name()}'s Registered flag")
+                
+                if not self.__dry_run:
+                    self.__humble_library.SetProductRegistered(product_dict["humble_key"], product.ProductMachineName()) 
+
+                print("")
+                continue
+
+            if self.__dry_run:
+                print("")
+                continue
+
+            res = self.__steam.RegisterKey(product_dict["key"])
+
+            if res["success"] == 1:
+                print(f"\tRegistered {product.Name()} ({product.ProductMachineName()}")
+                self.__humble_library.SetProductRegistered(product_dict["humble_key"], product.ProductMachineName()) 
+                self.__db.Log(product.Key(), product.Name(), product.ProductMachineName(), "register", True)
+            else:
+                error_code = res["\tpurchase_receipt_info"]["result_detail"]
+                match error_code:
+                    case 9:
+                        print(f"\tThis Steam account already owns the product. Assuming the key was used.")
+                        self.__humble_library.SetProductRegistered(product_dict["humble_key"], product.ProductMachineName()) 
+                    case 14:
+                        print(f"\tKey is not valid or is not a product code.")
+                    case 15:
+                        print(f"\tKey has already been activated by another account.")
+                        self.__humble_library.SetProductRegistered(product_dict["humble_key"], product.ProductMachineName()) 
+                    case 53:
+                        print(f"\tThere have been too many recent activation attempts from this account or Internet address.")
+
+
+                self.__db.Log(product.Key(), product.Name(), product.ProductMachineName(), "register", error_code)
+                if error_code == 53:
+                    return
+                print("")
 
     def FullyProcessChoiceContent(self, skip_owned_games=False):
-        self.RegisterContent(self.RedeemChoiceContent(skip_owned_games, self.ChoseChoiceContent()))
+        if not self.HumbleLogin():
+            return
 
-    def GetHumbleLibrary():
+        if not self.SteamLogin():
+            return
+
+        if self.__humble_library is None: 
+            self.__humble_library = self.GetHumbleLibrary()
+        
+        if self.__steam_library is None:
+            self.__steam_library = self.GetSteamLibrary()
+
+        self.ChoseChoiceContent()
+        register_content = self.__redeemChoiceContent(skip_owned_games)
+        register_content.extend(self.__humble_library.ChoiceKeyContent(["steam"]))
+        self.__registerContent(register_content)
+
+        self.UpdateOrders(self.__humble_library)
+        self.__db.SaveHumbleLibrary(self.__humble_library)
+
+    def __proceedWithAction(self, name, key_type, platform_id, action, bundle_info=None):
+        if "steam" not in key_type:
+            return True
+
+        contains, exact_match = self.__steam_library.ContainsProduct(name, platform_id)
+
+        if exact_match:
+            print(f"\tFound product in steam library, skipping.")
+            return False
+
+        if not platform_id:
+            return True
+
+        print(f"\tChecking if {name} is a bundle...")
+        bundle_info = self.__steam.GetBundleInfo(platform_id)
+        if bundle_info:
+            print(f"\t{name} is a bundle. Checking if all ids are owned.")
+            if not self.__steam_library.ContainsBundle(bundle_info):
+                print(f"\tMissing ids from the bundle, {action}.")
+                return True
+            else:
+                print("\tFully owned bundle, skipping.")
+                return False
+        else:
+            print(f"\t{name} is not a bundle, {action}.")
+            return True
+
+
+
+    def GetHumbleLibrary(self):
         humble_library = HumbleLibrary.FromOrderRecords(self.__db.GetOrders())
 
         orders = set(humble_library.GetOrderKeys())
         all_orders = set(self.__hb.GetGameKeys())
 
         if not orders:
-            return HumbleLibrary(self.__hb.GetOrderDetails(all_orders))
+            return HumbleLibrary(self.__hb.GetOrdersDetails(list(all_orders)))
 
         new_orders = all_orders - orders
-        self.UpdateOrders(humble_library, orders_to_update)
+        self.UpdateOrders(humble_library)
 
         return humble_library
 
-    def GetSteamLibrary():
+    def GetSteamLibrary(self):
         gameslist_config = self.__steam.GetLibraryDetails()
         licenses_info = self.__steam.GetLicenses()
         steam_library = SteamLibrary(gameslist_config, licenses_info)
@@ -90,8 +305,8 @@ class HumbleController:
     def HumbleLogin(self):
         login_result = self.__hb.Login()
         counter = 0
-        limit = 5 if interactive else 1
-        while login_result != LoginResult.SUCCESS and counter < limit:
+        limit = 5 if self.__interactive else 1
+        while login_result != hc.LoginResult.SUCCESS and counter < limit:
             match login_result:
                 case hc.LoginResult.GUARD:
                     guard = input("Please enter the humble bundle guard code from your email: ")
@@ -122,7 +337,7 @@ class HumbleController:
         self.__steam.Login()
         login_result = self.__steam.GetLoginResult()
 
-        if not interactive and login_result != sc.LoginResult.SUCCESS:
+        if not self.__interactive and login_result != sc.LoginResult.SUCCESS:
             return False
 
         while self.__steam.Polling():
@@ -131,10 +346,11 @@ class HumbleController:
 
         return self.__steam.GetLoginResult() == sc.LoginResult.SUCCESS
 
-    def UpdateOrders(self, humble_library, orders_to_update):
-        update_order_dicts = self.__hb.GetOrderDetails(orders_to_update)
+    def UpdateOrders(self, humble_library):
+        update_order_dicts = self.__hb.GetOrdersDetails(list(self.__orders_to_update))
         
         for update_order_dict in update_order_dicts.values():
             humble_library.UpdateOrder(update_order_dict)
 
-        
+        self.__orders_to_update.clear()
+

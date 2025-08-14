@@ -4,7 +4,7 @@ from requests.cookies import cookiejar_from_dict, create_cookie, morsel_to_cooki
 import pickle
 from os.path import exists
 import http.client, urllib.parse
-from http_utils import SetCookieHeaderToMorsels 
+from clients.http_utils import SetCookieHeaderToMorsels 
 from enum import Enum
 import json
 from bs4 import BeautifulSoup
@@ -36,7 +36,7 @@ class GameKeyClient(ABC):
         pass
 
     @abstractmethod
-    def GetOrdersDetail(self):
+    def GetOrdersDetails(self):
         pass
 
     @abstractmethod
@@ -85,7 +85,7 @@ class HumbleClient(GameKeyClient):
 
         return self.__ValidateLoginRequest(res.status, res.reason, data_decoded)
 
-    def GetOrdersDetail(self, gamekeys):
+    def GetOrdersDetails(self, gamekeys):
         order_details = self.__QueryOrders(gamekeys)
         for (gamekey, order_info) in order_details.items():
             if "choice_url" in order_info["product"]:
@@ -162,7 +162,7 @@ class HumbleClient(GameKeyClient):
 
         return json.loads(data_decoded)
 
-    def RedeemKey(self, keytype, gamekey, keyindex=0):
+    def RedeemKey(self, gamekey, keytype, keyindex=0):
         payload = [("keytype", keytype),
                    ("key", gamekey),
                    ("keyindex", keyindex)

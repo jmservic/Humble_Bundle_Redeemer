@@ -40,7 +40,8 @@ class OrderFactory():
             storekey_order_dict = {"gamekey": storekey_row[0],
                                   "machine_name": storekey_row[2],
                                   "created": storekey_row[3],
-                                  "subproducts": storekey_row[5]
+                                  "subproducts": storekey_row[5],
+                                   "human_name": storekey_row[1]
                                    }
             storekey_product_dict = {"human_name": storekey_row[1],
                                      "machine_name": storekey_row[4],
@@ -81,11 +82,11 @@ class OrderFactory():
 
     def CreateStoreKeyOrder(self, order_dict, product_dict):
         init_dict = {"order_machine_name": order_dict["machine_name"],
-                     "name": product_dict.get("human_name", None),
+                     "name": product_dict.get("human_name", order_dict["human_name"]),
                      "humblekey": order_dict["gamekey"],
                      "created": order_dict["created"],
                      "subproducts": order_dict["subproducts"],
-                     "product_machine_name": product_dict.get("machine_name",None),
+                     "product_machine_name": product_dict.get("machine_name", order_dict["machine_name"]),
                      "redeem_key": product_dict.get("redeemed_key_val", None),
                      "key_type": product_dict.get("key_type", None),
                      "platform_id": product_dict.get("steam_app_id", None),
@@ -165,6 +166,22 @@ class HumbleLibrary():
                 redeemable_content_dict[humblekey] = redeemable_content
 
         return redeemable_content_dict
+
+    def ChoiceRegisterContent(self):
+        key_content = []
+        for choice in self.__choice_bundles.values():
+            content = choice.Products(platforms)
+            key_content.extend([{"key": product.RedeemKey(),
+                                 "key_type": product.KeyType(),
+                                 "platform_id": product.PlatformId(),
+                                 "name": product.Name(),
+                                 "created": product.Created(),
+                                 "humble_key": product.Key()
+                                }
+                               for product in content
+                                if not product.Registered() and not product.Expired()
+                               ])
+        return key_content
 
     def ChoiceKeyContent(self, platforms=[]):
         key_content = []

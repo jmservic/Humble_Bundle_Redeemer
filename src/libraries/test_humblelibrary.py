@@ -979,6 +979,7 @@ class TestHumbleBundle(unittest.TestCase):
         sut = self.CreateHumbleBundle(mixed_key_bundle)
         order_dict = {"machine_name": mixed_key_bundle["product"]["machine_name"],
                      "name": mixed_key_bundle["product"]["human_name"],
+                     "human_name": mixed_key_bundle["product"]["human_name"],
                      "gamekey": mixed_key_bundle["gamekey"],
                      "created": mixed_key_bundle["created"],
                      "subproducts": mixed_key_bundle["subproducts"]
@@ -993,6 +994,7 @@ class TestHumbleBundle(unittest.TestCase):
         platforms = ["steam", "origin"]
         order_dict = {"machine_name": mixed_key_bundle["product"]["machine_name"],
                      "name": mixed_key_bundle["product"]["human_name"],
+                     "human_name": mixed_key_bundle["product"]["human_name"],
                      "gamekey": mixed_key_bundle["gamekey"],
                      "created": mixed_key_bundle["created"],
                      "subproducts": mixed_key_bundle["subproducts"]
