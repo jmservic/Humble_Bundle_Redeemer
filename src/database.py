@@ -35,7 +35,7 @@ class Database():
                     )""")
         cur.execute("""CREATE TABLE IF NOT EXISTS Giftable(
         HumbleKey NOT NULL, Name NOT NULL, ProductMachineName NOT NULL, 
-        RedeemKey NOT NULL, KeyType NOT NULL, ExpirationDate,
+        RedeemKey, KeyType, ExpirationDate,
         CONSTRAINT PK PRIMARY KEY (HumbleKey, ProductMachineName),
         FOREIGN KEY (HumbleKey, ProductMachineName) REFERENCES HumbleStoreKey(HumbleKey, ProductMachineName)
                     )""")
