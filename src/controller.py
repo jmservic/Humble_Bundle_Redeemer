@@ -46,7 +46,7 @@ class HumbleController:
                         print(f"\tSuccessfully chosen {display_name}.")
                         choice_made = True
                     else:
-                        print(f"\tFailed to chose {content} Message: {res['error_msg']}.")
+                        print(f"\tFailed to chose {display_name} Message: {res['error_msg']}.")
 
                     self.__db.Log(order_key, order.Name(), display_name, "choose", res["success"])
 
