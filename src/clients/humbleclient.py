@@ -169,16 +169,17 @@ class HumbleClient(GameKeyClient):
         conn = http.client.HTTPSConnection(HUMBLE_DOMAIN) 
         res = self.__HumblePostRequest(conn, HUMBLE_REDEEMKEY_API, payload)
         data = res.read()
-        data_decode = data.decode("utf-8")
+        data_decoded = data.decode("utf-8")
         self.__SetCookies(res.getheaders())
         
         if res.status < 300:
             json_dict = json.loads(data_decode)
             json_dict["status"] = res.status
+            json_dict["error_msg"] = data_decoded
         else:
             json_dict = {"success": False,
                          "status": res.status,
-                         "error_msg": data_decode
+                         "error_msg": data_decoded
                          }
         conn.close() 
 
