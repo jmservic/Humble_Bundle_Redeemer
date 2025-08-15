@@ -158,7 +158,7 @@ class HumbleClient(GameKeyClient):
                          }
         conn.close()
 
-        return json.loads(data_decoded)
+        return json_dict
 
     def RedeemKey(self, gamekey, keytype, keyindex=0):
         payload = [("keytype", keytype),
