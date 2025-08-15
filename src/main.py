@@ -21,7 +21,7 @@ def App():
 
     parser = argparse.ArgumentParser(
                         prog="hbredeemer",
-            description="This program automatically chooses, redeems, and register steam keys from Humble Bundle.",
+            description="This program automatically chooses, redeems, and registers steam keys from Humble Bundle.",
             epilog="""The redeem, register, and run actions will also save any already owned games to the Giftable table
             in the sqlite database located in the data directory.""")
     parser.add_argument("action",
