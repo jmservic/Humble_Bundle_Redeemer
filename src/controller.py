@@ -242,6 +242,8 @@ class HumbleController:
 
         self.ChoseChoiceContent()
         register_content = self.__redeemChoiceContent(skip_owned_games)
+        self.UpdateOrders(self.__humble_library)
+
         if all_keys:
             register_content.extend(self.__humble_library.ChoiceKeyContent(["steam"]))
 
