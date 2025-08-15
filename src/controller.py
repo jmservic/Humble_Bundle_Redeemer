@@ -289,7 +289,7 @@ class HumbleController:
     def RefreshLibrary(self):
         self.__humble_library = HumbleLibrary.FromOrderRecords(self.__db.GetOrders())
         self.__orders_to_update.update(self.__hb.GetGameKeys())
-        self.__db.SaveHumbleLibrary(self.__humble_library)
+        self.__updateAndSaveLibrary()
 
     def GetHumbleLibrary(self):
         humble_library = HumbleLibrary.FromOrderRecords(self.__db.GetOrders())
