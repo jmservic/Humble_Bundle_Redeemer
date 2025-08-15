@@ -173,7 +173,7 @@ class HumbleClient(GameKeyClient):
         self.__SetCookies(res.getheaders())
         
         if res.status < 300:
-            json_dict = json.loads(data_decode)
+            json_dict = json.loads(data_decoded)
             json_dict["status"] = res.status
             json_dict["error_msg"] = data_decoded
         else:
