@@ -1,15 +1,15 @@
 from requests import Request, Session
 from http.cookiejar import MozillaCookieJar
-from humbleclient import HUMBLE_MAIN, HumbleClient, LoginResult
+from clients.humbleclient import HUMBLE_MAIN, HumbleClient, LoginResult
 import os
 from dotenv import load_dotenv
-import Steam_RSA_Public_Key_Request_pb2 
-from steam_utils import *
-from steamclient import SteamClient
-from steamlibrary import SteamLibrary
+import clients.Steam_pb2 
+from clients.steam_utils import *
+from clients.steamclient import SteamClient
+from libraries.steamlibrary import SteamLibrary
 import base64
 from time import sleep
-from humblelibrary import HumbleLibrary
+from libraries.humblelibrary import HumbleLibrary
 #We're going to use the pickle module to save and load the cookies.
 load_dotenv()
 hb_account = os.getenv("HB_ACCOUNT")
@@ -61,10 +61,10 @@ while login_result != LoginResult.SUCCESS and counter < 5:
             exit(1)
     counter += 1
 
-#print(hb.ChooseContent("qqnZwGv4YXWAvdGm", "dcuniverseinfinite_onemonthfreetrial"))
+print(hb.ChooseContent("mExPNRbVHSRRrn84", "tinytinaswonderlands_chaoticgreatedition"))
 #print(hb.RedeemKey("dccomicsfreetrial_november2023choice_coupon","qqnZwGv4YXWAvdGm"))
 #print(steam.GetBundleInfo(38150))#(15367))
-#exit(0)
+exit(0)
 print("Obtaining Order Details")
 hb_orders = hb.GetOrdersDetail()
 print("Creating the Humble Library Object")

@@ -117,7 +117,7 @@ class HumbleController:
                                              })
                 if not self.__dry_run:
                     self.__db.Log(order_key, product.Name(), product_machine_name, "redeem", res["success"])
-                    self.__db.SaveRedeemAttempt(order_key, product.Name(), product_machine_name, datetime.Now(), res["success"])
+                    self.__db.SaveRedeemAttempt(order_key, product.Name(), product_machine_name, datetime.now(), res["success"])
 
             if redeemed_product:
                 self.__orders_to_update.add(order_key)
