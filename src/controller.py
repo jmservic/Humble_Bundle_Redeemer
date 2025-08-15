@@ -179,7 +179,7 @@ class HumbleController:
                     aq_method = self.__steam_library.ProductAcquisitionMethod(title=product_dict["name"], id=product_dict["platform_id"])
 
                 if aq_method != "retail" or (date and (product_dict["created"].date() - date).days > 1):
-                    print(f"\tacquisiton method : {aq_method} | { (product_dict['created'].date() - date).days if date else 'unknown'} difference between order creation and steam activation dates.")
+                    print(f"\tacquisiton method : {aq_method} | { (product_dict['created'].date() - date).days if date else 'unknown'} day difference between order creation and steam activation dates.")
                     print(f"\tSaving {product_dict['name']} as a gift.")
                     if not self.__dry_run:
                         self.__db.SaveGift(product)
@@ -225,7 +225,7 @@ class HumbleController:
                 self.__db.Log(product.Key(), product.Name(), product.ProductMachineName(), "register", error_code)
                 if error_code == 53:
                     return
-                print("")
+            print("")
 
     def FullyProcessChoiceContent(self, skip_owned_games=False, all_keys=False):
         if not self.__humble_auth and not self.HumbleLogin():
