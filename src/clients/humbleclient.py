@@ -63,7 +63,6 @@ class HumbleClient(GameKeyClient):
         response = self.__session.get(HUMBLE_KEYS, headers={"User-Agent": USER_AGENT})
 
         if not HUMBLE_LOGIN in response.url:
-            print("Already Logged In")
             self.__loggedIn = True
             return LoginResult.SUCCESS #(True, None)
 
@@ -91,7 +90,7 @@ class HumbleClient(GameKeyClient):
             if "choice_url" in order_info["product"]:
                 choice_details = self.GetChoiceDetails(order_info["product"]["choice_url"])
                 order_info["product"]["all_choices"] = {"productIsChoiceless": choice_details["productIsChoiceless"],
-                                                        "contentChoiceOptions": choice_details["contentChoiceOptions"]}#all_products_details
+                                                        "contentChoiceOptions": choice_details["contentChoiceOptions"]}
         return order_details
 
     def GetGameKeys(self):
@@ -112,13 +111,11 @@ class HumbleClient(GameKeyClient):
             end = start + 40 if start + 40 < len(gamekeys) else len(gamekeys)
             params = [("gamekeys", gamekey) for gamekey in gamekeys[start:end]]
             params.insert(0, ("all_tpkds", "true"))
-            #print(f"Requesting for {end - start} keys.")
             response = self.__session.get(HUMBLE_ORDER_API, params=params, headers={"User-Agent": USER_AGENT})
+
             if response.ok:
-            #    print("Request was successful.")
                 order_details.update(response.json())
-            #else:
-            #    print("Request failed.")
+
             start = end
         
         return order_details
@@ -227,7 +224,7 @@ class HumbleClient(GameKeyClient):
     def __LoadCookies(self):
         if not self.__session or not self.__login:
             return
-        cookies_file = f"../cookies/hb_{self.__login.lower()}_cookies.txt"
+        cookies_file = f"./cookies/hb_{self.__login.lower()}_cookies.txt"
         if not exists(cookies_file):
             return
         with open(cookies_file, "r+b") as f:
@@ -262,12 +259,10 @@ class HumbleClient(GameKeyClient):
         if self.__session :
             try:
                 if self.__login and len(self.__session.cookies) > 0:
-                    cookies_file = f"../cookies/hb_{self.__login.lower()}_cookies.txt"
+                    cookies_file = f"./cookies/hb_{self.__login.lower()}_cookies.txt"
                     with open(cookies_file, "w+b") as f:
                         pickle.dump(self.__session.cookies, f)
             except Exception as ex:
                 print(f"Exception of type {type(ex)}: {ex}")
             finally:
                 self.__session.close()
-    
-

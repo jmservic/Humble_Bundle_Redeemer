@@ -16,7 +16,6 @@ class SteamLibrary():
 
         for license_info in licenses_info:
             license_info["title"] = SanitizeText(license_info["title"]) 
-            #print(license_info["title"])
 
         for game_dict in self.__library_dict.values():
             for license_info in licenses_info:
@@ -25,7 +24,6 @@ class SteamLibrary():
                     game_dict["aq_method"] = license_info["aq_method"].lower()
                 if game_dict["name"] == license_info["title"]:
                     break
-            #print(game_dict)
 
     def ContainsProduct(self, title=None, id=None):
         product, exact_match = self.__FindProduct(title, id)

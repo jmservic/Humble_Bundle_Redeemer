@@ -374,6 +374,7 @@ class HumbleChoice(HumbleBundle):
         if self.__all_choices_dict is None:
             self.__chosen = self.__choices_remaining == 0 and len(self._products) > 0
             self.__all_choices = []
+            self.__choiceless = True
             return
 
         self.__choiceless = self.__all_choices_dict["productIsChoiceless"]
@@ -548,7 +549,6 @@ class HumbleStoreKey(Order):
                 if platform in self.__key_type:
                     self.__key_type = platform
                     return
-        #self.__is_expired = init_dict["is_expired"]
 
     def ProductMachineName(self):
         return self.__product_machine_name

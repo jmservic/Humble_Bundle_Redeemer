@@ -1,4 +1,3 @@
-
 import http.cookies
 
 def SetCookieHeaderToMorsels(headers):

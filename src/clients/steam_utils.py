@@ -1,4 +1,4 @@
-from Crypto.Cipher import PKCS1_OAEP, PKCS1_v1_5
+from Crypto.Cipher import PKCS1_v1_5
 from Crypto.PublicKey import RSA
 import re
 import math
@@ -32,13 +32,6 @@ def EncodeProtoBuff(proto_buffer):
             pass
     return "".join(encode_blocks)
 
-#    for (var t, n = e.length, o = n % 3, i = [], s = 16383, a = 0, l = n - o; a < l; a += s)
-#        i.push(u(e, a, a + s > l ? l : a + s));
-#    1 === o ? (t = e[n - 1],
-#    i.push(r[t >> 2] + r[t << 4 & 63] + "==")) : 2 === o && (t = (e[n - 2] << 8) + e[n - 1],
-#    i.push(r[t >> 10] + r[t >> 4 & 63] + r[t << 2 & 63] + "="));
-#    return i.join("")
-    
 def EncodeProtoSection(proto_buffer, start_index, end_index):
     encode_blocks = []
     for index in range(start_index, end_index, 3):
@@ -46,28 +39,15 @@ def EncodeProtoSection(proto_buffer, start_index, end_index):
         encode_blocks.append(CHAR_ENCODE_ARR[aggregate_val >> 18 & 63] + CHAR_ENCODE_ARR[aggregate_val >> 12 & 63] + CHAR_ENCODE_ARR[aggregate_val >> 6 & 63] + CHAR_ENCODE_ARR[aggregate_val & 63])
     
     return "".join(encode_blocks)
-#        function u(e, t, n) {
-#            for (var o, i, s = [], a = t; a < n; a += 3)
-#                o = (e[a] << 16 & 16711680) + (e[a + 1] << 8 & 65280) + (255 & e[a + 2]),
-#                s.push(r[(i = o) >> 18 & 63] + r[i >> 12 & 63] + r[i >> 6 & 63] + r[63 & i]);
-#            return s.join("")
-#        }
 
 def EncryptPassword(password, rsa_key):
-    # print(rsa_key)
-    #print(type(rsa_key.publickey_mod.encode()))	
-    key_mod = int(rsa_key.publickey_mod, 16)#int.from_bytes(rsa_key.publickey_mod.encode(encoding="utf-16"))
+    key_mod = int(rsa_key.publickey_mod, 16)
     key_exponent = int(rsa_key.publickey_exp, 16)
-    #print(key_mod)
-    #print(key_exponent)
 	
 	
     key = RSA.construct((key_mod, key_exponent))
-    #print(key)
-    cipher = PKCS1_v1_5.new(key)#PKCS1_OAEP.new(key) 
+    cipher = PKCS1_v1_5.new(key)
     ciphertext = cipher.encrypt(password.encode())
-   # print(ciphertext.hex())
-   # print(password.encode())
     decode_hex_str = decodeHexString(ciphertext.hex())
     encode_hex_str = encodeHexString(decode_hex_str)
     return encode_hex_str
@@ -78,7 +58,7 @@ def decodeHexString(hex_value):
     hex_value_clean = re.sub(r"/[^0-9abcdef]/g", "", hex_value)
     hex_string_arr = []
     index = 0
-    #print(len(hex_value_clean))
+
     while index < len(hex_value_clean):
         temp_val = HEX_ENCODE_STR.index(hex_value_clean[index]) << 4 & 240
         index += 1
@@ -86,7 +66,7 @@ def decodeHexString(hex_value):
         index += 1
         hex_string_arr.append(chr(temp_val))
     hex_string = "".join(hex_string_arr)
-    #print(f"decodeHexString returns:\n {hex_string_arr}")
+
     return hex_string
 
 def encodeHexString(hex_string):
@@ -126,13 +106,10 @@ def encodeHexString(hex_string):
             a = o
         elif math.isnan(i):
             o = 64
-        #print(index)
     
         encode_string_arr.append(f"{BASE_64_STR[n]}{BASE_64_STR[s]}{BASE_64_STR[a]}{BASE_64_STR[o]}")
-        #print(encode_string_arr[-1])
     
     encode_string = "".join(encode_string_arr)
-    #print(encode_string)
     return encode_string
 
 

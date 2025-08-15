@@ -15,10 +15,12 @@ class HumbleController:
         self.__dry_run = dry_run
         self.__humble_library = None
         self.__steam_library = None
-        self.__orders_to_update = {}
+        self.__orders_to_update = set()
+        self.__humble_auth = False
+        self.__steam_auth = False
 
     def ChoseChoiceContent(self): #, skip_owned_games=False):
-        if not self.HumbleLogin():
+        if not self.__humble_auth and not self.HumbleLogin():
             return
 
         if self.__humble_library is None: 
@@ -26,17 +28,14 @@ class HumbleController:
 
         self.__choseChoiceContent()
 
-        self.UpdateOrders(self.__humble_library)
         self.__db.SaveHumbleLibrary(self.__humble_library)
 
     def __choseChoiceContent(self):
         unchosen_content = self.__humble_library.ChoiceChooseContent()
-        #redeem_dict = {}
         for order_key, contents in unchosen_content.items():
             order = self.__humble_library.GetOrder(order_key)
             print(f"Choosing Content for {order.Name()} ({order_key}):")
             choice_made = False
-            #redeem_dict[order_key] = {}
             for display_name, machine_names in contents.items():
                 print(f"\tChoosing {display_name}...")
 
@@ -45,7 +44,6 @@ class HumbleController:
 
                     if res["success"]:
                         print(f"\tSuccessfully chosen {display_name}.")
-                        #redeem_dict[order_key].update(machine_names)
                         choice_made = True
                     else:
                         print(f"\tFailed to chose {content} Message: {res['error_msg']}.")
@@ -59,13 +57,11 @@ class HumbleController:
             if choice_made:
                 self.__orders_to_update.add(order_key)
 
-        #return redeem_dict
-
     def RedeemChoiceContent(self, skip_owned_games=False):
-        if not self.HumbleLogin():
+        if not self.__humble_auth and not self.HumbleLogin():
             return
 
-        if skip_owned_games and not self.SteamLogin():
+        if skip_owned_games and not self.__steam_auth and not self.SteamLogin():
             return
 
         if self.__humble_library is None: 
@@ -76,16 +72,10 @@ class HumbleController:
 
         self.__redeemChoiceContent(skip_owned_games)
 
-        self.UpdateOrders(self.__humble_library)
-        self.__db.SaveHumbleLibrary(self.__humble_library)
+        self.__updateAndSaveLibrary()
 
     def __redeemChoiceContent(self, skip_owned_games=False):
         redeemable_content = self.__humble_library.ChoiceRedeemableContent()
-            #content_to_add = self.__humble_library.ChoiceRedeemableContent()
-           #for order_key, contents in content_to_add:
-           #    if order_key not in redeemable_content:
-           #        redeemable_content[order_key] = {}
-           #    redeemable_content[order_key].update(contents)
         register_content = []
 
         for order_key, contents in redeemable_content.items():
@@ -96,24 +86,25 @@ class HumbleController:
                 print(f"Redeeming {product.Name()} ({product_machine_name})")
 
                 if skip_owned_games and not self.__proceedWithAction(product.Name(), product.KeyType(), product.PlatformId(), "redeeming"):
-                    self.__db.SaveGift(product)
+                    if not self.__dry_run:
+                        self.__db.SaveGift(product)
                     continue
 
                 if self.__dry_run:
                     self.__db.Log(order_key, product.Name(), product_machine_name, "redeem_dry_run", True)
-                    continue
-                
-                attempts = 1
-                res = self.__hb.RedeemKey(order_key, product_machine_name)
-
-                while not res["success"] and attempts < 4:
+                    res = {"success": True, "key": "Fake_News"}
+                else:
+                    attempts = 1
                     res = self.__hb.RedeemKey(order_key, product_machine_name)
-                    attempts += 1
+
+                    while not res["success"] and attempts < 4:
+                        res = self.__hb.RedeemKey(order_key, product_machine_name)
+                        attempts += 1
 
                 if not res["success"]:
-                    print(f"Failed to redeem {product.Name()} ({product_machine_name}). Message: {res['error_msg']}")
+                    print(f"\tFailed to redeem {product.Name()} ({product_machine_name}). Message: {res['error_msg']}")
                 else:              
-                    print(f"Successfully redeemed {product.Name()} ({product_machine_name}).")
+                    print(f"\tSuccessfully redeemed {product.Name()} ({product_machine_name}).")
                     redeemed_product = True
                     register_content.append({"key": res["key"],
                                  "key_type": product.KeyType(),
@@ -124,22 +115,21 @@ class HumbleController:
                                  "registered": product.Registered(),
                                  "humble_key": product.Key()
                                              })
-
-                self.__db.Log(order_key, product.Name(), product_machine_name, "redeem", res["success"])
-                self.__db.SaveRedeemAttempt(order_key, product.Name(), product_machine_name, datetime.Now(), res["success"])
+                if not self.__dry_run:
+                    self.__db.Log(order_key, product.Name(), product_machine_name, "redeem", res["success"])
+                    self.__db.SaveRedeemAttempt(order_key, product.Name(), product_machine_name, datetime.Now(), res["success"])
 
             if redeemed_product:
                 self.__orders_to_update.add(order_key)
+            print("")
 
         return register_content
 
-            
-
     def RegisterContent(self):
-        if not self.HumbleLogin():
+        if not self.__humble_auth and not self.HumbleLogin():
             return
 
-        if not self.SteamLogin():
+        if not self.__steam_auth and not self.SteamLogin():
             return
 
         if self.__humble_library is None: 
@@ -150,11 +140,16 @@ class HumbleController:
 
         self.__registerContent(self.__humble_library.KeysContent(["steam"]))
 
+        print("Saving Library to Database...")
         self.__db.SaveHumbleLibrary(self.__humble_library)
 
     def __registerContent(self, register_content):
         for product_dict in register_content:
-            if product_dict["expired"] or product_dict["registered"] or not product_dict["key"]:
+            if (product_dict["expired"] or product_dict["registered"] 
+            or not product_dict["key"] or "steam" not in product_dict["key_type"]):
+                if self.__dry_run: 
+                    print(f"""Skipping {product_dict['name']}. Key={product_dict['key']} | Expired={product_dict['expired']}
+                           | Registered={product_dict['registered']} | Key Type={product_dict['key_type']}\n""")
                 continue
 
             order = self.__humble_library.GetOrder(product_dict["humble_key"])
@@ -232,11 +227,11 @@ class HumbleController:
                     return
                 print("")
 
-    def FullyProcessChoiceContent(self, skip_owned_games=False):
-        if not self.HumbleLogin():
+    def FullyProcessChoiceContent(self, skip_owned_games=False, all_keys=False):
+        if not self.__humble_auth and not self.HumbleLogin():
             return
 
-        if not self.SteamLogin():
+        if not self.__steam_auth and not self.SteamLogin():
             return
 
         if self.__humble_library is None: 
@@ -247,10 +242,18 @@ class HumbleController:
 
         self.ChoseChoiceContent()
         register_content = self.__redeemChoiceContent(skip_owned_games)
-        register_content.extend(self.__humble_library.ChoiceKeyContent(["steam"]))
-        self.__registerContent(register_content)
+        if all_keys:
+            register_content.extend(self.__humble_library.ChoiceKeyContent(["steam"]))
 
+        self.__registerContent(register_content)
+        self.__updateAndSaveLibrary()
+
+
+    def __updateAndSaveLibrary(self):
+        print("Updating Orders in Library...")
         self.UpdateOrders(self.__humble_library)
+
+        print("Saving Library to Database...")
         self.__db.SaveHumbleLibrary(self.__humble_library)
 
     def __proceedWithAction(self, name, key_type, platform_id, action, bundle_info=None):
@@ -264,6 +267,7 @@ class HumbleController:
             return False
 
         if not platform_id:
+            print(f"\tDid not not find in steam library. Product is missing steam Id to check for bundles.")
             return True
 
         print(f"\tChecking if {name} is a bundle...")
@@ -280,7 +284,10 @@ class HumbleController:
             print(f"\t{name} is not a bundle, {action}.")
             return True
 
-
+    def RefreshLibrary(self):
+        humble_library = HumbleLibrary.FromOrderRecords(self.__db.GetOrders())
+        self.__orders_to_update.update(self.__hb.GetGameKeys())
+        self.__db.SaveHumbleLibrary(self.__humble_library)
 
     def GetHumbleLibrary(self):
         humble_library = HumbleLibrary.FromOrderRecords(self.__db.GetOrders())
@@ -292,6 +299,7 @@ class HumbleController:
             return HumbleLibrary(self.__hb.GetOrdersDetails(list(all_orders)))
 
         new_orders = all_orders - orders
+        self.__orders_to_update.update(new_orders)
         self.UpdateOrders(humble_library)
 
         return humble_library
@@ -303,23 +311,27 @@ class HumbleController:
         return steam_library
 
     def HumbleLogin(self):
+        print("Logging into Humble Bundle.")
         login_result = self.__hb.Login()
+        if not self.__interactive and login_result != hc.LoginResult.SUCCESS:
+            return False
+
         counter = 0
-        limit = 5 if self.__interactive else 1
+        limit = 5
         while login_result != hc.LoginResult.SUCCESS and counter < limit:
             match login_result:
                 case hc.LoginResult.GUARD:
                     guard = input("Please enter the humble bundle guard code from your email: ")
                     payload = {"guard": guard}
-                    login_result = hb.Login(payload)
+                    login_result = self.__hb.Login(payload)
                 case hc.LoginResult.BAD_USERNAME:
                     hb_account = input("Cannot find an account with that name, please enter a new account name: ")
                     hb.Set_Login(hb_account)
-                    login_result = hb.Login()
+                    login_result = self.__hb.Login()
                 case hc.LoginResult.BAD_PASSWORD:
                     hb_password = input("Password does not match, please enter a new password: ")
                     hb.Set_Password(hb_password)
-                    login_result = hb.Login()
+                    login_result = self.__hb.Login()
                 case hc.LoginResult.BLOCKED:
                     print("Yeah... Cloudflare doesn't like us. Shutting down!")
                     return False
@@ -331,20 +343,26 @@ class HumbleController:
         if counter == limit:
             return False
 
+        self.__humble_auth = True
         return True
 
     def SteamLogin(self):
+        print("Logging into Steam.")
         self.__steam.Login()
         login_result = self.__steam.GetLoginResult()
 
         if not self.__interactive and login_result != sc.LoginResult.SUCCESS:
+            self.__steam.EndPolling()
             return False
 
         while self.__steam.Polling():
-            print("Waiting for steam authentication login.")
+            print("Waiting Steam to authenticate.")
             sleep(5)
-
-        return self.__steam.GetLoginResult() == sc.LoginResult.SUCCESS
+        
+        if self.__steam.GetLoginResult() == sc.LoginResult.SUCCESS:
+            self.__steam_auth = True
+        
+        return self.__steam_auth
 
     def UpdateOrders(self, humble_library):
         update_order_dicts = self.__hb.GetOrdersDetails(list(self.__orders_to_update))
@@ -353,4 +371,3 @@ class HumbleController:
             humble_library.UpdateOrder(update_order_dict)
 
         self.__orders_to_update.clear()
-

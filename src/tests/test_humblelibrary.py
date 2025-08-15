@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta
-from humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey, ChoiceContent
-from humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice, assassinscreed_bundle, mixed_key_bundle
+from libraries.humblelibrary import OrderFactory, HumbleLibrary, HumbleChoice, HumbleBundle, HumbleStoreKey, ChoiceContent
+from tests.humble_ref_data import january_2019_monthly, april_2021_choice, june_2020_choice, april_2024_choice, june_2025_choice, assassinscreed_bundle, mixed_key_bundle
 import json
 
 def EqualInContent(collection_1, collection_2):

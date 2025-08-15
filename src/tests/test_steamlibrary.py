@@ -1,5 +1,5 @@
 import unittest
-from steamlibrary import SteamLibrary
+from libraries.steamlibrary import SteamLibrary
 from datetime import datetime
 
 class TestSteamLibrary(unittest.TestCase):

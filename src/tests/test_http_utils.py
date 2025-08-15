@@ -1,5 +1,5 @@
 import unittest
-from http_utils import SetCookieHeaderToMorsels
+from clients.http_utils import SetCookieHeaderToMorsels
 
 class TestHTTPUtils(unittest.TestCase):
 
