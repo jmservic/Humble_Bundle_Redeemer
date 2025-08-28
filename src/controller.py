@@ -28,7 +28,7 @@ class HumbleController:
 
         self.__choseChoiceContent()
 
-        self.__db.SaveHumbleLibrary(self.__humble_library)
+        self.__updateAndSaveLibrary()
 
     def __choseChoiceContent(self):
         unchosen_content = self.__humble_library.ChoiceChooseContent()
