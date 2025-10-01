@@ -542,7 +542,7 @@ class HumbleStoreKey(Order):
         self.__key_index = init_dict["keyindex"]
         self.__platform_id = init_dict["platform_id"]
         self.__expiration_date = datetime.fromisoformat(init_dict["expiration_date"]) if init_dict.get("expiration_date", None) else None  
-        self.__registered = False
+        self.__registered = init_dict["registered"]
 
         if self.__key_type and self.__key_type not in PLATFORMS:
             for platform in PLATFORMS:
