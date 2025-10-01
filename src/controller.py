@@ -208,7 +208,7 @@ class HumbleController:
                 self.__humble_library.SetProductRegistered(product_dict["humble_key"], product.ProductMachineName()) 
                 self.__db.Log(product.Key(), product.Name(), product.ProductMachineName(), "register", True)
             else:
-                error_code = res["\tpurchase_receipt_info"]["result_detail"]
+                error_code = res["purchase_receipt_info"]["result_detail"]
                 match error_code:
                     case 9:
                         print(f"\tThis Steam account already owns the product. Assuming the key was used.")
