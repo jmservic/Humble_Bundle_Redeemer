@@ -225,6 +225,7 @@ class HumbleController:
                 self.__db.Log(product.Key(), product.Name(), product.ProductMachineName(), "register", error_code)
                 if error_code == 53:
                     return
+            sleep(5) #Sleep to hopefully prevent steam from blocking me!
             print("")
 
     def FullyProcessChoiceContent(self, skip_owned_games=False, all_keys=False):
