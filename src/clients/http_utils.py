@@ -1,5 +1,5 @@
 import http.cookies
-from datetime import datetime
+import re
 
 def SetCookieHeaderToMorsels(headers):
     #headers is a list of (header, value) tuples like that returned from HTTPResponse.getheaders()
@@ -17,13 +17,14 @@ def SetCookieHeaderToMorsels(headers):
     return morsels
 
 def createRequestDateTimeStr(date_str):
-    try:
-        new_date_str = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S GMT").strftime("%a, %d-%b-%Y %H:%M:%S GMT")
-        return new_date_str
-    except:
-        try:
-            new_date_str = datetime.strptime(date_str, "%a, %d-%b-%y %H:%M:%S GMT").strftime("%a, %d-%b-%Y %H:%M:%S GMT")
-            return new_date_str
-        except:
-            return date_str
-        
+    good_format_regex = re.compile(r"(?:(\w*), (\d{1,2})-(\w*)-(\d{4}) (\d{1,2}):(\d{1,2}):(\d{1,2}) (\w+))")
+    bad_format_regex = re.compile(r"(?:(\w*), (\d{1,2}) (\w*) (\d{2,4}) (\d{1,2}):(\d{1,2}):(\d{1,2}) (\w+))|(?:(\w*), (\d{1,2})-(\w*)-(\d{2}) (\d{1,2}):(\d{1,2}):(\d{1,2}) (\w+))")
+
+    if good_format_regex.match(date_str):
+        return date_str
+    else:
+        m = bad_format_regex.match(date_str)
+        if m is not None:
+            return f"{m[1]}, {m[2]}-{m[3]}-{m[4] if len(m[4]) == 4 else 2000 + m[4]} {m[5]}:{m[6]}:{m[7]} {m[8]}"
+
+        return date_str
